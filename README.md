@@ -80,5 +80,3 @@ curl -X POST http://localhost:8080/api/tickets \
 
 ## 6. Notas sobre credenciais
 Para fins de desenvolvimento e testes, utilize credenciais fictícias no arquivo de configuração (application.properties).
-
-

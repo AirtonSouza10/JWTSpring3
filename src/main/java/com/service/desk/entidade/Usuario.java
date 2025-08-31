@@ -41,6 +41,9 @@ public class Usuario implements UserDetails{
 
     @Column(nullable = false)
     private String senha;
+    
+    @Column(nullable = false)
+    private String identificacao;
 
     @Column(nullable = false)
     private UserRoleEnum role;

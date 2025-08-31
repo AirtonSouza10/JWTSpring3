@@ -47,6 +47,7 @@ public class UsuarioServiceImpl implements UsuarioService{
 		
 		var novoUsuario = Usuario.builder()
 				.login(dadosRegistro.getLogin())
+				.identificacao(dadosRegistro.getIdentificacao())
 				.senha(encryptedPassword)
 				.role(dadosRegistro.getRole())
 				.build();

@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class NotaTipo{
+public class TipoNota{
 
 	@Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "nota_Tipo_seq")

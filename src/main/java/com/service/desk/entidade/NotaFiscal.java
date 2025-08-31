@@ -68,7 +68,7 @@ public class NotaFiscal{
     
     @ManyToOne
     @JoinColumn(name = "nota_tipo_id", nullable = false)
-    private NotaTipo tipo;
+    private TipoNota tipo;
     
     @ManyToOne
     @JoinColumn(name = "pessoa_id", nullable = false)

@@ -12,5 +12,6 @@ public class RequestMappingConstants {
     public static final String TELEFONE_END_POINT = VERSAO + "/telefones";
     public static final String TELEFONE_TIPOS_END_POINT = VERSAO + "/telefone-tipos";
     public static final String FORMA_PAGAMENTO_END_POINT = VERSAO + "/forma-pagamento";
-    public static final String TIPO_PAGAMENTO_END_POINT = VERSAO + "/tipo-pamganeto";
+    public static final String TIPO_PAGAMENTO_END_POINT = VERSAO + "/tipo-pagamento";
+    public static final String TIPO_NOTA_END_POINT = VERSAO + "/tipo-nota";
 }

@@ -1,5 +1,7 @@
 package com.service.desk.entidade;
 
+import java.util.Date;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -7,6 +9,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -30,4 +34,9 @@ public class FormaPagamento{
     
     @Column(nullable = false)
     private Integer qtdeParcelas;
+    
+	@Temporal(TemporalType.DATE)
+	private Date dtInclusao;
+	@Temporal(TemporalType.DATE)
+	private Date dtAtualizacao;
 }

@@ -45,6 +45,10 @@ public class ContaReceber implements Serializable {
 	private Date dtVencimento;
 	@Temporal(TemporalType.DATE)
 	private Date dtPagamento;
+	@Temporal(TemporalType.DATE)
+	private Date dtInclusao;
+	@Temporal(TemporalType.DATE)
+	private Date dtAtualizacao;
 	private BigDecimal valorTotal;
 	private BigDecimal valorDesconto;
 
@@ -55,4 +59,5 @@ public class ContaReceber implements Serializable {
 	@ManyToOne(targetEntity = Pessoa.class)
 	@JoinColumn(name = "forn_id", nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.CONSTRAINT, name = "forn_fk"))
 	private Fornecedor fornecedor;
+	
 }

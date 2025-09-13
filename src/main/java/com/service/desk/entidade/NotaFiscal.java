@@ -2,6 +2,8 @@ package com.service.desk.entidade;
 
 import java.math.BigDecimal;
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -10,6 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
@@ -61,6 +64,11 @@ public class NotaFiscal{
 
     @Temporal(TemporalType.DATE)
     private Date dtCompra;
+    
+	@Temporal(TemporalType.DATE)
+	private Date dtInclusao;
+	@Temporal(TemporalType.DATE)
+	private Date dtAtualizacao;
 
     @ManyToOne
     @JoinColumn(name = "fornecedor_id", nullable = false)
@@ -73,4 +81,7 @@ public class NotaFiscal{
     @ManyToOne
     @JoinColumn(name = "pessoa_id", nullable = false)
     private Pessoa pessoa;
+    
+    @OneToMany(mappedBy = "notaFiscal")
+    private List<NotaDuplicata> notas = new ArrayList<>();
 }

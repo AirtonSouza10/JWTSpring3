@@ -1,5 +1,6 @@
 package com.service.desk.entidade;
 
+import java.util.Date;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
@@ -11,6 +12,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -40,6 +43,11 @@ public class Fornecedor{
     
     @Column
     private String email;
+    
+	@Temporal(TemporalType.DATE)
+	private Date dtInclusao;
+	@Temporal(TemporalType.DATE)
+	private Date dtAtualizacao;
     
     @OneToMany(mappedBy = "fornecedor", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Telefone> telefones;

@@ -2,12 +2,14 @@ package com.service.desk.enumerator;
 
 public enum StatusContaEnum {
 	
-	COBRANCA("Pagar"),
-	VENCIDA("Vencida"),
-	ABERTA("Aberta"),
-	QUITADA("Quitada"),
-	NEGOCIADA("Negociada");
-	
+    ABERTA("Aberta"),
+    COBRANCA("Pagar"),
+    VENCIDA("Vencida"),
+    QUITADA("Quitada"),
+    NEGOCIADA("Negociada"),
+    PARCIAL("Parcialmente Paga"),
+    CANCELADA("Cancelada"),
+    SUSPENSA("Suspensa");
 
 	private String descricao;
 	

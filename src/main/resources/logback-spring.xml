@@ -1,10 +1,10 @@
 <configuration>
     <property name="LOG_PATH" value="logs"/>
 
+    <!-- Appender de arquivo: tudo vai para arquivo -->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_PATH}/app.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <!-- Arquivo rotaciona todo dia e mantém 30 arquivos -->
             <fileNamePattern>${LOG_PATH}/app.%d{yyyy-MM-dd}.log</fileNamePattern>
             <maxHistory>30</maxHistory>
         </rollingPolicy>
@@ -13,18 +13,24 @@
         </encoder>
     </appender>
 
-    <root level="DEBUG">
-        <appender-ref ref="FILE" />
-        <appender-ref ref="CONSOLE" />
-    </root>
-
+    <!-- Appender de console: só logs INFO e acima -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
         <encoder>
             <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
 
-    <logger name="org.springframework.web" level="DEBUG" additivity="false">
+    <!-- Root logger: tudo vai para arquivo, mas console só INFO+ -->
+    <root level="DEBUG">
+        <appender-ref ref="FILE" />
+        <appender-ref ref="CONSOLE" />
+    </root>
+
+    <!-- Logger Spring Web: pode ficar em INFO no console -->
+    <logger name="org.springframework.web" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
         <appender-ref ref="CONSOLE"/>
     </logger>

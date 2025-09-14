@@ -4,12 +4,8 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-import com.service.desk.enumerator.StatusContaEnum;
-
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -38,9 +34,6 @@ public class ContaPagar implements Serializable {
 
 	private String descricao;
 
-	@Enumerated(EnumType.STRING)
-	private StatusContaEnum status;
-
 	@Temporal(TemporalType.DATE)
 	private Date dtVencimento;
 	@Temporal(TemporalType.DATE)
@@ -60,6 +53,10 @@ public class ContaPagar implements Serializable {
 	@ManyToOne(targetEntity = Pessoa.class)
 	@JoinColumn(name = "forn_id", nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.CONSTRAINT, name = "forn_fk"))
 	private Fornecedor fornecedor;
+	
+	@ManyToOne
+	@JoinColumn(name = "status_id", nullable = false, foreignKey = @ForeignKey(name = "status_conta_fk"))
+	private StatusConta status;
 	
 	
 }

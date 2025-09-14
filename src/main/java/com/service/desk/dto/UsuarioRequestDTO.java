@@ -1,7 +1,5 @@
 package com.service.desk.dto;
 
-import com.service.desk.enumerator.UserRoleEnum;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,5 +13,4 @@ public class UsuarioRequestDTO {
 	private String login;
 	private String senha;
 	private String identificacao;
-	private UserRoleEnum role;
 }

@@ -1,19 +1,23 @@
 package com.service.desk.entidade;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.service.desk.enumerator.UserRoleEnum;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -27,11 +31,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Usuario implements UserDetails{
+public class Usuario implements UserDetails {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	@Id
+    @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "usuario_seq")
     @SequenceGenerator(name = "usuario_seq", sequenceName = "usuario_seq", allocationSize = 1)
     private Long id;
@@ -41,31 +45,52 @@ public class Usuario implements UserDetails{
 
     @Column(nullable = false)
     private String senha;
-    
+
     @Column(nullable = false)
     private String identificacao;
 
-    @Column(nullable = false)
-    private UserRoleEnum role;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "usuario_role",
+        joinColumns = @JoinColumn(name = "usuario_id"),
+        inverseJoinColumns = @JoinColumn(name = "role_id")
+    )	
+    private Set<Role> roles = new HashSet<>();
 
-	@Override
-	public Collection<? extends GrantedAuthority> getAuthorities() {
-		if(this.role == UserRoleEnum.ADMIN) {
-			return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"), new SimpleGrantedAuthority("ROLE_USER"));
-		}
-		return List.of(new SimpleGrantedAuthority("ROLE_USER"));
-	}
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return roles.stream()
+                    .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getNome().toUpperCase()))
+                    .collect(Collectors.toSet());
+    }
 
-	@Override
-	public String getPassword() {
-		// TODO Auto-generated method stub
-		return senha;
-	}
+    @Override
+    public String getPassword() {
+        return senha;
+    }
 
-	@Override
-	public String getUsername() {
-		// TODO Auto-generated method stub
-		return login;
-	}
+    @Override
+    public String getUsername() {
+        return login;
+    }
 
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
 }

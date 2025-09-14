@@ -20,14 +20,14 @@ import org.springframework.web.cors.CorsConfiguration;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfigurations {
-	
-	@Autowired
-	SecurityFilter securityFilter;
-	
-	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
-		return httpSecurity
-				.csrf(csrf -> csrf.disable())
+
+    @Autowired
+    private SecurityFilter securityFilter;
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+        return httpSecurity
+                .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(request -> {
                     var config = new CorsConfiguration();
                     config.setAllowCredentials(true);
@@ -36,28 +36,29 @@ public class SecurityConfigurations {
                     config.setAllowedMethods(List.of("*"));
                     return config;
                 }))
-				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-				.authorizeHttpRequests(authorize -> authorize
-						.requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
-						.requestMatchers(
-			                    "/v3/api-docs/**",
-			                    "/swagger-ui/**",
-			                    "/swagger-ui.html"
-			                ).permitAll()
-						.requestMatchers("/error").permitAll()
-						.anyRequest().authenticated()
-						)
-				.addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
-				.build();
-	}
-	
-	@Bean
-	public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-		return authenticationConfiguration.getAuthenticationManager();
-	}
-	
-	@Bean
-	public PasswordEncoder passwordEncoder () {
-		return new BCryptPasswordEncoder();
-	}
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/tipo-nota").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers(
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html"
+                        ).permitAll()
+                        .requestMatchers("/error").permitAll()
+                        .anyRequest().authenticated()
+                )
+                .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
+                .build();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 }

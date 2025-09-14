@@ -1,6 +1,7 @@
 package com.service.desk.service.impl;
 
 import java.util.Objects;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,6 +15,7 @@ import com.service.desk.dto.UsuarioRequestDTO;
 import com.service.desk.entidade.Usuario;
 import com.service.desk.enumerator.MensagemEnum;
 import com.service.desk.exceptions.NegocioException;
+import com.service.desk.repository.RoleRepository;
 import com.service.desk.repository.UsuarioRepository;
 import com.service.desk.security.TokenService;
 import com.service.desk.service.service.UsuarioService;
@@ -27,6 +29,8 @@ public class UsuarioServiceImpl implements UsuarioService{
 	private UsuarioRepository usuarioRepository;
 	@Autowired
 	private TokenService tokenService;
+	@Autowired
+	private RoleRepository roleRepository;
 	
 	@Override
 	public LoginResponseDTO authenticarUsuario (AuthenticationDTO dadosAutenticacao) {
@@ -45,11 +49,13 @@ public class UsuarioServiceImpl implements UsuarioService{
 		
 		var encryptedPassword = new BCryptPasswordEncoder().encode(dadosRegistro.getSenha());
 		
+	    var roleTipoNota = roleRepository.findByNome("USER");
+		
 		var novoUsuario = Usuario.builder()
 				.login(dadosRegistro.getLogin())
 				.identificacao(dadosRegistro.getIdentificacao())
 				.senha(encryptedPassword)
-				.role(dadosRegistro.getRole())
+				.roles(Set.of(roleTipoNota))
 				.build();
 		
 		usuarioRepository.save(novoUsuario);

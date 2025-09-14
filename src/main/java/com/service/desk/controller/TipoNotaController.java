@@ -36,7 +36,7 @@ public class TipoNotaController extends ControllerServiceDesk{
 		return new ResponseServiceDesk(tipoNotaService.listarTiposNota());
     }
 
-	@Operation(summary = "Salvar novo tipo de pagamento")
+	@Operation(summary = "Salvar novo tipo de nota")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseServiceDesk salvarTipoNota(@Valid @RequestBody TipoNotaRequestDTO dto) {
@@ -44,7 +44,7 @@ public class TipoNotaController extends ControllerServiceDesk{
         return new ResponseServiceDesk(responseSucesso(MensagemEnum.MSGS001));
     }
 
-	@Operation(summary = "Atualiza dados do tipo de pagamento")
+	@Operation(summary = "Atualiza dados do tipo de nota")
 	@PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseServiceDesk atualizarTipoNota(@PathVariable Long id , @Valid @RequestBody TipoNotaRequestDTO dto) {

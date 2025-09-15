@@ -14,4 +14,5 @@ public class RequestMappingConstants {
     public static final String FORMA_PAGAMENTO_END_POINT = VERSAO + "/forma-pagamento";
     public static final String TIPO_PAGAMENTO_END_POINT = VERSAO + "/tipo-pagamento";
     public static final String TIPO_NOTA_END_POINT = VERSAO + "/tipo-nota";
+    public static final String STATUS_CONTA_END_POINT = VERSAO + "/status-conta";
 }

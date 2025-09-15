@@ -12,19 +12,23 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "status_conta")
-@AllArgsConstructor
 @Data
-@SequenceGenerator(name = "seq_status_contar", sequenceName = "seq_status_conta", allocationSize = 1, initialValue = 1)
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class StatusConta implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_status_conta")
+    @SequenceGenerator(name = "status_conta_seq", sequenceName = "status_conta_seq", allocationSize = 1)
 	private Long id;
 
 	private String descricao;

@@ -11,5 +11,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class TelefoneTipoDTO {
 	private Long id;
-    private String descricacao;
+    private String descricao;
 }

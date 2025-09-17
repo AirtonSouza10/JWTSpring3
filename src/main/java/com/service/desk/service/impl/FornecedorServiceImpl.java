@@ -45,7 +45,7 @@ public class FornecedorServiceImpl implements FornecedorService {
     		var telefonesList = f.getTelefones().stream().map(t-> TelefoneDTO.builder()
     				.id(t.getId())
     				.numero(t.getNumero())
-    				.tpTelefone(TelefoneTipoDTO.builder().id(t.getTpTelefone().getId()).descricacao(t.getTpTelefone().getDescricao()).build())
+    				.tpTelefone(TelefoneTipoDTO.builder().id(t.getTpTelefone().getId()).descricao(t.getTpTelefone().getDescricao()).build())
     				.build()
     			).toList();
     		

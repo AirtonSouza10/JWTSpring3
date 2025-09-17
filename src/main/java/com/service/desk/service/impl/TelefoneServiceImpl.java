@@ -28,7 +28,7 @@ public class TelefoneServiceImpl implements TelefoneService {
     	tipos.forEach(f->{    		    			
     		var tipo = TelefoneTipoDTO.builder()
     				.id(f.getId())
-    				.descricacao(f.getDescricao())
+    				.descricao(f.getDescricao())
     				.build();
     		
     		listaTiposTelefone.add(tipo);

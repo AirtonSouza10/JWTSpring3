@@ -44,6 +44,6 @@ public class Endereco{
     private Fornecedor fornecedor;
     
     @ManyToOne
-    @JoinColumn(name = "pessoa_id", nullable = false)
+    @JoinColumn(name = "pessoa_id")
     private Pessoa pessoa;
 }

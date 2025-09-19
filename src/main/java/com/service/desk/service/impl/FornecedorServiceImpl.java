@@ -17,8 +17,10 @@ import com.service.desk.entidade.Fornecedor;
 import com.service.desk.entidade.Telefone;
 import com.service.desk.repository.EnderecoTipoRepository;
 import com.service.desk.repository.FornecedorRepository;
+import com.service.desk.repository.PessoaRepository;
 import com.service.desk.repository.TelefoneTipoRepository;
 import com.service.desk.service.service.FornecedorService;
+import com.service.desk.utils.UsuarioLogadoUtil;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +38,10 @@ public class FornecedorServiceImpl implements FornecedorService {
 
 	@Autowired
 	private EnderecoTipoRepository enderecoTipoRepository;
-    
+	
+	@Autowired
+	private PessoaRepository pessoaRepository;
+	    
     @Override
     public List<FornecedorResponseDTO> listarFornecdores() {
     	var listaFornecedores = new ArrayList<FornecedorResponseDTO>();
@@ -117,7 +122,7 @@ public class FornecedorServiceImpl implements FornecedorService {
 
         fornecedor.setTelefones(telefones);
         fornecedor.setEnderecos(enderecos);
-
+        
         fornecedorRepository.save(fornecedor);	
     }
     

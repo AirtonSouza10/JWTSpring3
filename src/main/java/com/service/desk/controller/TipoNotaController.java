@@ -2,6 +2,7 @@ package com.service.desk.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -50,5 +51,21 @@ public class TipoNotaController extends ControllerServiceDesk{
     public ResponseServiceDesk atualizarTipoNota(@PathVariable Long id , @Valid @RequestBody TipoNotaRequestDTO dto) {
 		tipoNotaService.atualizarTipoNota(id,dto);
         return new ResponseServiceDesk(responseSucesso(MensagemEnum.MSGS001));
+    }
+	
+    @Operation(summary = "Remove um tipo de nota pelo ID")
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseServiceDesk deletarTipoNota(@PathVariable Long id) {
+        tipoNotaService.deletarTipoNota(id);
+        return new ResponseServiceDesk(responseSucesso(MensagemEnum.MSGS003));
+    }
+    
+    @Operation(summary = "Busca tipo de nota pelo ID")
+    @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseServiceDesk buscarTipoNotaPorId(@PathVariable Long id) {
+        var tipoNota = tipoNotaService.buscarPorId(id);
+        return new ResponseServiceDesk(tipoNota);
     }
 }

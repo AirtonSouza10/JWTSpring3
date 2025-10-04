@@ -61,6 +61,9 @@ public class NotaFiscal{
 
     @Column(nullable = true)
     private BigDecimal valorMulta;
+    
+    @Column(nullable = true)
+    private BigDecimal valorIpi;
 
     @Temporal(TemporalType.DATE)
     private Date dtCompra;
@@ -82,6 +85,10 @@ public class NotaFiscal{
     @JoinColumn(name = "pessoa_id", nullable = false)
     private Pessoa pessoa;
     
+    @ManyToOne
+    @JoinColumn(name = "filial_id", nullable = false)
+    private Filial filial;
+    
     @OneToMany(mappedBy = "notaFiscal")
-    private List<NotaDuplicata> notas = new ArrayList<>();
+    private List<NotaDuplicata> notasDuplicata = new ArrayList<>();
 }

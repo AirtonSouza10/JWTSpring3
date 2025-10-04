@@ -59,5 +59,20 @@ public class TipoNotaServiceImpl implements TipoNotaService {
         tipoNotaRepository.save(tipoNota);   	
     }
 	
-	
+    @Override
+    @Transactional
+    public void deletarTipoNota(Long id) {
+        var tipoNota = tipoNotaRepository.findById(id).orElseThrow();
+        tipoNotaRepository.delete(tipoNota);
+    }
+    
+    @Override
+    public TipoNotaResponseDTO buscarPorId(Long id) {
+        var tipoNota = tipoNotaRepository.findById(id).orElseThrow();
+
+        return TipoNotaResponseDTO.builder()
+                .id(tipoNota.getId())
+                .descricao(tipoNota.getDescricao())
+                .build();
+    }	
 }

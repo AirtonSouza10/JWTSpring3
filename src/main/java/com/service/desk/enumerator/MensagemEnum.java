@@ -6,6 +6,7 @@ import lombok.Getter;
 public enum MensagemEnum {
 	MSGS001("MSGS001"),
 	MSGS002("MSGS002"),
+	MSGS003("MSGS003"),
 	
     MSGE001("MSGE001"),
     MSGE002("MSGE002"),

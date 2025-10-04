@@ -13,5 +13,9 @@ public interface TipoNotaService {
 
 	void atualizarTipoNota(Long id, TipoNotaRequestDTO tipoNotaRequestDTO);
 
+	void deletarTipoNota(Long id);
+
+	TipoNotaResponseDTO buscarPorId(Long id);
+
 
 }

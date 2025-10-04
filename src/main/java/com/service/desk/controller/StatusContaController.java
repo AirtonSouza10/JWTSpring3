@@ -2,6 +2,7 @@ package com.service.desk.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -51,4 +52,19 @@ public class StatusContaController extends ControllerServiceDesk{
 		statusService.atualizarStatus(id,dto);
         return new ResponseServiceDesk(responseSucesso(MensagemEnum.MSGS001));
     }
+	
+	@Operation(summary = "Retorna um status pelo ID")
+	@GetMapping("/{id}")
+	@ResponseStatus(HttpStatus.OK)
+	public ResponseServiceDesk buscarStatusPorId(@PathVariable Long id) {
+	    return new ResponseServiceDesk(statusService.buscarPorId(id));
+	}
+
+	@Operation(summary = "Deleta um status pelo ID")
+	@DeleteMapping("/{id}")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public ResponseServiceDesk deletarStatus(@PathVariable Long id) {
+	    statusService.deletarStatus(id);
+	      return new ResponseServiceDesk(responseSucesso(MensagemEnum.MSGS003));
+	}
 }

@@ -58,5 +58,23 @@ public class StatusContaServiceImpl implements StatusContaService {
 
         statusContaRepository.save(status);   	
     }
+    
+    @Override
+    public StatusContaResponseDTO buscarPorId(Long id) {
+        var status = statusContaRepository.findById(id).orElseThrow();
+
+        return StatusContaResponseDTO.builder()
+                .id(status.getId())
+                .descricao(status.getDescricao())
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public void deletarStatus(Long id) {
+        var status = statusContaRepository.findById(id).orElseThrow();
+
+        statusContaRepository.delete(status);
+    }
 	
 }

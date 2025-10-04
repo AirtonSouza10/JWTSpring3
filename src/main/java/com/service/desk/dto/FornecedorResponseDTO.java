@@ -16,4 +16,5 @@ public class FornecedorResponseDTO {
     private String tpIdentificacao;
     private List<TelefoneDTO> telefones;
     private List<EnderecoDTO> enderecos;
+    private Boolean ativo;
 }

@@ -35,11 +35,26 @@ public class FilialServiceImpl implements FilialService {
     				.identificacao(f.getIdentificacao())
     				.email(f.getEmail())
     				.tpidentificacao(f.getTpIdentificacao())
+    				.ativo(f.getAtivo())
     				.build();
     		
     		listaFiliais.add(filial);
     	});
     	return listaFiliais;
+    }
+   
+    @Override
+    public FilialResponseDTO buscarPorId(Long id) {
+        var filial = filialRepository.findById(id).orElseThrow();
+        
+        return FilialResponseDTO.builder()
+                .id(filial.getId())
+                .nome(filial.getNome())
+                .identificacao(filial.getIdentificacao())
+                .tpidentificacao(filial.getTpIdentificacao())
+                .email(filial.getEmail())
+                .ativo(filial.getAtivo())
+                .build();
     }
     
     @Override
@@ -50,6 +65,7 @@ public class FilialServiceImpl implements FilialService {
         		.tpIdentificacao(dto.getTpidentificacao())
         		.email(dto.getEmail())
         		.nome(dto.getNome())
+        		.ativo(true)
                 .build();
 
         filialRepository.save(filial);	
@@ -59,7 +75,7 @@ public class FilialServiceImpl implements FilialService {
     @Transactional
     public void atualizarFilial(Long id, FilialRequestDTO dto) {
         var filial = filialRepository.findById(id).orElseThrow();
-
+        
         filial.setNome(dto.getNome());
         filial.setIdentificacao(dto.getIdentificacao());
         filial.setTpIdentificacao(dto.getTpidentificacao());
@@ -67,5 +83,12 @@ public class FilialServiceImpl implements FilialService {
 
         filialRepository.save(filial);   	
     }
-	
+    
+    @Override
+    @Transactional
+    public void atualizarStatus(Long id, Boolean ativo) {
+        var filial = filialRepository.findById(id).orElseThrow();
+        filial.setAtivo(ativo);
+        filialRepository.save(filial);
+    }
 }

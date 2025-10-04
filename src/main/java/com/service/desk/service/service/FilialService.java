@@ -13,5 +13,9 @@ public interface FilialService {
 
 	void atualizarFilial(Long id, FilialRequestDTO dto);
 
+	FilialResponseDTO buscarPorId(Long id);
+
+	void atualizarStatus(Long id, Boolean ativo);
+
 
 }

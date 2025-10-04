@@ -41,6 +41,9 @@ public class Filial{
     @Column
     private String email;
     
+    @Column(nullable = false)
+    private Boolean ativo = true;
+    
 	@Temporal(TemporalType.DATE)
 	private Date dtInclusao;
 	@Temporal(TemporalType.DATE)

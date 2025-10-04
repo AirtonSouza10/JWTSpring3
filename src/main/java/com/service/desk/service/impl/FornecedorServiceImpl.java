@@ -174,5 +174,47 @@ public class FornecedorServiceImpl implements FornecedorService {
 
         fornecedorRepository.save(fornecedor);   	
     }
+    
+    @Override
+    public FornecedorResponseDTO buscarPorId(Long id) {
+        var fornecedor = fornecedorRepository.findById(id).orElseThrow();
+
+        var telefonesList = fornecedor.getTelefones().stream().map(t -> TelefoneDTO.builder()
+                .id(t.getId())
+                .numero(t.getNumero())
+                .tpTelefone(TelefoneTipoDTO.builder().id(t.getTpTelefone().getId()).descricao(t.getTpTelefone().getDescricao()).build())
+                .build()).toList();
+
+        var enderecosList = fornecedor.getEnderecos().stream().map(e -> EnderecoDTO.builder()
+                .id(e.getId())
+                .logradouro(e.getLogradouro())
+                .complemento(e.getComplemento())
+                .numero(e.getNumero())
+                .cidade(e.getCidade())
+                .estado(e.getEstado())
+                .bairro(e.getBairro())
+                .uf(e.getUf())
+                .cep(e.getCep())
+                .tipoEndereco(EnderecoTipoDTO.builder().id(e.getEnderecoTipo().getId()).descricao(e.getEnderecoTipo().getDescricao()).build())
+                .build()).toList();
+
+        return FornecedorResponseDTO.builder()
+                .id(fornecedor.getId())
+                .nome(fornecedor.getNome())
+                .identificacao(fornecedor.getIdentificacao())
+                .tpIdentificacao(fornecedor.getTpIdentificacao())
+                .telefones(telefonesList)
+                .enderecos(enderecosList)
+                .ativo(fornecedor.getAtivo())
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public void atualizarStatus(Long id, Boolean ativo) {
+        var fornecedor = fornecedorRepository.findById(id).orElseThrow();
+        fornecedor.setAtivo(ativo);
+        fornecedorRepository.save(fornecedor);
+    }
 
 }

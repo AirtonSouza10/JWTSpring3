@@ -13,4 +13,8 @@ public interface TipoPagamentoService {
 
 	void atualizarTipoPagamento(Long id, TipoPagamentoRequestDTO tipoPagamentoRequestDTO);
 
+	TipoPagamentoResponseDTO buscarPorId(Long id);
+
+	void deletarTipoPagamento(Long id);
+
 }

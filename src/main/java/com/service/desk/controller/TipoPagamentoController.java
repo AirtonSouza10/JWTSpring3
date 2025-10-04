@@ -2,6 +2,7 @@ package com.service.desk.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -50,5 +51,21 @@ public class TipoPagamentoController extends ControllerServiceDesk{
     public ResponseServiceDesk atualizarTipoPagamento(@PathVariable Long id , @Valid @RequestBody TipoPagamentoRequestDTO dto) {
 		tipoPagamentoService.atualizarTipoPagamento(id,dto);
         return new ResponseServiceDesk(responseSucesso(MensagemEnum.MSGS001));
+    }
+	
+    @Operation(summary = "Remove um tipo de pagamento pelo ID")
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public ResponseServiceDesk deletarTipoPagamento(@PathVariable Long id) {
+        tipoPagamentoService.deletarTipoPagamento(id);
+        return new ResponseServiceDesk(responseSucesso(MensagemEnum.MSGS003));
+
+    }
+    
+    @Operation(summary = "Retorna um tipo de pagamento por ID")
+    @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseServiceDesk buscarPorId(@PathVariable Long id) {
+        return new ResponseServiceDesk(tipoPagamentoService.buscarPorId(id));
     }
 }

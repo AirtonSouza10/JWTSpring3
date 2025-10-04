@@ -13,4 +13,8 @@ public interface FormaPagamentoService {
 
 	void atualizarFormaPagamento(Long id, FormaPagamentoRequestDTO formaPagamentoRequestDTO);
 
+	FormaPagamentoResponseDTO buscarPorId(Long id);
+
+	void deletarFormaPagamento(Long id);
+
 }

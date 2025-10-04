@@ -41,6 +41,17 @@ public class FormaPagamentoServiceImpl implements FormaPagamentoService {
     }
     
     @Override
+    public FormaPagamentoResponseDTO buscarPorId(Long id) {
+        var formaPagamento = formaPagamentoRepository.findById(id).orElseThrow();
+
+        return FormaPagamentoResponseDTO.builder()
+                .id(formaPagamento.getId())
+                .descricao(formaPagamento.getDescricao())
+                .qtdeParcelas(formaPagamento.getQtdeParcelas())
+                .build();
+    }
+    
+    @Override
     @Transactional
     public void salvarFormaPagamento(FormaPagamentoRequestDTO formaPagamentoRequestDTO) {
         var formaPagamento = FormaPagamento.builder()
@@ -60,6 +71,13 @@ public class FormaPagamentoServiceImpl implements FormaPagamentoService {
         formaPagamento.setQtdeParcelas(formaPagamentoRequestDTO.getQtdeParcelas());
 
         formaPagamentoRepository.save(formaPagamento);   	
+    }
+    
+    @Override
+    @Transactional
+    public void deletarFormaPagamento(Long id) {
+        var formaPagamento = formaPagamentoRepository.findById(id).orElseThrow();
+        formaPagamentoRepository.delete(formaPagamento);
     }
 	
 }

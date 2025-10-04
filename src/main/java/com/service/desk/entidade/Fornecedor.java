@@ -38,11 +38,14 @@ public class Fornecedor{
     @Column(nullable = false)
     private String identificacao;
     
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String tpIdentificacao;
     
     @Column
     private String email;
+    
+    @Column(nullable = false)
+    private Boolean ativo = true;
     
 	@Temporal(TemporalType.DATE)
 	private Date dtInclusao;

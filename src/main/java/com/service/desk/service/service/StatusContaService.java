@@ -13,5 +13,9 @@ public interface StatusContaService {
 
 	void atualizarStatus(Long id, StatusContaRequestDTO formaPagamentoResponseDTO);
 
+	StatusContaResponseDTO buscarPorId(Long id);
+
+	void deletarStatus(Long id);
+
 
 }

@@ -2,6 +2,7 @@ package com.service.desk.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,6 +36,13 @@ public class FormaPagamentoController extends ControllerServiceDesk{
     public ResponseServiceDesk listarFormasPagamento() {
 		return new ResponseServiceDesk(formaPagamentoService.listarFormasPagamento());
     }
+	
+    @Operation(summary = "Retorna uma forma de pagamento por ID")
+    @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseServiceDesk buscarPorId(@PathVariable Long id) {
+        return new ResponseServiceDesk(formaPagamentoService.buscarPorId(id));
+    }
 
 	@Operation(summary = "Salvar nova forma de pagmaneto")
     @PostMapping
@@ -50,5 +58,13 @@ public class FormaPagamentoController extends ControllerServiceDesk{
     public ResponseServiceDesk atualizarFormaPagamento(@PathVariable Long id , @Valid @RequestBody FormaPagamentoRequestDTO dto) {
 		formaPagamentoService.atualizarFormaPagamento(id,dto);
         return new ResponseServiceDesk(responseSucesso(MensagemEnum.MSGS001));
+    }
+	
+    @Operation(summary = "Remove uma forma de pagamento pelo ID")
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public ResponseServiceDesk deletarFormaPagamento(@PathVariable Long id) {
+        formaPagamentoService.deletarFormaPagamento(id);
+        return new ResponseServiceDesk(responseSucesso(MensagemEnum.MSGS003));
     }
 }

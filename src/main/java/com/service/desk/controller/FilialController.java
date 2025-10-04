@@ -35,6 +35,13 @@ public class FilialController extends ControllerServiceDesk{
     public ResponseServiceDesk listarFiliais() {
 		return new ResponseServiceDesk(filialService.listarFiliais());
     }
+	
+	@Operation(summary = "Retorna uma filial pelo ID")
+	@GetMapping("/{id}")
+	@ResponseStatus(HttpStatus.OK)
+	public ResponseServiceDesk buscarFilialPorId(@PathVariable Long id) {
+	    return new ResponseServiceDesk(filialService.buscarPorId(id));
+	}
 
 	@Operation(summary = "Salvar nova filial")
     @PostMapping
@@ -51,4 +58,12 @@ public class FilialController extends ControllerServiceDesk{
 		filialService.atualizarFilial(id,dto);
         return new ResponseServiceDesk(responseSucesso(MensagemEnum.MSGS001));
     }
+
+	@Operation(summary = "Atualiza status (ativo/inativo) da filial")
+	@PutMapping("/{id}/status")
+	@ResponseStatus(HttpStatus.OK)
+	public ResponseServiceDesk atualizarStatusFilial(@PathVariable Long id, @RequestBody Boolean ativo) {
+	    filialService.atualizarStatus(id, ativo);
+	    return new ResponseServiceDesk(responseSucesso(MensagemEnum.MSGS001));
+	}
 }

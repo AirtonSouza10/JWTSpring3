@@ -40,6 +40,15 @@ public class TipoPagamentoServiceImpl implements TipoPagamentoService {
     }
     
     @Override
+    public TipoPagamentoResponseDTO buscarPorId(Long id) {
+        var tipoPagamento = tipoPagamentoRepository.findById(id).orElseThrow();
+        return TipoPagamentoResponseDTO.builder()
+                .id(tipoPagamento.getId())
+                .descricao(tipoPagamento.getDescricao())
+                .build();
+    }
+    
+    @Override
     @Transactional
     public void salvarTipoPagamento(TipoPagamentoRequestDTO tipoPagamentoRequestDTO) {
         var tipoPagamento = TipoPagamento.builder()
@@ -57,6 +66,13 @@ public class TipoPagamentoServiceImpl implements TipoPagamentoService {
         formaPagamento.setDescricao(tipoPagamentoRequestDTO.getDescricao());
 
         tipoPagamentoRepository.save(formaPagamento);   	
+    }
+    
+    @Override
+    @Transactional
+    public void deletarTipoPagamento(Long id) {
+        var tipoPagamento = tipoPagamentoRepository.findById(id).orElseThrow();
+        tipoPagamentoRepository.delete(tipoPagamento);
     }
 	
 	

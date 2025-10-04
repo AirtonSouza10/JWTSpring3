@@ -12,4 +12,8 @@ public interface FornecedorService {
 	void salvarFornecedores(FornecedorRequestDTO fornecedorRequest);
 
 	void atualizarFornecedores(Long id,FornecedorRequestDTO fornecedorRequest);
+
+	void atualizarStatus(Long id, Boolean ativo);
+
+	FornecedorResponseDTO buscarPorId(Long id);
 }

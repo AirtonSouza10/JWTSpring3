@@ -51,4 +51,19 @@ public class FornecedorController extends ControllerServiceDesk{
 		fornecedorService.atualizarFornecedores(id,dto);
         return new ResponseServiceDesk(responseSucesso(MensagemEnum.MSGS001));
     }
+
+	@Operation(summary = "Retorna um fornecedor pelo ID")
+	@GetMapping("/{id}")
+	@ResponseStatus(HttpStatus.OK)
+	public ResponseServiceDesk buscarFornecedorPorId(@PathVariable Long id) {
+	    return new ResponseServiceDesk(fornecedorService.buscarPorId(id));
+	}
+
+	@Operation(summary = "Atualiza status (ativo/inativo) do fornecedor")
+	@PutMapping("/{id}/status")
+	@ResponseStatus(HttpStatus.OK)
+	public ResponseServiceDesk atualizarStatusFornecedor(@PathVariable Long id, @RequestBody Boolean ativo) {
+	    fornecedorService.atualizarStatus(id, ativo);
+	    return new ResponseServiceDesk(responseSucesso(MensagemEnum.MSGS001));
+	}
 }

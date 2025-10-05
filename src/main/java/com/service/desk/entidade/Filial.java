@@ -36,7 +36,7 @@ public class Filial{
     private String identificacao;
     
     @Column(nullable = false)
-    private String tpIdentificacao;
+    private Integer tpIdentificacao;
     
     @Column
     private String email;

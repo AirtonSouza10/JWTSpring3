@@ -11,7 +11,7 @@ public class FilialResponseDTO {
     private Long id;
     private String nome;
     private String identificacao;
-    private String tpidentificacao;
+    private Integer tpidentificacao;
     private String email;
     private Boolean ativo; 
 }

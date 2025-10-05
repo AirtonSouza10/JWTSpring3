@@ -62,7 +62,7 @@ public class FilialServiceImpl implements FilialService {
     public void salvarFilial(FilialRequestDTO dto) {
         var filial = Filial.builder()
         		.identificacao(dto.getIdentificacao())
-        		.tpIdentificacao(dto.getTpidentificacao())
+        		.tpIdentificacao(dto.getIdentificacao().length() == 11 ? 4 : 3)
         		.email(dto.getEmail())
         		.nome(dto.getNome())
         		.ativo(true)
@@ -78,7 +78,7 @@ public class FilialServiceImpl implements FilialService {
         
         filial.setNome(dto.getNome());
         filial.setIdentificacao(dto.getIdentificacao());
-        filial.setTpIdentificacao(dto.getTpidentificacao());
+        filial.setTpIdentificacao(dto.getIdentificacao().length() == 11 ? 4 : 3);
         filial.setEmail(dto.getEmail());
 
         filialRepository.save(filial);   	

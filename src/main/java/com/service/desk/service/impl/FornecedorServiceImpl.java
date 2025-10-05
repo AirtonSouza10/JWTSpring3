@@ -75,6 +75,8 @@ public class FornecedorServiceImpl implements FornecedorService {
     				.telefones(telefonesList)
     				.enderecos(enderecosList)
     				.nome(f.getNome())
+    				.email(f.getEmail())
+    				.ativo(f.getAtivo())
     				.build();
     		
     		listaFornecedores.add(fornecedor);
@@ -88,8 +90,9 @@ public class FornecedorServiceImpl implements FornecedorService {
         var fornecedor = Fornecedor.builder()
                 .identificacao(fornecedorRequest.getIdentificacao())
                 .nome(fornecedorRequest.getNome())
-                .tpIdentificacao(fornecedorRequest.getTpIdentificacao())
+                .tpIdentificacao(fornecedorRequest.getIdentificacao().length() ==11 ? 4 : 3)
                 .email(fornecedorRequest.getEmail())
+                .ativo(true)
                 .build();
 
         var telefones = fornecedorRequest.getTelefones().stream().map(telDto -> {
@@ -133,47 +136,61 @@ public class FornecedorServiceImpl implements FornecedorService {
 
         fornecedor.setNome(fornecedorRequest.getNome());
         fornecedor.setIdentificacao(fornecedorRequest.getIdentificacao());
-        fornecedor.setTpIdentificacao(fornecedorRequest.getTpIdentificacao());
+        fornecedor.setTpIdentificacao(fornecedorRequest.getIdentificacao().length() == 11 ? 4 : 3);
         fornecedor.setEmail(fornecedorRequest.getEmail());
+        fornecedor.setAtivo(fornecedorRequest.getAtivo());
 
+        // Certifique-se de que as listas são mutáveis
+        if (fornecedor.getTelefones() == null) {
+            fornecedor.setTelefones(new ArrayList<>());
+        }
+        if (fornecedor.getEnderecos() == null) {
+            fornecedor.setEnderecos(new ArrayList<>());
+        }
+
+        // Limpar listas existentes (mutáveis)
         fornecedor.getTelefones().clear();
         fornecedor.getEnderecos().clear();
 
-        List<Telefone> telefones = fornecedorRequest.getTelefones().stream().map(telDto -> {
-            var telefone = new Telefone();
+        // Preencher telefones
+        fornecedorRequest.getTelefones().forEach(telDto -> {
+            Telefone telefone = new Telefone();
+            telefone.setId(telDto.getId()); // null se novo
             telefone.setNumero(telDto.getNumero());
+            telefone.setFornecedor(fornecedor);
 
             var tipo = telefoneTipoRepository.findById(telDto.getTpTelefone().getId())
                     .orElseThrow();
-
             telefone.setTpTelefone(tipo);
-            telefone.setFornecedor(fornecedor);
-            return telefone;
-        }).toList();
 
-        List<Endereco> enderecos = fornecedorRequest.getEnderecos().stream().map(endDto -> {
-            var endereco = new Endereco();
+            fornecedor.getTelefones().add(telefone);
+        });
+
+        // Preencher endereços
+        fornecedorRequest.getEnderecos().forEach(endDto -> {
+            Endereco endereco = new Endereco();
+            endereco.setId(endDto.getId()); // null se novo
             endereco.setLogradouro(endDto.getLogradouro());
             endereco.setNumero(endDto.getNumero());
             endereco.setComplemento(endDto.getComplemento());
             endereco.setBairro(endDto.getBairro());
             endereco.setCidade(endDto.getCidade());
             endereco.setEstado(endDto.getEstado());
+            endereco.setUf(endDto.getUf());
             endereco.setCep(endDto.getCep());
+            endereco.setFornecedor(fornecedor);
 
             var tipo = enderecoTipoRepository.findById(endDto.getTipoEndereco().getId())
                     .orElseThrow();
-
             endereco.setEnderecoTipo(tipo);
-            endereco.setFornecedor(fornecedor);
-            return endereco;
-        }).toList();
 
-        fornecedor.setTelefones(telefones);
-        fornecedor.setEnderecos(enderecos);
+            fornecedor.getEnderecos().add(endereco);
+        });
 
-        fornecedorRepository.save(fornecedor);   	
+        fornecedorRepository.save(fornecedor);
     }
+
+
     
     @Override
     public FornecedorResponseDTO buscarPorId(Long id) {
@@ -206,6 +223,7 @@ public class FornecedorServiceImpl implements FornecedorService {
                 .telefones(telefonesList)
                 .enderecos(enderecosList)
                 .ativo(fornecedor.getAtivo())
+                .email(fornecedor.getEmail())
                 .build();
     }
 

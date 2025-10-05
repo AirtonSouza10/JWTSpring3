@@ -13,8 +13,9 @@ public class FornecedorResponseDTO {
     private Long id;
     private String nome;
     private String identificacao;
-    private String tpIdentificacao;
+    private Integer tpIdentificacao;
     private List<TelefoneDTO> telefones;
     private List<EnderecoDTO> enderecos;
     private Boolean ativo;
+    private String email;
 }

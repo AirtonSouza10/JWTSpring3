@@ -39,7 +39,7 @@ public class Fornecedor{
     private String identificacao;
     
     @Column(nullable = true)
-    private String tpIdentificacao;
+    private Integer tpIdentificacao;
     
     @Column
     private String email;

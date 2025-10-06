@@ -2,20 +2,28 @@ package com.service.desk.utils;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
+
+import com.service.desk.entidade.Usuario;
 
 public class UsuarioLogadoUtil {
     private UsuarioLogadoUtil() {
     }
 
-    public static UserDetails getUsuarioLogado() {
+    public static Usuario getUsuarioLogado() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
         if (authentication != null && authentication.isAuthenticated()) {
             Object principal = authentication.getPrincipal();
-            if (principal instanceof UserDetails userDetails) {
-                return userDetails;
+
+            if (principal instanceof Usuario usuario) {
+                return usuario;
             }
         }
         return null;
+    }
+
+    public static Long getIdUsuarioLogado() {
+        Usuario usuario = getUsuarioLogado();
+        return usuario != null ? usuario.getId() : null;
     }
 }

@@ -17,4 +17,5 @@ public class RequestMappingConstants {
     public static final String FILIAL_END_POINT = VERSAO + "/filial";
     public static final String ENDERECO_END_POINT = VERSAO + "/enderecos";
     public static final String NOTA_FISCAL_END_POINT = VERSAO + "/nota-fiscal";
+    public static final String DUPLICATA_END_POINT = VERSAO + "/duplicata";
 }

@@ -12,4 +12,8 @@ public interface NotaFiscalService {
 	void salvarNotaFiscal(NotaFiscalRequestDTO dto);
 
 	void atualizarNotaFiscal(Long id, NotaFiscalRequestDTO dto);
+
+	NotaFiscalResponseDTO buscarNotaFiscalPorId(Long id);
+
+	void excluirNotaFiscal(Long id);
 }

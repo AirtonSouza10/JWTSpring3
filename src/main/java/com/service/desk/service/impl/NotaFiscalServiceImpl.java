@@ -23,6 +23,7 @@ import com.service.desk.repository.ParcelaRepository;
 import com.service.desk.repository.PessoaRepository;
 import com.service.desk.repository.TipoNotaRepository;
 import com.service.desk.service.service.NotaFiscalService;
+import com.service.desk.utils.UsuarioLogadoUtil;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -96,10 +97,10 @@ public class NotaFiscalServiceImpl implements NotaFiscalService {
                 .orElseThrow(() -> new RuntimeException("Fornecedor não encontrado"));
         var tipoNota = tipoNotaRepository.findById(dto.getTipoNotaId())
                 .orElseThrow(() -> new RuntimeException("Tipo de nota não encontrado"));
-        var pessoa = pessoaRepository.findById(dto.getPessoaId())
-                .orElseThrow(() -> new RuntimeException("Pessoa não encontrada"));
         var filial = filialRepository.findById(dto.getFilialId())
                 .orElseThrow(() -> new RuntimeException("Filial não encontrada"));
+        var idPessoa = UsuarioLogadoUtil.getIdUsuarioLogado();
+        var pessoa = pessoaRepository.findById(idPessoa).orElseThrow();
 
         NotaFiscal nf = new NotaFiscal();
         nf.setNumero(dto.getNumero());
@@ -194,5 +195,47 @@ public class NotaFiscalServiceImpl implements NotaFiscalService {
         }
         notaFiscalRepository.save(notaFiscal); 	
     }
+    
+    @Override
+    public NotaFiscalResponseDTO buscarNotaFiscalPorId(Long id) {
+        var nota = notaFiscalRepository.findById(id).orElseThrow();
+
+        List<NotaDuplicataResponseDTO> duplicatasDTO = nota.getNotasDuplicata().stream()
+                .map(nd -> NotaDuplicataResponseDTO.builder()
+                        .id(nd.getId())
+                        .duplicataId(nd.getDuplicata().getId())
+                        .valorRateado(nd.getValorRateado())
+                        .build())
+                .toList();
+
+        return NotaFiscalResponseDTO.builder()
+                .id(nota.getId())
+                .numero(nota.getNumero())
+                .serie(nota.getSerie())
+                .chave(nota.getChave())
+                .descricaoObs(nota.getDescricaoObs())
+                .valorTotal(nota.getValorTotal())
+                .valorDesconto(nota.getValorDesconto())
+                .valorIcms(nota.getValorIcms())
+                .valorJuros(nota.getValorJuros())
+                .valorMulta(nota.getValorMulta())
+                .dtCompra(nota.getDtCompra())
+                .fornecedorId(nota.getFornecedor() != null ? nota.getFornecedor().getId() : null)
+                .tipoNotaId(nota.getTipo() != null ? nota.getTipo().getId() : null)
+                .pessoaId(nota.getPessoa() != null ? nota.getPessoa().getId() : null)
+                .duplicatas(duplicatasDTO)
+                .build();
+    }
+    
+    @Override
+    @Transactional
+    public void excluirNotaFiscal(Long id) {
+        var notaFiscal = notaFiscalRepository.findById(id).orElseThrow();
+
+        notaDuplicataRepository.deleteAll(notaFiscal.getNotasDuplicata());
+
+        notaFiscalRepository.delete(notaFiscal);
+    }
+
 	
 }

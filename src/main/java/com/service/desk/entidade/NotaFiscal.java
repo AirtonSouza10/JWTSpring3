@@ -5,6 +5,7 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -82,13 +83,13 @@ public class NotaFiscal{
     private TipoNota tipo;
     
     @ManyToOne
-    @JoinColumn(name = "pessoa_id", nullable = false)
+    @JoinColumn(name = "pessoa_id", nullable = true)
     private Pessoa pessoa;
     
     @ManyToOne
     @JoinColumn(name = "filial_id", nullable = false)
     private Filial filial;
     
-    @OneToMany(mappedBy = "notaFiscal")
-    private List<NotaDuplicata> notasDuplicata = new ArrayList<>();
+    @OneToMany(mappedBy = "notaFiscal", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ParcelaPrevistaNota> parcelasPrevistas = new ArrayList<>();
 }

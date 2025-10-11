@@ -11,4 +11,6 @@ public class FormaPagamentoResponseDTO {
     private Long id;
     private String descricao;
     private Integer qtdeParcelas;
+    private Integer prazoPrimeiraParcela;
+    private Integer intervaloParcelas;
 }

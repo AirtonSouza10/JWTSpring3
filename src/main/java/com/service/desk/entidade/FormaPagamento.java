@@ -35,6 +35,12 @@ public class FormaPagamento{
     @Column(nullable = false)
     private Integer qtdeParcelas;
     
+    @Column(nullable = true)
+    private Integer prazoPrimeiraParcela;
+    
+    @Column(nullable = true)
+    private Integer intervaloParcelas;
+    
 	@Temporal(TemporalType.DATE)
 	private Date dtInclusao;
 	@Temporal(TemporalType.DATE)

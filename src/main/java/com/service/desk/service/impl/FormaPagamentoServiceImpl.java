@@ -33,6 +33,8 @@ public class FormaPagamentoServiceImpl implements FormaPagamentoService {
     				.id(f.getId())
     				.descricao(f.getDescricao())
     				.qtdeParcelas(f.getQtdeParcelas())
+    				.prazoPrimeiraParcela(f.getPrazoPrimeiraParcela())
+    				.intervaloParcelas(f.getIntervaloParcelas())
     				.build();
     		
     		listaFormasPagamento.add(formaPagamento);
@@ -48,6 +50,8 @@ public class FormaPagamentoServiceImpl implements FormaPagamentoService {
                 .id(formaPagamento.getId())
                 .descricao(formaPagamento.getDescricao())
                 .qtdeParcelas(formaPagamento.getQtdeParcelas())
+				.prazoPrimeiraParcela(formaPagamento.getPrazoPrimeiraParcela())
+				.intervaloParcelas(formaPagamento.getIntervaloParcelas())
                 .build();
     }
     
@@ -57,6 +61,8 @@ public class FormaPagamentoServiceImpl implements FormaPagamentoService {
         var formaPagamento = FormaPagamento.builder()
                 .descricao(formaPagamentoRequestDTO.getDescricao())
                 .qtdeParcelas(formaPagamentoRequestDTO.getQtdeParcelas())
+				.prazoPrimeiraParcela(formaPagamentoRequestDTO.getPrazoPrimeiraParcela())
+				.intervaloParcelas(formaPagamentoRequestDTO.getIntervaloParcelas())
                 .build();
 
         formaPagamentoRepository.save(formaPagamento);	
@@ -69,6 +75,8 @@ public class FormaPagamentoServiceImpl implements FormaPagamentoService {
 
         formaPagamento.setDescricao(formaPagamentoRequestDTO.getDescricao());
         formaPagamento.setQtdeParcelas(formaPagamentoRequestDTO.getQtdeParcelas());
+        formaPagamento.setPrazoPrimeiraParcela(formaPagamentoRequestDTO.getPrazoPrimeiraParcela());
+        formaPagamento.setIntervaloParcelas(formaPagamentoRequestDTO.getIntervaloParcelas());
 
         formaPagamentoRepository.save(formaPagamento);   	
     }

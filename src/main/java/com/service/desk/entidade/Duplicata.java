@@ -38,6 +38,7 @@ public class Duplicata{
     private BigDecimal valor;
     private BigDecimal desconto;
     private BigDecimal multa;
+    private BigDecimal juros;
     private BigDecimal valorTotal;
     
 	

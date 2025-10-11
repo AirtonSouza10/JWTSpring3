@@ -31,9 +31,6 @@ public class Parcela{
     @SequenceGenerator(name = "parcela_seq", sequenceName = "parcela_seq", allocationSize = 1)
     private Long id;
 
-    private BigDecimal valor;
-    private BigDecimal desconto;
-    private BigDecimal multa;
     private BigDecimal valorTotal;
 
     @Temporal(TemporalType.DATE)

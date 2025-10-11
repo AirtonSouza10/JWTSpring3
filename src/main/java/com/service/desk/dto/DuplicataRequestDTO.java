@@ -17,6 +17,7 @@ public class DuplicataRequestDTO {
     private BigDecimal valor;
     private BigDecimal desconto;
     private BigDecimal multa;
+    private BigDecimal juros;
     private BigDecimal valorTotal;
     private Date dtCriacao;
     private Date dtAtualizacao;

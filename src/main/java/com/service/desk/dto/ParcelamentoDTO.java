@@ -12,9 +12,6 @@ import lombok.Data;
 @AllArgsConstructor
 public class ParcelamentoDTO {
     private Long id;
-    private BigDecimal valor;
-    private BigDecimal desconto;
-    private BigDecimal multa;
     private BigDecimal valorTotal;
     private Date dtVencimento;
     private Date dtCriacao;

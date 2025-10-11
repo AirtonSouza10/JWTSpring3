@@ -1,6 +1,7 @@
 package com.service.desk.service.impl;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,15 +43,13 @@ public class DuplicataServiceImpl implements DuplicataService {
                 .valor(d.getValor())
                 .desconto(d.getDesconto())
                 .multa(d.getMulta())
+                .juros(d.getJuros())
                 .valorTotal(d.getValorTotal())
                 .dtCriacao(d.getDtCriacao() != null ? new java.sql.Date(d.getDtCriacao().getTime()) : null)
                 .dtAtualizacao(d.getDtAtualizacao() != null ? new java.sql.Date(d.getDtAtualizacao().getTime()) : null)
                 .parcelas(d.getParcelas() != null ? d.getParcelas().stream().map(p ->
                         ParcelamentoDTO.builder()
                                 .id(p.getId())
-                                .valor(p.getValor())
-                                .desconto(p.getDesconto())
-                                .multa(p.getMulta())
                                 .valorTotal(p.getValorTotal())
                                 .dtVencimento(p.getDtVencimento() != null ? new java.sql.Date(p.getDtVencimento().getTime()) : null)
                                 .dtCriacao(p.getDtCriacao() != null ? new java.sql.Date(p.getDtCriacao().getTime()) : null)
@@ -69,9 +68,6 @@ public class DuplicataServiceImpl implements DuplicataService {
         List<ParcelamentoDTO> parcelasDTO = duplicata.getParcelas().stream().map(p ->
                 ParcelamentoDTO.builder()
                         .id(p.getId())
-                        .valor(p.getValor())
-                        .desconto(p.getDesconto())
-                        .multa(p.getMulta())
                         .valorTotal(p.getValorTotal())
                         .dtVencimento(p.getDtVencimento() != null ? new java.sql.Date(p.getDtVencimento().getTime()) : null)
                         .dtCriacao(p.getDtCriacao() != null ? new java.sql.Date(p.getDtCriacao().getTime()) : null)
@@ -100,6 +96,7 @@ public class DuplicataServiceImpl implements DuplicataService {
         duplicata.setDescricao(dto.getDescricao());
         duplicata.setValor(dto.getValor());
         duplicata.setDesconto(dto.getDesconto());
+        duplicata.setJuros(dto.getJuros());
         duplicata.setMulta(dto.getMulta());
         duplicata.setValorTotal(dto.getValorTotal());
         duplicata.setDtCriacao(new java.util.Date());
@@ -110,9 +107,6 @@ public class DuplicataServiceImpl implements DuplicataService {
             for (var parcDto : dto.getParcelas()) {
                 Parcela parcela = new Parcela();
                 parcela.setDuplicata(duplicata);
-                parcela.setValor(parcDto.getValor());
-                parcela.setDesconto(parcDto.getDesconto());
-                parcela.setMulta(parcDto.getMulta());
                 parcela.setValorTotal(parcDto.getValorTotal());
                 parcela.setDtVencimento(parcDto.getDtVencimento());
                 parcela.setDtCriacao(new java.util.Date());
@@ -131,8 +125,48 @@ public class DuplicataServiceImpl implements DuplicataService {
         duplicata.setValor(dto.getValor());
         duplicata.setDesconto(dto.getDesconto());
         duplicata.setMulta(dto.getMulta());
+        duplicata.setJuros(dto.getJuros());
         duplicata.setValorTotal(dto.getValorTotal());
         duplicata.setDtAtualizacao(new java.util.Date());
+
+        var parcelasAtuais = parcelaRepository.findByDuplicataId(duplicata.getId());
+
+        if (dto.getParcelas() != null) {
+            for (var parcelaDto : dto.getParcelas()) {
+                if (parcelaDto.getId() != null) {
+                    var existente = parcelasAtuais.stream()
+                            .filter(p -> p.getId().equals(parcelaDto.getId()))
+                            .findFirst()
+                            .orElse(null);
+
+                    if (existente != null) {
+                        existente.setDtVencimento(parcelaDto.getDtVencimento());
+                        existente.setValorTotal(parcelaDto.getValorTotal());
+                        parcelaRepository.save(existente);
+                    }
+                } else {
+                    var nova = Parcela.builder()
+                            .duplicata(duplicata)
+                            .dtVencimento(parcelaDto.getDtVencimento())
+                            .valorTotal(parcelaDto.getValorTotal())
+                            .build();
+                    parcelaRepository.save(nova);
+                }
+            }
+        }
+
+        var idsEnviados = dto.getParcelas() != null
+                ? dto.getParcelas().stream()
+                        .map(ParcelamentoDTO::getId)
+                        .filter(Objects::nonNull)
+                        .toList()
+                : List.<Long>of();
+
+        for (var parcela : parcelasAtuais) {
+            if (!idsEnviados.contains(parcela.getId())) {
+                parcelaRepository.delete(parcela);
+            }
+        }
 
         duplicataRepository.save(duplicata);
     }

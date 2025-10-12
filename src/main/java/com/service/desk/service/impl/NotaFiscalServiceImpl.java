@@ -2,6 +2,7 @@ package com.service.desk.service.impl;
 
 import java.sql.Date;
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -92,8 +93,6 @@ public class NotaFiscalServiceImpl implements NotaFiscalService {
                 .orElseThrow(() -> new NegocioException(MensagemEnum.MSGE008.getKey()));
         var filial = filialRepository.findById(dto.getFilialId())
                 .orElseThrow(() -> new NegocioException(MensagemEnum.MSGE009.getKey()));
-        var formaPagamento = formaPagamentoRepository.findById(dto.getFormaPagamentoId())
-                .orElseThrow(() -> new NegocioException(MensagemEnum.MSGE011.getKey()));
         var idPessoa = UsuarioLogadoUtil.getIdUsuarioLogado();
 
         NotaFiscal nf = new NotaFiscal();
@@ -110,7 +109,7 @@ public class NotaFiscalServiceImpl implements NotaFiscalService {
         nf.setFornecedor(fornecedor);
         nf.setTipo(tipoNota);
         nf.setFilial(filial);
-        nf.setFormaPagamento(formaPagamento);
+        nf.setFormaPagamento(Objects.nonNull(dto.getFormaPagamentoId()) ? formaPagamentoRepository.findById(dto.getFormaPagamentoId()).get() : null);
 
         notaFiscalRepository.save(nf);
 
@@ -163,7 +162,14 @@ public class NotaFiscalServiceImpl implements NotaFiscalService {
             notaFiscal.setPessoa(pessoa);
         }
         
-        if (dto.getFormaPagamentoId() != null) {
+        // Se a forma de pagamento for nula, apagar parcelas previstas ---
+        if (Objects.isNull(dto.getFormaPagamentoId())) {
+            var parcelasExistentes = parcelaPrevistaNotaRepository.findByNotaFiscalId(notaFiscal.getId());
+            if (!parcelasExistentes.isEmpty()) {
+                parcelaPrevistaNotaRepository.deleteAll(parcelasExistentes);
+            }
+            notaFiscal.setFormaPagamento(null);
+        } else {
             var formaPgto = formaPagamentoRepository.findById(dto.getFormaPagamentoId())
                     .orElseThrow(() -> new NegocioException(MensagemEnum.MSGE011.getKey()));
             notaFiscal.setFormaPagamento(formaPgto);

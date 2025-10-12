@@ -86,6 +86,13 @@ public class NotaFiscalServiceImpl implements NotaFiscalService {
     @Override
     @Transactional
     public void salvarNotaFiscal(NotaFiscalRequestDTO dto) {
+    	
+    	var notaFiscal = notaFiscalRepository.findByNumeroAndSerieAndFornecedorId(dto.getNumero(),dto.getSerie(),dto.getFornecedorId());
+    	
+    	if(!notaFiscal.isEmpty()) {
+    		throw new NegocioException(MensagemEnum.MSGE013.getKey());
+    	}
+    	
 
         var fornecedor = fornecedorRepository.findById(dto.getFornecedorId())
                 .orElseThrow(() -> new NegocioException(MensagemEnum.MSGE007.getKey()));
@@ -129,6 +136,11 @@ public class NotaFiscalServiceImpl implements NotaFiscalService {
     @Override
     @Transactional
     public void atualizarNotaFiscal(Long id, NotaFiscalRequestDTO dto) {
+    	var notaFiscalSalva = notaFiscalRepository.findByNumeroAndSerieAndFornecedorIdAndIdNot(dto.getNumero(), dto.getSerie(), dto.getFornecedorId(), id);
+    	if(!notaFiscalSalva.isEmpty()) {
+    		throw new NegocioException(MensagemEnum.MSGE013.getKey());
+    	}
+    	
         var notaFiscal = notaFiscalRepository.findById(id)
                 .orElseThrow(() -> new NegocioException(MensagemEnum.MSGE010.getKey()));
 

@@ -13,6 +13,7 @@ import com.service.desk.dto.ParcelamentoDTO;
 import com.service.desk.entidade.Duplicata;
 import com.service.desk.entidade.Parcela;
 import com.service.desk.repository.DuplicataRepository;
+import com.service.desk.repository.FormaPagamentoRepository;
 import com.service.desk.repository.ParcelaRepository;
 import com.service.desk.service.service.DuplicataService;
 
@@ -32,6 +33,9 @@ public class DuplicataServiceImpl implements DuplicataService {
 
     @Autowired
     private ParcelaRepository parcelaRepository;
+    
+    @Autowired
+    private FormaPagamentoRepository formaPagamentoRepository;
 
     @Override
     public List<DuplicataResponseDTO> listarDuplicatas() {
@@ -45,6 +49,7 @@ public class DuplicataServiceImpl implements DuplicataService {
                 .multa(d.getMulta())
                 .juros(d.getJuros())
                 .valorTotal(d.getValorTotal())
+                .formaPagamentoId(Objects.nonNull(d.getFormaPagamento()) ? d.getFormaPagamento().getId() : null)
                 .dtCriacao(d.getDtCriacao() != null ? new java.sql.Date(d.getDtCriacao().getTime()) : null)
                 .dtAtualizacao(d.getDtAtualizacao() != null ? new java.sql.Date(d.getDtAtualizacao().getTime()) : null)
                 .parcelas(d.getParcelas() != null ? d.getParcelas().stream().map(p ->
@@ -83,6 +88,7 @@ public class DuplicataServiceImpl implements DuplicataService {
                 .desconto(duplicata.getDesconto())
                 .multa(duplicata.getMulta())
                 .valorTotal(duplicata.getValorTotal())
+                .formaPagamentoId(duplicata.getFormaPagamento().getId())
                 .dtCriacao(duplicata.getDtCriacao() != null ? new java.sql.Date(duplicata.getDtCriacao().getTime()) : null)
                 .dtAtualizacao(duplicata.getDtAtualizacao() != null ? new java.sql.Date(duplicata.getDtAtualizacao().getTime()) : null)
                 .parcelas(parcelasDTO)
@@ -99,6 +105,8 @@ public class DuplicataServiceImpl implements DuplicataService {
         duplicata.setJuros(dto.getJuros());
         duplicata.setMulta(dto.getMulta());
         duplicata.setValorTotal(dto.getValorTotal());
+        var formaPagamento = formaPagamentoRepository.findById(dto.getFormaPagamentoId()).orElseThrow();
+        duplicata.setFormaPagamento(formaPagamento);
         duplicata.setDtCriacao(new java.util.Date());
 
         duplicataRepository.save(duplicata);
@@ -127,6 +135,8 @@ public class DuplicataServiceImpl implements DuplicataService {
         duplicata.setMulta(dto.getMulta());
         duplicata.setJuros(dto.getJuros());
         duplicata.setValorTotal(dto.getValorTotal());
+        var formaPagamento = formaPagamentoRepository.findById(dto.getFormaPagamentoId()).orElseThrow();
+        duplicata.setFormaPagamento(formaPagamento);
         duplicata.setDtAtualizacao(new java.util.Date());
 
         var parcelasAtuais = parcelaRepository.findByDuplicataId(duplicata.getId());

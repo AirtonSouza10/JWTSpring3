@@ -10,6 +10,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
@@ -47,6 +49,10 @@ public class Duplicata{
     
     @Temporal(TemporalType.DATE)
     private Date dtAtualizacao;
+    
+    @ManyToOne
+    @JoinColumn(name = "forma_pagamento_id", nullable = true)
+    private FormaPagamento formaPagamento;
     
     @OneToMany(mappedBy = "duplicata", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Parcela> parcelas = new ArrayList<>();

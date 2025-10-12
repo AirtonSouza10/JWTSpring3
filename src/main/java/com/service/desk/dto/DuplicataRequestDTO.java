@@ -21,5 +21,6 @@ public class DuplicataRequestDTO {
     private BigDecimal valorTotal;
     private Date dtCriacao;
     private Date dtAtualizacao;
+    private Long formaPagamentoId;
     private List<ParcelamentoDTO> parcelas;
 }

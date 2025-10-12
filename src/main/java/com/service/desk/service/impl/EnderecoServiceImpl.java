@@ -68,8 +68,8 @@ public class EnderecoServiceImpl implements EnderecoService {
             endereco.setComplemento((String) response.get("complemento"));
             endereco.setBairro((String) response.get("bairro"));
             endereco.setCidade((String) response.get("localidade"));
-            endereco.setUf((String) response.get("uf"));
-            endereco.setEstado((String) response.get("uf"));
+            endereco.setUf((String) response.get("uf"));	
+            endereco.setEstado((String) response.get("estado"));
 
             return endereco;
         } catch (Exception e) {

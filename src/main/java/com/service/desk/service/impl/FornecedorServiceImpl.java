@@ -2,6 +2,7 @@ package com.service.desk.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,8 @@ import com.service.desk.dto.TelefoneTipoDTO;
 import com.service.desk.entidade.Endereco;
 import com.service.desk.entidade.Fornecedor;
 import com.service.desk.entidade.Telefone;
+import com.service.desk.enumerator.MensagemEnum;
+import com.service.desk.exceptions.NegocioException;
 import com.service.desk.repository.EnderecoTipoRepository;
 import com.service.desk.repository.FornecedorRepository;
 import com.service.desk.repository.TelefoneTipoRepository;
@@ -79,16 +82,21 @@ public class FornecedorServiceImpl implements FornecedorService {
     
     @Override
     @Transactional
-    public void salvarFornecedores(FornecedorRequestDTO fornecedorRequest) {
+    public void salvarFornecedores(FornecedorRequestDTO dto) {
+    	var fornecedorSalvo = fornecedorRepository.findByIdentificacao(dto.getIdentificacao());
+    	if(Objects.nonNull(fornecedorSalvo)) {
+    		throw new NegocioException(MensagemEnum.MSGE012.getKey());
+    	}
+    	
         var fornecedor = Fornecedor.builder()
-                .identificacao(fornecedorRequest.getIdentificacao())
-                .nome(fornecedorRequest.getNome())
-                .tpIdentificacao(fornecedorRequest.getIdentificacao().length() ==11 ? 4 : 3)
-                .email(fornecedorRequest.getEmail())
+                .identificacao(dto.getIdentificacao())
+                .nome(dto.getNome())
+                .tpIdentificacao(dto.getIdentificacao().length() ==11 ? 4 : 3)
+                .email(dto.getEmail())
                 .ativo(true)
                 .build();
 
-        var telefones = fornecedorRequest.getTelefones().stream().map(telDto -> {
+        var telefones = dto.getTelefones().stream().map(telDto -> {
             var telefone = new Telefone();
             telefone.setId(telDto.getId());
             telefone.setNumero(telDto.getNumero());
@@ -98,7 +106,7 @@ public class FornecedorServiceImpl implements FornecedorService {
             return telefone;
         }).toList();
 
-        var enderecos = fornecedorRequest.getEnderecos().stream().map(endDto -> {
+        var enderecos = dto.getEnderecos().stream().map(endDto -> {
             var endereco = new Endereco();
             endereco.setLogradouro(endDto.getLogradouro());
             endereco.setNumero(endDto.getNumero());
@@ -124,14 +132,18 @@ public class FornecedorServiceImpl implements FornecedorService {
     
     @Override
     @Transactional
-    public void atualizarFornecedores(Long id, FornecedorRequestDTO fornecedorRequest) {
+    public void atualizarFornecedores(Long id, FornecedorRequestDTO dto) {
+    	if (!fornecedorRepository.findByIdentificacaoAndIdNot(dto.getIdentificacao(),id).isEmpty()) {
+    	    throw new NegocioException(MensagemEnum.MSGE012.getKey());
+    	}
+    	
         Fornecedor fornecedor = fornecedorRepository.findById(id).orElseThrow();
 
-        fornecedor.setNome(fornecedorRequest.getNome());
-        fornecedor.setIdentificacao(fornecedorRequest.getIdentificacao());
-        fornecedor.setTpIdentificacao(fornecedorRequest.getIdentificacao().length() == 11 ? 4 : 3);
-        fornecedor.setEmail(fornecedorRequest.getEmail());
-        fornecedor.setAtivo(fornecedorRequest.getAtivo());
+        fornecedor.setNome(dto.getNome());
+        fornecedor.setIdentificacao(dto.getIdentificacao());
+        fornecedor.setTpIdentificacao(dto.getIdentificacao().length() == 11 ? 4 : 3);
+        fornecedor.setEmail(dto.getEmail());
+        fornecedor.setAtivo(dto.getAtivo());
 
         // Certifique-se de que as listas são mutáveis
         if (fornecedor.getTelefones() == null) {
@@ -146,7 +158,7 @@ public class FornecedorServiceImpl implements FornecedorService {
         fornecedor.getEnderecos().clear();
 
         // Preencher telefones
-        fornecedorRequest.getTelefones().forEach(telDto -> {
+        dto.getTelefones().forEach(telDto -> {
             Telefone telefone = new Telefone();
             telefone.setId(telDto.getId()); // null se novo
             telefone.setNumero(telDto.getNumero());
@@ -160,7 +172,7 @@ public class FornecedorServiceImpl implements FornecedorService {
         });
 
         // Preencher endereços
-        fornecedorRequest.getEnderecos().forEach(endDto -> {
+        dto.getEnderecos().forEach(endDto -> {
             Endereco endereco = new Endereco();
             endereco.setId(endDto.getId()); // null se novo
             endereco.setLogradouro(endDto.getLogradouro());

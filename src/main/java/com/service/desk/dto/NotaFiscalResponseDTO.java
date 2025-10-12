@@ -31,6 +31,7 @@ public class NotaFiscalResponseDTO {
     private Long tipoNotaId;
     private Long pessoaId;
     private Long filialId;
+    private Long formaPagamentoId;
     
     private List<ParcelaPrevistaNotaResponseDTO> parcelasPrevistas;
 }

@@ -94,6 +94,10 @@ public class NotaFiscal{
     @JoinColumn(name = "forma_pagamento_id", nullable = true)
     private FormaPagamento formaPagamento;
     
+    @ManyToOne
+    @JoinColumn(name = "duplicata_id", nullable = true)
+    private Duplicata duplicata;
+    
     @OneToMany(mappedBy = "notaFiscal", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ParcelaPrevistaNota> parcelasPrevistas = new ArrayList<>();
 }

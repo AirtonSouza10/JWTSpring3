@@ -57,4 +57,7 @@ public class Duplicata{
     @OneToMany(mappedBy = "duplicata", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Parcela> parcelas = new ArrayList<>();
     
+    @OneToMany(mappedBy = "duplicata", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<NotaFiscal> notasFiscais = new ArrayList<>();
+    
 }

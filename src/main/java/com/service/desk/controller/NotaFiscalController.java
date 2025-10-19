@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -65,5 +66,17 @@ public class NotaFiscalController extends ControllerServiceDesk{
     @ResponseStatus(HttpStatus.OK)
     public ResponseServiceDesk buscarPorId(@PathVariable Long id) {
         return new ResponseServiceDesk(notaFiscalService.buscarNotaFiscalPorId(id));
+    }
+    
+    @Operation(summary = "Buscar nota fiscal pelo número e fornecedor")
+    @GetMapping("/buscar")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseServiceDesk buscarPorNumeroEFornecedor(
+            @RequestParam String numero,
+            @RequestParam Long fornecedorId) {
+
+        return new ResponseServiceDesk(
+                notaFiscalService.buscarPorNumeroEFornecedor(numero, fornecedorId)
+        );
     }
 }

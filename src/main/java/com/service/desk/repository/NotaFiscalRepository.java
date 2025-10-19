@@ -1,6 +1,7 @@
 package com.service.desk.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -13,5 +14,6 @@ public interface NotaFiscalRepository extends JpaRepository<NotaFiscal, Long> {
     
 	List<NotaFiscal> findByNumeroAndSerieAndFornecedorIdAndIdNot(String numero, String serie, Long fornecedorId,
 			Long id);
-
+	
+	Optional<NotaFiscal> findByNumeroAndFornecedorId(String numero, Long fornecedorId);
 }

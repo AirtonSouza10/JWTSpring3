@@ -1,5 +1,6 @@
 package com.service.desk.service.impl;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -14,6 +15,8 @@ import com.service.desk.dto.ParcelamentoDTO;
 import com.service.desk.entidade.Duplicata;
 import com.service.desk.entidade.NotaFiscal;
 import com.service.desk.entidade.Parcela;
+import com.service.desk.enumerator.MensagemEnum;
+import com.service.desk.exceptions.NegocioException;
 import com.service.desk.repository.DuplicataRepository;
 import com.service.desk.repository.FormaPagamentoRepository;
 import com.service.desk.repository.NotaFiscalRepository;
@@ -76,6 +79,7 @@ public class DuplicataServiceImpl implements DuplicataService {
 		                        .serie(nf.getSerie())
 		                        .dtCompra(nf.getDtCompra())
 		                        .fornecedorId(nf.getFornecedor().getId())
+		                        .fornecedorNome(nf.getFornecedor().getNome())
 		                        .filialId(nf.getFilial().getId())
 		                        .tipoNotaId(nf.getTipo().getId())
 		                        .valorTotal(nf.getValorTotal())
@@ -108,6 +112,7 @@ public class DuplicataServiceImpl implements DuplicataService {
 		        .serie(nf.getSerie())
 		        .dtCompra(nf.getDtCompra())
 		        .fornecedorId(nf.getFornecedor().getId())
+		        .fornecedorNome(nf.getFornecedor().getNome())
 		        .filialId(nf.getFilial().getId())
 		        .tipoNotaId(nf.getTipo().getId())
 		        .valorTotal(nf.getValorTotal())
@@ -144,10 +149,18 @@ public class DuplicataServiceImpl implements DuplicataService {
         duplicata.setDtCriacao(new java.util.Date());
         
         // Notas fiscais associadas
-        if (dto.getNotaFiscalId() != null && !dto.getNotaFiscalId().isEmpty()) {
-            var notas = notaFiscalRepository.findAllById(dto.getNotaFiscalId());
-            notas.forEach(nf -> nf.setDuplicata(duplicata));
+        if (dto.getNotasFiscais() != null && !dto.getNotasFiscais().isEmpty()) {
+            List<NotaFiscal> notas = dto.getNotasFiscais().stream()
+                .map(nfDto -> {
+                    NotaFiscal nf = notaFiscalRepository.findById(nfDto.getId()).orElseThrow();
+                    nf.setDuplicata(duplicata);
+                    return nf;
+                })
+                .toList();
+
             duplicata.setNotasFiscais(notas);
+        } else {
+            duplicata.setNotasFiscais(Collections.emptyList());
         }
 
         duplicataRepository.save(duplicata);
@@ -176,15 +189,19 @@ public class DuplicataServiceImpl implements DuplicataService {
         duplicata.setMulta(dto.getMulta());
         duplicata.setJuros(dto.getJuros());
         duplicata.setValorTotal(dto.getValorTotal());
-        var formaPagamento = formaPagamentoRepository.findById(dto.getFormaPagamentoId()).orElseThrow();
+        var formaPagamento = formaPagamentoRepository.findById(dto.getFormaPagamentoId()).orElseThrow(() -> new NegocioException(MensagemEnum.MSGE010.getKey()));
         duplicata.setFormaPagamento(formaPagamento);
         duplicata.setDtAtualizacao(new java.util.Date());
         
 
         // Atualizar notas fiscais associadas
-        List<NotaFiscal> novasNotas = dto.getNotaFiscalId() != null && !dto.getNotaFiscalId().isEmpty()
-                ? notaFiscalRepository.findAllById(dto.getNotaFiscalId())
-                : List.of();
+        List<NotaFiscal> novasNotas = (dto.getNotasFiscais() != null && !dto.getNotasFiscais().isEmpty())
+        	    ? dto.getNotasFiscais().stream()
+        	        .map(nfDto -> notaFiscalRepository.findById(nfDto.getId())
+        	            .orElseThrow(() -> new NegocioException(MensagemEnum.MSGE010.getKey())))
+        	        .peek(nf -> nf.setDuplicata(duplicata))
+        	        .toList()
+        	    : List.of();
 
         // Desvincular as antigas
         duplicata.getNotasFiscais().forEach(nf -> nf.setDuplicata(null));

@@ -28,6 +28,7 @@ public class NotaFiscalResponseDTO {
     private Date dtCompra;
 
     private Long fornecedorId;
+    private String fornecedorNome;
     private Long tipoNotaId;
     private Long pessoaId;
     private Long filialId;

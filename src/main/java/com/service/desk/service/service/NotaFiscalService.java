@@ -16,4 +16,6 @@ public interface NotaFiscalService {
 	NotaFiscalResponseDTO buscarNotaFiscalPorId(Long id);
 
 	void excluirNotaFiscal(Long id);
+
+	NotaFiscalResponseDTO buscarPorNumeroEFornecedor(String numero, Long fornecedorId);
 }

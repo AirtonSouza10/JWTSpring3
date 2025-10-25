@@ -64,6 +64,7 @@ public class DuplicataServiceImpl implements DuplicataService {
                 .parcelas(d.getParcelas() != null ? d.getParcelas().stream().map(p ->
                         ParcelamentoDTO.builder()
                                 .id(p.getId())
+                                .numeroParcela(p.getNumeroParcela())
                                 .valorTotal(p.getValorTotal())
                                 .dtVencimento(p.getDtVencimento() != null ? new java.sql.Date(p.getDtVencimento().getTime()) : null)
                                 .dtCriacao(p.getDtCriacao() != null ? new java.sql.Date(p.getDtCriacao().getTime()) : null)
@@ -96,6 +97,7 @@ public class DuplicataServiceImpl implements DuplicataService {
         List<ParcelamentoDTO> parcelasDTO = duplicata.getParcelas().stream().map(p ->
                 ParcelamentoDTO.builder()
                         .id(p.getId())
+                        .numeroParcela(p.getNumeroParcela())
                         .valorTotal(p.getValorTotal())
                         .dtVencimento(p.getDtVencimento() != null ? new java.sql.Date(p.getDtVencimento().getTime()) : null)
                         .dtCriacao(p.getDtCriacao() != null ? new java.sql.Date(p.getDtCriacao().getTime()) : null)
@@ -169,6 +171,7 @@ public class DuplicataServiceImpl implements DuplicataService {
             for (var parcDto : dto.getParcelas()) {
                 Parcela parcela = new Parcela();
                 parcela.setDuplicata(duplicata);
+                parcela.setNumeroParcela(parcDto.getNumeroParcela());
                 parcela.setValorTotal(parcDto.getValorTotal());
                 parcela.setDtVencimento(parcDto.getDtVencimento());
                 parcela.setDtCriacao(new java.util.Date());
@@ -223,6 +226,7 @@ public class DuplicataServiceImpl implements DuplicataService {
                             .orElse(null);
 
                     if (existente != null) {
+                    	existente.setNumeroParcela(parcelaDto.getNumeroParcela());
                         existente.setDtVencimento(parcelaDto.getDtVencimento());
                         existente.setValorTotal(parcelaDto.getValorTotal());
                         parcelaRepository.save(existente);
@@ -230,6 +234,7 @@ public class DuplicataServiceImpl implements DuplicataService {
                 } else {
                     var nova = Parcela.builder()
                             .duplicata(duplicata)
+                            .numeroParcela(parcelaDto.getNumeroParcela())
                             .dtVencimento(parcelaDto.getDtVencimento())
                             .valorTotal(parcelaDto.getValorTotal())
                             .build();

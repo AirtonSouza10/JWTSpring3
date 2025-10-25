@@ -12,6 +12,7 @@ import lombok.Data;
 @AllArgsConstructor
 public class ParcelamentoDTO {
     private Long id;
+    private String numeroParcela;
     private BigDecimal valorTotal;
     private Date dtVencimento;
     private Date dtCriacao;

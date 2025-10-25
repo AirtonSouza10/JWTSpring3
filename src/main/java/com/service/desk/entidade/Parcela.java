@@ -30,6 +30,8 @@ public class Parcela{
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "parcela_seq")
     @SequenceGenerator(name = "parcela_seq", sequenceName = "parcela_seq", allocationSize = 1)
     private Long id;
+	
+	private String numeroParcela;
 
     private BigDecimal valorTotal;
 

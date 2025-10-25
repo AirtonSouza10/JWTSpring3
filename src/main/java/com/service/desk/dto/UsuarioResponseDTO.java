@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UsuarioRequestDTO {
+public class UsuarioResponseDTO {
 	private String login;
 	private String senha;
 	private String identificacao;
@@ -19,6 +19,5 @@ public class UsuarioRequestDTO {
     private String email;
     private String telefone;
     private String tpPessoa;
-    private boolean ativo;
 
 }

@@ -8,4 +8,5 @@ import com.service.desk.entidade.Pessoa;
 @Repository
 public interface PessoaRepository extends JpaRepository<Pessoa, Long> {
 	Pessoa findByNome(String nome);
+	Pessoa findByIdentificacao(String identificacao);
 }

@@ -1,6 +1,6 @@
 package com.service.desk.service.impl;
 
-import java.util.Objects;
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,16 +9,21 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.service.desk.dto.AlterarSenhaDTO;
 import com.service.desk.dto.AuthenticationDTO;
 import com.service.desk.dto.LoginResponseDTO;
 import com.service.desk.dto.UsuarioRequestDTO;
+import com.service.desk.dto.UsuarioResponseDTO;
+import com.service.desk.entidade.Pessoa;
 import com.service.desk.entidade.Usuario;
 import com.service.desk.enumerator.MensagemEnum;
 import com.service.desk.exceptions.NegocioException;
+import com.service.desk.repository.PessoaRepository;
 import com.service.desk.repository.RoleRepository;
 import com.service.desk.repository.UsuarioRepository;
 import com.service.desk.security.TokenService;
 import com.service.desk.service.service.UsuarioService;
+import com.service.desk.utils.UsuarioLogadoUtil;
 
 @Service
 public class UsuarioServiceImpl implements UsuarioService{
@@ -31,6 +36,8 @@ public class UsuarioServiceImpl implements UsuarioService{
 	private TokenService tokenService;
 	@Autowired
 	private RoleRepository roleRepository;
+	@Autowired
+	private PessoaRepository pessoaRepository;
 	
 	@Override
 	public LoginResponseDTO authenticarUsuario (AuthenticationDTO dadosAutenticacao) {
@@ -41,23 +48,107 @@ public class UsuarioServiceImpl implements UsuarioService{
 	}
 	
 	@Override
-	public void registrarUsuario (UsuarioRequestDTO dadosRegistro) {
-		var usuario = usuarioRepository.findByLogin(dadosRegistro.getLogin());
-		if(Objects.nonNull(usuario)) {
-			throw new NegocioException(MensagemEnum.MSGE006.getKey());
+	public void registrarUsuario (UsuarioRequestDTO dto) {
+        if (usuarioRepository.findByLogin(dto.getLogin()) != null) {
+            throw new NegocioException("Login já existe");
+        }
+
+        var encryptedPassword = new BCryptPasswordEncoder().encode(dto.getSenha());
+
+        var roleUsuario = roleRepository.findByNome("USER");
+
+        var usuario = Usuario.builder()
+                .login(dto.getLogin())
+                .identificacao(dto.getIdentificacao())
+                .senha(encryptedPassword)
+                .roles(Set.of(roleUsuario))
+                .build();
+
+        var pessoa = new Pessoa();
+        pessoa.setNome(dto.getNome());
+        pessoa.setIdentificacao(dto.getIdentificacao());
+        pessoa.setEmail(dto.getEmail());
+        pessoa.setTelefone(dto.getTelefone());
+        pessoa.setTpPessoa(dto.getTpPessoa().length() == 11 ? "4" : "3");
+        pessoa.setUsuario(usuario);
+        pessoa.setAtivo(true);
+
+        usuarioRepository.save(usuario);
+        pessoaRepository.save(pessoa);
+	}
+
+	@Override
+	public void atualizarUsuario(Long usuarioId, UsuarioRequestDTO dto) {
+	    var usuario = usuarioRepository.findById(usuarioId)
+	            .orElseThrow(() -> new NegocioException(MensagemEnum.MSGE014.getKey()));
+
+	    if (dto.getLogin() != null && !dto.getLogin().isBlank()) {
+	        usuario.setLogin(dto.getLogin());
+	    }
+	    if (dto.getIdentificacao() != null && !dto.getIdentificacao().isBlank()) {
+	        usuario.setIdentificacao(dto.getIdentificacao());
+	    }
+
+	    var pessoa = pessoaRepository.findByIdentificacao(usuario.getIdentificacao());
+
+	    if (dto.getNome() != null) pessoa.setNome(dto.getNome());
+	    if (dto.getEmail() != null) pessoa.setEmail(dto.getEmail());
+	    if (dto.getTelefone() != null) pessoa.setTelefone(dto.getTelefone());
+	    if (dto.getTpPessoa() != null) pessoa.setTpPessoa(dto.getTpPessoa().length() == 11 ? "4" : "3");
+
+	    usuarioRepository.save(usuario);
+	    pessoaRepository.save(pessoa);
+	}
+	
+	@Override
+	public void atualizarStatusUsuario(Long idUsuario, Boolean ativo) {
+	    var usuario = usuarioRepository.findById(idUsuario)
+	            .orElseThrow(() -> new NegocioException(MensagemEnum.MSGE014.getKey()));
+
+	    var pessoa = pessoaRepository.findByIdentificacao(usuario.getIdentificacao());
+
+	    pessoa.setAtivo(ativo);
+	    pessoaRepository.save(pessoa);
+	}
+	
+	@Override
+	public List<UsuarioResponseDTO> listarUsuarios() {
+		Usuario usuarioLogado = UsuarioLogadoUtil.getUsuarioLogado();
+
+		boolean isAdmin = usuarioLogado.getRoles().stream().anyMatch(role -> role.getNome().equalsIgnoreCase("ADMIN"));
+
+		List<Pessoa> pessoas;
+		if (isAdmin) {
+			pessoas = pessoaRepository.findAll();
+		} else {
+			Pessoa pessoa = pessoaRepository.findByIdentificacao(usuarioLogado.getIdentificacao());
+			pessoas = List.of(pessoa);
 		}
-		
-		var encryptedPassword = new BCryptPasswordEncoder().encode(dadosRegistro.getSenha());
-		
-	    var roleTipoNota = roleRepository.findByNome("USER");
-		
-		var novoUsuario = Usuario.builder()
-				.login(dadosRegistro.getLogin())
-				.identificacao(dadosRegistro.getIdentificacao())
-				.senha(encryptedPassword)
-				.roles(Set.of(roleTipoNota))
-				.build();
-		
-		usuarioRepository.save(novoUsuario);
+
+		return pessoas.stream().map(p -> UsuarioResponseDTO.builder().login(p.getUsuario().getLogin())
+				.identificacao(p.getIdentificacao()).nome(p.getNome()).email(p.getEmail()).telefone(p.getTelefone())
+				.tpPessoa(p.getTpPessoa()).build()).toList();
+	}
+	
+	@Override
+	public void alterarSenha(Long usuarioId, AlterarSenhaDTO dto) {
+	    Usuario usuario = usuarioRepository.findById(usuarioId)
+	            .orElseThrow(() -> new NegocioException(MensagemEnum.MSGE014.getKey()));
+
+	    Usuario usuarioLogado = UsuarioLogadoUtil.getUsuarioLogado();
+
+	    boolean isAdmin = usuarioLogado.getRoles().stream()
+	            .anyMatch(role -> role.getNome().equalsIgnoreCase("ADMIN"));
+
+	    BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
+	    if (!isAdmin) {
+	        if (!encoder.matches(dto.getSenhaAntiga(), usuario.getSenha())) {
+	            throw new NegocioException(MensagemEnum.MSGE014.getKey());
+	        }
+	    }
+
+	    usuario.setSenha(encoder.encode(dto.getSenhaNova()));
+	    usuarioRepository.save(usuario);
 	}
 }

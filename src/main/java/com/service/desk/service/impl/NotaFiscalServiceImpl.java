@@ -277,40 +277,45 @@ public class NotaFiscalServiceImpl implements NotaFiscalService {
     }
     
     @Override
-    public NotaFiscalResponseDTO buscarPorNumeroEFornecedor(String numero, Long fornecedorId) {
-        var nota = notaFiscalRepository.findByNumeroAndFornecedorId(numero, fornecedorId)
-                .orElseThrow(() -> new NegocioException(MensagemEnum.MSGE010.getKey()));
+    public List<NotaFiscalResponseDTO> buscarPorNumeroEFornecedor(String numero, Long fornecedorId) {
+        List<NotaFiscal> notas = notaFiscalRepository.findByNumeroAndFornecedorId(numero, fornecedorId);
 
-        List<ParcelaPrevistaNotaResponseDTO> parcelasPrevistasDTO = nota.getParcelasPrevistas() != null
-                ? nota.getParcelasPrevistas().stream()
-                    .map(parcela -> ParcelaPrevistaNotaResponseDTO.builder()
-                            .id(parcela.getId())
-                            .dtVencimentoPrevisto(new Date(parcela.getDtVencimentoPrevisto().getTime()))
-                            .valorPrevisto(parcela.getValorPrevisto())
-                            .build())
-                    .toList()
-                : List.of();
+        if (notas.isEmpty()) {
+            throw new NegocioException(MensagemEnum.MSGE010.getKey());
+        }
 
-        return NotaFiscalResponseDTO.builder()
-                .id(nota.getId())
-                .numero(nota.getNumero())
-                .serie(nota.getSerie())
-                .chave(nota.getChave())
-                .descricaoObs(nota.getDescricaoObs())
-                .valorTotal(nota.getValorTotal())
-                .valorDesconto(nota.getValorDesconto())
-                .valorIcms(nota.getValorIcms())
-                .valorJuros(nota.getValorJuros())
-                .valorMulta(nota.getValorMulta())
-                .dtCompra(nota.getDtCompra())
-                .fornecedorId(nota.getFornecedor() != null ? nota.getFornecedor().getId() : null)
-                .fornecedorNome(nota.getFornecedor() != null ? nota.getFornecedor().getNome() : null)
-                .tipoNotaId(nota.getTipo() != null ? nota.getTipo().getId() : null)
-                .pessoaId(nota.getPessoa() != null ? nota.getPessoa().getId() : null)
-                .filialId(nota.getFilial() != null ? nota.getFilial().getId() : null)
-                .formaPagamentoId(nota.getFormaPagamento() != null ? nota.getFormaPagamento().getId() : null)
-                .parcelasPrevistas(parcelasPrevistasDTO)
-                .build();
+        return notas.stream().map(nota -> {
+            List<ParcelaPrevistaNotaResponseDTO> parcelasPrevistasDTO = nota.getParcelasPrevistas() != null
+                    ? nota.getParcelasPrevistas().stream()
+                        .map(parcela -> ParcelaPrevistaNotaResponseDTO.builder()
+                                .id(parcela.getId())
+                                .dtVencimentoPrevisto(new Date(parcela.getDtVencimentoPrevisto().getTime()))
+                                .valorPrevisto(parcela.getValorPrevisto())
+                                .build())
+                        .toList()
+                    : List.of();
+
+            return NotaFiscalResponseDTO.builder()
+                    .id(nota.getId())
+                    .numero(nota.getNumero())
+                    .serie(nota.getSerie())
+                    .chave(nota.getChave())
+                    .descricaoObs(nota.getDescricaoObs())
+                    .valorTotal(nota.getValorTotal())
+                    .valorDesconto(nota.getValorDesconto())
+                    .valorIcms(nota.getValorIcms())
+                    .valorJuros(nota.getValorJuros())
+                    .valorMulta(nota.getValorMulta())
+                    .dtCompra(nota.getDtCompra())
+                    .fornecedorId(nota.getFornecedor() != null ? nota.getFornecedor().getId() : null)
+                    .fornecedorNome(nota.getFornecedor() != null ? nota.getFornecedor().getNome() : null)
+                    .tipoNotaId(nota.getTipo() != null ? nota.getTipo().getId() : null)
+                    .pessoaId(nota.getPessoa() != null ? nota.getPessoa().getId() : null)
+                    .filialId(nota.getFilial() != null ? nota.getFilial().getId() : null)
+                    .formaPagamentoId(nota.getFormaPagamento() != null ? nota.getFormaPagamento().getId() : null)
+                    .parcelasPrevistas(parcelasPrevistasDTO)
+                    .build();
+        }).toList();
     }
 	
 }

@@ -1,5 +1,6 @@
 package com.service.desk.service.impl;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -58,22 +59,23 @@ public class UsuarioServiceImpl implements UsuarioService{
         var roleUsuario = roleRepository.findByNome("USER");
 
         var usuario = Usuario.builder()
-                .login(dto.getLogin())
+                .login(dto.getIdentificacao())
                 .identificacao(dto.getIdentificacao())
                 .senha(encryptedPassword)
                 .roles(Set.of(roleUsuario))
                 .build();
-
+        var usuarioSalvo = usuarioRepository.save(usuario);
+        
         var pessoa = new Pessoa();
         pessoa.setNome(dto.getNome());
         pessoa.setIdentificacao(dto.getIdentificacao());
         pessoa.setEmail(dto.getEmail());
         pessoa.setTelefone(dto.getTelefone());
-        pessoa.setTpPessoa(dto.getTpPessoa().length() == 11 ? "4" : "3");
-        pessoa.setUsuario(usuario);
+        pessoa.setTpPessoa(dto.getIdentificacao().length() == 11 ? "4" : "3");
+        pessoa.setUsuario(usuarioSalvo);
+        pessoa.setDtInclusao(new Date());
         pessoa.setAtivo(true);
 
-        usuarioRepository.save(usuario);
         pessoaRepository.save(pessoa);
 	}
 
@@ -125,9 +127,11 @@ public class UsuarioServiceImpl implements UsuarioService{
 			pessoas = List.of(pessoa);
 		}
 
-		return pessoas.stream().map(p -> UsuarioResponseDTO.builder().login(p.getUsuario().getLogin())
+		return pessoas.stream().map(p -> UsuarioResponseDTO.builder().login(p.getUsuario().getLogin()).id(p.getId())
 				.identificacao(p.getIdentificacao()).nome(p.getNome()).email(p.getEmail()).telefone(p.getTelefone())
-				.tpPessoa(p.getTpPessoa()).build()).toList();
+				.tpPessoa(p.getTpPessoa())
+				.ativo(p.getAtivo().booleanValue())
+				.build()).toList();
 	}
 	
 	@Override

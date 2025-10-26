@@ -68,4 +68,15 @@ public class AuthenticationController  extends ControllerServiceDesk{
 	    usuarioService.alterarSenha(id, dto);
 	    return new ResponseServiceDesk(responseSucesso(MensagemEnum.MSGS001));
 	}
+	
+	@Operation(summary = "Atualizar dados do usuário")
+	@PutMapping("/{id}")
+	@ResponseStatus(HttpStatus.OK)
+	public ResponseServiceDesk atualizarUsuario(
+	        @PathVariable Long id,
+	        @RequestBody @Valid UsuarioRequestDTO dto) {
+
+	    usuarioService.atualizarUsuario(id, dto);
+	    return new ResponseServiceDesk(responseSucesso(MensagemEnum.MSGS001));
+	}
 }

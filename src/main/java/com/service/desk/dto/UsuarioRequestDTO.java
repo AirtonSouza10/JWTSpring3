@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UsuarioRequestDTO {
+	private Long id;
 	private String login;
 	private String senha;
 	private String identificacao;
@@ -19,6 +20,6 @@ public class UsuarioRequestDTO {
     private String email;
     private String telefone;
     private String tpPessoa;
-    private boolean ativo;
+    private Boolean ativo;
 
 }

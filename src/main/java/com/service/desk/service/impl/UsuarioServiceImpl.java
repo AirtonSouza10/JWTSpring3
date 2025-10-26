@@ -50,7 +50,7 @@ public class UsuarioServiceImpl implements UsuarioService{
 	
 	@Override
 	public void registrarUsuario (UsuarioRequestDTO dto) {
-        if (usuarioRepository.findByLogin(dto.getLogin()) != null) {
+        if (usuarioRepository.findByLogin(dto.getIdentificacao()) != null) {
             throw new NegocioException("Login já existe");
         }
 

@@ -1,7 +1,7 @@
 package com.service.desk.entidade;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDate;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -11,8 +11,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -35,8 +33,7 @@ public class ParcelaPrevistaNota{
     @JoinColumn(name="nota_fiscal_id", nullable=false)
     private NotaFiscal notaFiscal;
 
-    @Temporal(TemporalType.DATE)
-    private Date dtVencimentoPrevisto;
+    private LocalDate dtVencimentoPrevisto;
 
     private BigDecimal valorPrevisto;
     

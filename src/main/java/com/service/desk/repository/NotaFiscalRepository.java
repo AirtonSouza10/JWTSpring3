@@ -2,6 +2,8 @@ package com.service.desk.repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -15,4 +17,8 @@ public interface NotaFiscalRepository extends JpaRepository<NotaFiscal, Long> {
 			Long id);
 	
 	List<NotaFiscal> findByNumeroAndFornecedorId(String numero, Long fornecedorId);
+	
+    Page<NotaFiscal> findByNumeroContainingAndFornecedorId(String numero, Long fornecedorId, Pageable pageable);
+
+    Page<NotaFiscal> findAll(Pageable pageable);
 }

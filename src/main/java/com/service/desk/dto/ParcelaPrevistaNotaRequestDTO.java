@@ -1,7 +1,7 @@
 package com.service.desk.dto;
 
 import java.math.BigDecimal;
-import java.sql.Date;
+import java.time.LocalDate;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,6 +12,6 @@ import lombok.Data;
 @AllArgsConstructor
 public class ParcelaPrevistaNotaRequestDTO {
     private Long id;
-    private Date dtVencimentoPrevisto;
+    private LocalDate dtVencimentoPrevisto;
     private BigDecimal valorPrevisto;
 }

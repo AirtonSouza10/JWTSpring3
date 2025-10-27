@@ -1,10 +1,11 @@
 package com.service.desk.service.impl;
 
-import java.sql.Date;
 import java.util.List;
 import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.service.desk.dto.NotaFiscalRequestDTO;
@@ -54,7 +55,7 @@ public class NotaFiscalServiceImpl implements NotaFiscalService {
                         ? nota.getParcelasPrevistas().stream()
                             .map(parcela -> ParcelaPrevistaNotaResponseDTO.builder()
                                 .id(parcela.getId())
-                                .dtVencimentoPrevisto((Date) parcela.getDtVencimentoPrevisto())
+                                .dtVencimentoPrevisto(parcela.getDtVencimentoPrevisto())
                                 .valorPrevisto(parcela.getValorPrevisto())
                                 .build())
                             .toList()
@@ -82,6 +83,88 @@ public class NotaFiscalServiceImpl implements NotaFiscalService {
                         .build();
                 })
                 .toList();
+    }
+    
+    @Override
+    public Page<NotaFiscalResponseDTO> listarNotasFiscaisByNumeroAndFornecedor(String numero, Long fornecedorId, Pageable pageable) {
+        Page<NotaFiscal> page;
+
+        if (numero != null && fornecedorId != null) {
+            page = notaFiscalRepository.findByNumeroContainingAndFornecedorId(numero, fornecedorId, pageable);
+        } else {
+            page = notaFiscalRepository.findAll(pageable);
+        }
+
+        return page.map(nota -> {
+            List<ParcelaPrevistaNotaResponseDTO> parcelasPrevistasDTO = nota.getParcelasPrevistas() != null
+                ? nota.getParcelasPrevistas().stream()
+                    .map(parcela -> ParcelaPrevistaNotaResponseDTO.builder()
+                        .id(parcela.getId())
+                        .dtVencimentoPrevisto(parcela.getDtVencimentoPrevisto())
+                        .valorPrevisto(parcela.getValorPrevisto())
+                        .build())
+                    .toList()
+                : List.of();
+
+            return NotaFiscalResponseDTO.builder()
+                .id(nota.getId())
+                .numero(nota.getNumero())
+                .serie(nota.getSerie())
+                .chave(nota.getChave())
+                .descricaoObs(nota.getDescricaoObs())
+                .valorTotal(nota.getValorTotal())
+                .valorDesconto(nota.getValorDesconto())
+                .valorIcms(nota.getValorIcms())
+                .valorJuros(nota.getValorJuros())
+                .valorMulta(nota.getValorMulta())
+                .dtCompra(nota.getDtCompra())
+                .fornecedorId(nota.getFornecedor() != null ? nota.getFornecedor().getId() : null)
+                .fornecedorNome(nota.getFornecedor() != null ? nota.getFornecedor().getNome() : null)
+                .tipoNotaId(nota.getTipo() != null ? nota.getTipo().getId() : null)
+                .pessoaId(nota.getPessoa() != null ? nota.getPessoa().getId() : null)
+                .filialId(nota.getFilial() != null ? nota.getFilial().getId() : null)
+                .formaPagamentoId(nota.getFormaPagamento() != null ? nota.getFormaPagamento().getId() : null)
+                .parcelasPrevistas(parcelasPrevistasDTO)
+                .build();
+        });
+    }
+    
+    @Override
+    public Page<NotaFiscalResponseDTO> listarNotasFiscaisWithPaginacao(Pageable pageable) {
+        Page<NotaFiscal> page = notaFiscalRepository.findAll(pageable);
+
+        return page.map(nota -> {
+            List<ParcelaPrevistaNotaResponseDTO> parcelasPrevistasDTO = nota.getParcelasPrevistas() != null
+                ? nota.getParcelasPrevistas().stream()
+                    .map(parcela -> ParcelaPrevistaNotaResponseDTO.builder()
+                        .id(parcela.getId())
+                        .dtVencimentoPrevisto(parcela.getDtVencimentoPrevisto())
+                        .valorPrevisto(parcela.getValorPrevisto())
+                        .build())
+                    .toList()
+                : List.of();
+
+            return NotaFiscalResponseDTO.builder()
+                .id(nota.getId())
+                .numero(nota.getNumero())
+                .serie(nota.getSerie())
+                .chave(nota.getChave())
+                .descricaoObs(nota.getDescricaoObs())
+                .valorTotal(nota.getValorTotal())
+                .valorDesconto(nota.getValorDesconto())
+                .valorIcms(nota.getValorIcms())
+                .valorJuros(nota.getValorJuros())
+                .valorMulta(nota.getValorMulta())
+                .dtCompra(nota.getDtCompra())
+                .fornecedorId(nota.getFornecedor() != null ? nota.getFornecedor().getId() : null)
+                .fornecedorNome(nota.getFornecedor() != null ? nota.getFornecedor().getNome() : null)
+                .tipoNotaId(nota.getTipo() != null ? nota.getTipo().getId() : null)
+                .pessoaId(nota.getPessoa() != null ? nota.getPessoa().getId() : null)
+                .filialId(nota.getFilial() != null ? nota.getFilial().getId() : null)
+                .formaPagamentoId(nota.getFormaPagamento() != null ? nota.getFormaPagamento().getId() : null)
+                .parcelasPrevistas(parcelasPrevistasDTO)
+                .build();
+        });
     }
     
     @Override
@@ -239,7 +322,7 @@ public class NotaFiscalServiceImpl implements NotaFiscalService {
                 ? nota.getParcelasPrevistas().stream()
                     .map(parcela -> ParcelaPrevistaNotaResponseDTO.builder()
                             .id(parcela.getId())
-                            .dtVencimentoPrevisto(new java.sql.Date(parcela.getDtVencimentoPrevisto().getTime()))
+                            .dtVencimentoPrevisto(parcela.getDtVencimentoPrevisto())
                             .valorPrevisto(parcela.getValorPrevisto())
                             .build())
                     .toList()
@@ -289,7 +372,7 @@ public class NotaFiscalServiceImpl implements NotaFiscalService {
                     ? nota.getParcelasPrevistas().stream()
                         .map(parcela -> ParcelaPrevistaNotaResponseDTO.builder()
                                 .id(parcela.getId())
-                                .dtVencimentoPrevisto(new Date(parcela.getDtVencimentoPrevisto().getTime()))
+                                .dtVencimentoPrevisto(parcela.getDtVencimentoPrevisto())
                                 .valorPrevisto(parcela.getValorPrevisto())
                                 .build())
                         .toList()

@@ -6,6 +6,9 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.service.desk.dto.DuplicataRequestDTO;
@@ -87,6 +90,94 @@ public class DuplicataServiceImpl implements DuplicataService {
 		                        .build()
 		        ).collect(Collectors.toList()) : null)
                 .build()).toList();
+    }
+    
+    @Override   
+    public Page<DuplicataResponseDTO> listarDuplicatasPaginadas(int pagina, int tamanho) {
+        Pageable pageable = PageRequest.of(pagina, tamanho);
+        Page<Duplicata> duplicatasPage = duplicataRepository.findAll(pageable);
+
+        return duplicatasPage.map(d -> DuplicataResponseDTO.builder()
+                .id(d.getId())
+                .descricao(d.getDescricao())
+                .valor(d.getValor())
+                .desconto(d.getDesconto())
+                .multa(d.getMulta())
+                .juros(d.getJuros())
+                .valorTotal(d.getValorTotal())
+                .formaPagamentoId(Objects.nonNull(d.getFormaPagamento()) ? d.getFormaPagamento().getId() : null)
+                .dtCriacao(d.getDtCriacao() != null ? new java.sql.Date(d.getDtCriacao().getTime()) : null)
+                .dtAtualizacao(d.getDtAtualizacao() != null ? new java.sql.Date(d.getDtAtualizacao().getTime()) : null)
+                .parcelas(d.getParcelas() != null ? d.getParcelas().stream().map(p ->
+                        ParcelamentoDTO.builder()
+                                .id(p.getId())
+                                .numeroParcela(p.getNumeroParcela())
+                                .valorTotal(p.getValorTotal())
+                                .dtVencimento(p.getDtVencimento() != null ? new java.sql.Date(p.getDtVencimento().getTime()) : null)
+                                .dtCriacao(p.getDtCriacao() != null ? new java.sql.Date(p.getDtCriacao().getTime()) : null)
+                                .dtAtualizacao(p.getDtAtualizacao() != null ? new java.sql.Date(p.getDtAtualizacao().getTime()) : null)
+                                .duplicataId(d.getId())
+                                .build()
+                ).collect(Collectors.toList()) : null)
+                .notasFiscais(d.getNotasFiscais() != null ? d.getNotasFiscais().stream().map(nf ->
+                        NotaFiscalResponseDTO.builder()
+                                .id(nf.getId())
+                                .chave(nf.getChave())
+                                .numero(nf.getNumero())
+                                .serie(nf.getSerie())
+                                .dtCompra(nf.getDtCompra())
+                                .fornecedorId(nf.getFornecedor().getId())
+                                .fornecedorNome(nf.getFornecedor().getNome())
+                                .filialId(nf.getFilial().getId())
+                                .tipoNotaId(nf.getTipo().getId())
+                                .valorTotal(nf.getValorTotal())
+                                .build()
+                ).collect(Collectors.toList()) : null)
+                .build());
+    }
+
+    @Override 
+    public Page<DuplicataResponseDTO> buscarDuplicatasPorNumeroPaginadas(String numero, int pagina, int tamanho) {
+        Pageable pageable = PageRequest.of(pagina, tamanho);
+        Page<Duplicata> duplicatasPage = duplicataRepository.findByDescricaoContaining(numero, pageable);
+
+        return duplicatasPage.map(d -> DuplicataResponseDTO.builder()
+                .id(d.getId())
+                .descricao(d.getDescricao())
+                .valor(d.getValor())
+                .desconto(d.getDesconto())
+                .multa(d.getMulta())
+                .juros(d.getJuros())
+                .valorTotal(d.getValorTotal())
+                .formaPagamentoId(Objects.nonNull(d.getFormaPagamento()) ? d.getFormaPagamento().getId() : null)
+                .dtCriacao(d.getDtCriacao() != null ? new java.sql.Date(d.getDtCriacao().getTime()) : null)
+                .dtAtualizacao(d.getDtAtualizacao() != null ? new java.sql.Date(d.getDtAtualizacao().getTime()) : null)
+                .parcelas(d.getParcelas() != null ? d.getParcelas().stream().map(p ->
+                        ParcelamentoDTO.builder()
+                                .id(p.getId())
+                                .numeroParcela(p.getNumeroParcela())
+                                .valorTotal(p.getValorTotal())
+                                .dtVencimento(p.getDtVencimento() != null ? new java.sql.Date(p.getDtVencimento().getTime()) : null)
+                                .dtCriacao(p.getDtCriacao() != null ? new java.sql.Date(p.getDtCriacao().getTime()) : null)
+                                .dtAtualizacao(p.getDtAtualizacao() != null ? new java.sql.Date(p.getDtAtualizacao().getTime()) : null)
+                                .duplicataId(d.getId())
+                                .build()
+                ).collect(Collectors.toList()) : null)
+                .notasFiscais(d.getNotasFiscais() != null ? d.getNotasFiscais().stream().map(nf ->
+                        NotaFiscalResponseDTO.builder()
+                                .id(nf.getId())
+                                .chave(nf.getChave())
+                                .numero(nf.getNumero())
+                                .serie(nf.getSerie())
+                                .dtCompra(nf.getDtCompra())
+                                .fornecedorId(nf.getFornecedor().getId())
+                                .fornecedorNome(nf.getFornecedor().getNome())
+                                .filialId(nf.getFilial().getId())
+                                .tipoNotaId(nf.getTipo().getId())
+                                .valorTotal(nf.getValorTotal())
+                                .build()
+                ).collect(Collectors.toList()) : null)
+                .build());
     }
 
     @Override

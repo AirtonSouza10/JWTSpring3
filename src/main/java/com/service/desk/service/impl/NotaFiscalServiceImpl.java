@@ -15,6 +15,7 @@ import com.service.desk.entidade.NotaFiscal;
 import com.service.desk.entidade.ParcelaPrevistaNota;
 import com.service.desk.enumerator.MensagemEnum;
 import com.service.desk.exceptions.NegocioException;
+import com.service.desk.repository.DuplicataRepository;
 import com.service.desk.repository.FilialRepository;
 import com.service.desk.repository.FormaPagamentoRepository;
 import com.service.desk.repository.FornecedorRepository;
@@ -46,6 +47,8 @@ public class NotaFiscalServiceImpl implements NotaFiscalService {
 	private ParcelaPrevistaNotaRepository parcelaPrevistaNotaRepository;
 	@Autowired
 	private FormaPagamentoRepository formaPagamentoRepository;
+	@Autowired
+	private DuplicataRepository duplicataRepository;
 
     @Override
     public List<NotaFiscalResponseDTO> listarNotasFiscais() {
@@ -79,6 +82,8 @@ public class NotaFiscalServiceImpl implements NotaFiscalService {
                         .pessoaId(nota.getPessoa() != null ? nota.getPessoa().getId() : null)
                         .filialId(nota.getFilial() != null ? nota.getFilial().getId() : null)
                         .formaPagamentoId(nota.getFormaPagamento() != null ? nota.getFormaPagamento().getId() : null)
+                        .duplicataId(nota.getDuplicata() != null ? nota.getDuplicata().getId() : null)
+                        .dsDuplicata(nota.getDuplicata() != null ? nota.getDuplicata().getDescricao() : null)
                         .parcelasPrevistas(parcelasPrevistasDTO)
                         .build();
                 })
@@ -124,6 +129,8 @@ public class NotaFiscalServiceImpl implements NotaFiscalService {
                 .pessoaId(nota.getPessoa() != null ? nota.getPessoa().getId() : null)
                 .filialId(nota.getFilial() != null ? nota.getFilial().getId() : null)
                 .formaPagamentoId(nota.getFormaPagamento() != null ? nota.getFormaPagamento().getId() : null)
+                .duplicataId(nota.getDuplicata() != null ? nota.getDuplicata().getId() : null)
+                .dsDuplicata(nota.getDuplicata() != null ? nota.getDuplicata().getDescricao() : null)
                 .parcelasPrevistas(parcelasPrevistasDTO)
                 .build();
         });
@@ -162,6 +169,8 @@ public class NotaFiscalServiceImpl implements NotaFiscalService {
                 .pessoaId(nota.getPessoa() != null ? nota.getPessoa().getId() : null)
                 .filialId(nota.getFilial() != null ? nota.getFilial().getId() : null)
                 .formaPagamentoId(nota.getFormaPagamento() != null ? nota.getFormaPagamento().getId() : null)
+                .duplicataId(nota.getDuplicata() != null ? nota.getDuplicata().getId() : null)
+                .dsDuplicata(nota.getDuplicata() != null ? nota.getDuplicata().getDescricao() : null)
                 .parcelasPrevistas(parcelasPrevistasDTO)
                 .build();
         });
@@ -201,6 +210,11 @@ public class NotaFiscalServiceImpl implements NotaFiscalService {
         nf.setTipo(tipoNota);
         nf.setFilial(filial);
         nf.setFormaPagamento(Objects.nonNull(dto.getFormaPagamentoId()) ? formaPagamentoRepository.findById(dto.getFormaPagamentoId()).get() : null);
+        if (dto.getDuplicataId() != null) {
+            var duplicata = duplicataRepository.findById(dto.getDuplicataId())
+                .orElseThrow(() -> new NegocioException(MensagemEnum.MSGE016.getKey()));
+            nf.setDuplicata(duplicata);
+        }
 
         notaFiscalRepository.save(nf);
 
@@ -256,6 +270,12 @@ public class NotaFiscalServiceImpl implements NotaFiscalService {
             var pessoa = pessoaRepository.findById(dto.getPessoaId())
                     .orElseThrow(() -> new NegocioException(MensagemEnum.MSGE009.getKey()));
             notaFiscal.setPessoa(pessoa);
+        }
+        
+        if (dto.getDuplicataId() != null) {
+            var duplicata = duplicataRepository.findById(dto.getDuplicataId())
+                .orElseThrow(() -> new NegocioException(MensagemEnum.MSGE016.getKey()));
+            notaFiscal.setDuplicata(duplicata);
         }
         
         // Se a forma de pagamento for nula, apagar parcelas previstas ---
@@ -346,6 +366,8 @@ public class NotaFiscalServiceImpl implements NotaFiscalService {
                 .pessoaId(nota.getPessoa() != null ? nota.getPessoa().getId() : null)
                 .filialId(nota.getFilial() != null ? nota.getFilial().getId() : null)
                 .formaPagamentoId(nota.getFormaPagamento() != null ? nota.getFormaPagamento().getId() : null)
+                .duplicataId(nota.getDuplicata() != null ? nota.getDuplicata().getId() : null)
+                .dsDuplicata(nota.getDuplicata() != null ? nota.getDuplicata().getDescricao() : null)
                 .parcelasPrevistas(parcelasPrevistasDTO)
                 .build();
     }

@@ -358,5 +358,56 @@ public class DuplicataServiceImpl implements DuplicataService {
 
         parcelaRepository.deleteAll(duplicata.getParcelas());
         duplicataRepository.delete(duplicata);
-    }	
+    }
+    
+    @Override
+    public List<DuplicataResponseDTO> buscarDuplicataPorDescricao(String descricao) {
+        List<Duplicata> duplicatas = duplicataRepository.findByDescricaoContaining(descricao);
+        return duplicatas.stream()
+                         .map(this::mapToDTO)
+                         .collect(Collectors.toList());
+    }
+
+    private DuplicataResponseDTO mapToDTO(Duplicata duplicata) {
+        List<ParcelamentoDTO> parcelasDTO = duplicata.getParcelas().stream()
+                .map(p -> ParcelamentoDTO.builder()
+                        .id(p.getId())
+                        .numeroParcela(p.getNumeroParcela())
+                        .valorTotal(p.getValorTotal())
+                        .dtVencimento(p.getDtVencimento() != null ? new java.sql.Date(p.getDtVencimento().getTime()) : null)
+                        .dtCriacao(p.getDtCriacao() != null ? new java.sql.Date(p.getDtCriacao().getTime()) : null)
+                        .dtAtualizacao(p.getDtAtualizacao() != null ? new java.sql.Date(p.getDtAtualizacao().getTime()) : null)
+                        .duplicataId(duplicata.getId())
+                        .build())
+                .collect(Collectors.toList());
+
+        List<NotaFiscalResponseDTO> notaFiscalResponseDTO = duplicata.getNotasFiscais().stream()
+                .map(nf -> NotaFiscalResponseDTO.builder()
+                        .id(nf.getId())
+                        .chave(nf.getChave())
+                        .numero(nf.getNumero())
+                        .serie(nf.getSerie())
+                        .dtCompra(nf.getDtCompra())
+                        .fornecedorId(nf.getFornecedor().getId())
+                        .fornecedorNome(nf.getFornecedor().getNome())
+                        .filialId(nf.getFilial().getId())
+                        .tipoNotaId(nf.getTipo().getId())
+                        .valorTotal(nf.getValorTotal())
+                        .build())
+                .collect(Collectors.toList());
+
+        return DuplicataResponseDTO.builder()
+                .id(duplicata.getId())
+                .descricao(duplicata.getDescricao())
+                .valor(duplicata.getValor())
+                .desconto(duplicata.getDesconto())
+                .multa(duplicata.getMulta())
+                .valorTotal(duplicata.getValorTotal())
+                .formaPagamentoId(duplicata.getFormaPagamento().getId())
+                .dtCriacao(duplicata.getDtCriacao() != null ? new java.sql.Date(duplicata.getDtCriacao().getTime()) : null)
+                .dtAtualizacao(duplicata.getDtAtualizacao() != null ? new java.sql.Date(duplicata.getDtAtualizacao().getTime()) : null)
+                .parcelas(parcelasDTO)
+                .notasFiscais(notaFiscalResponseDTO)
+                .build();
+    }
 }

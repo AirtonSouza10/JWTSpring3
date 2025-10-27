@@ -1,5 +1,7 @@
 package com.service.desk.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -84,10 +86,18 @@ public class DuplicataController extends ControllerServiceDesk{
         duplicataService.excluirDuplicata(id);
     }
     
-    @Operation(summary = "Buscar nota fiscal por ID")
+    @Operation(summary = "Buscar duplicata por ID")
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseServiceDesk buscarPorId(@PathVariable Long id) {
         return new ResponseServiceDesk(duplicataService.buscarDuplicataPorId(id));
+    }
+    
+    @Operation(summary = "Buscar duplicata por descrição (sem paginação)")
+    @GetMapping("/descricao")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseServiceDesk buscarPorDescricaoSemPaginacao(@RequestParam String descricao) {
+        List<DuplicataResponseDTO> duplicatas = duplicataService.buscarDuplicataPorDescricao(descricao);
+        return new ResponseServiceDesk(duplicatas);
     }
 }

@@ -32,6 +32,7 @@ public class NotaFiscalRequestDTO {
     private Long pessoaId;
     private Long filialId;
     private Long formaPagamentoId;
+    private Long duplicataId;
     
     private List<ParcelaPrevistaNotaRequestDTO> parcelasPrevistas;
 }

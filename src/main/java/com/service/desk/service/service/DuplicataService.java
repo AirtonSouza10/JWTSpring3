@@ -23,4 +23,6 @@ public interface DuplicataService {
 
 	Page<DuplicataResponseDTO> buscarDuplicatasPorNumeroPaginadas(String numero, int pagina, int tamanho);
 
+	List<DuplicataResponseDTO> buscarDuplicataPorDescricao(String descricao);
+
 }

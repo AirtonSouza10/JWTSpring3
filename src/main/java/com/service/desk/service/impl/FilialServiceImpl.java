@@ -14,9 +14,7 @@ import com.service.desk.service.service.FilialService;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 
-@Log4j2
 @Service
 @RequiredArgsConstructor
 public class FilialServiceImpl implements FilialService {

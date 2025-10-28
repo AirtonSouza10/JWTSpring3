@@ -1,7 +1,17 @@
 package com.service.desk.controller;
 
+import java.io.IOException;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,6 +29,13 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.engine.util.JRLoader;
 
 @RestController
 @RequiredArgsConstructor
@@ -65,5 +82,32 @@ public class FornecedorController extends ControllerServiceDesk{
 	public ResponseServiceDesk atualizarStatusFornecedor(@PathVariable Long id, @RequestBody Boolean ativo) {
 	    fornecedorService.atualizarStatus(id, ativo);
 	    return new ResponseServiceDesk(responseSucesso(MensagemEnum.MSGS001));
+	}
+
+	@Operation(summary = "Gera relatório de fornecedores em PDF")
+	@ResponseStatus(HttpStatus.OK)
+	@GetMapping("/relatorio-fornecedores")
+	public ResponseEntity<byte[]> gerarRelatorioFornecedores() throws JRException, IOException {
+	    var fornecedores = fornecedorService.listarFornecdores();
+	    JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(fornecedores);
+
+	    Map<String, Object> parametros = new HashMap<>();
+	    parametros.put("TITULO_RELATORIO", "Relatório de Fornecedores");
+	    parametros.put("DATA_EMISSAO", new Date());
+
+	    JasperReport jasperReport = (JasperReport) JRLoader.loadObject(
+	        new ClassPathResource("relatorios/Fornecedor.jasper").getInputStream()
+	    );
+
+	    JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, dataSource);
+
+	    byte[] pdf = JasperExportManager.exportReportToPdf(jasperPrint);
+
+	    HttpHeaders headers = new HttpHeaders();
+	    headers.setContentType(MediaType.APPLICATION_PDF);
+	    headers.setContentDisposition(ContentDisposition.builder("inline")
+	            .filename("relatorio-fornecedores.pdf").build());
+
+	    return new ResponseEntity<>(pdf, headers, HttpStatus.OK);
 	}
 }

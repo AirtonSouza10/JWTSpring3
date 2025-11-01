@@ -1,5 +1,6 @@
 package com.service.desk.service.impl;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,9 +15,7 @@ import com.service.desk.service.service.StatusContaService;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 
-@Log4j2
 @Service
 @RequiredArgsConstructor
 public class StatusContaServiceImpl implements StatusContaService {
@@ -44,6 +43,7 @@ public class StatusContaServiceImpl implements StatusContaService {
     public void salvarStatus(StatusContaRequestDTO statusRequestDTO) {
         var status = StatusConta.builder()
                 .descricao(statusRequestDTO.getDescricao())
+                .dtInclusao(LocalDate.now())
                 .build();
 
         statusContaRepository.save(status);	
@@ -51,10 +51,11 @@ public class StatusContaServiceImpl implements StatusContaService {
     
     @Override
     @Transactional
-    public void atualizarStatus(Long id, StatusContaRequestDTO formaPagamentoResponseDTO) {
+    public void atualizarStatus(Long id, StatusContaRequestDTO statusRequestDTO) {
         var status = statusContaRepository.findById(id).orElseThrow();
 
-        status.setDescricao(formaPagamentoResponseDTO.getDescricao());
+        status.setDescricao(statusRequestDTO.getDescricao());
+        status.setDtAtualizacao(LocalDate.now());
 
         statusContaRepository.save(status);   	
     }

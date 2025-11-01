@@ -1,7 +1,7 @@
 package com.service.desk.dto;
 
 import java.math.BigDecimal;
-import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -19,8 +19,8 @@ public class DuplicataResponseDTO {
     private BigDecimal multa;
     private BigDecimal juros;
     private BigDecimal valorTotal;
-    private Date dtCriacao;
-    private Date dtAtualizacao;
+    private LocalDate dtCriacao;
+    private LocalDate dtAtualizacao;
     private Long formaPagamentoId;
     private List<ParcelamentoDTO> parcelas;
     private List<NotaFiscalResponseDTO> notasFiscais;

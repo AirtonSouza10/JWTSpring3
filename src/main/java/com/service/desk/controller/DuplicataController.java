@@ -63,7 +63,7 @@ public class DuplicataController extends ControllerServiceDesk{
         return new ResponseServiceDesk(page);
     }
 
-	@Operation(summary = "Salvar nova nota")
+	@Operation(summary = "Salvar nova Duplicata")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseServiceDesk salvarNota(@Valid @RequestBody DuplicataRequestDTO dto) {
@@ -71,7 +71,7 @@ public class DuplicataController extends ControllerServiceDesk{
         return new ResponseServiceDesk(responseSucesso(MensagemEnum.MSGS001));
     }
 
-	@Operation(summary = "Atualiza dados da nota")
+	@Operation(summary = "Atualiza dados da Duplicata")
 	@PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseServiceDesk atualizarNota(@PathVariable Long id , @Valid @RequestBody DuplicataRequestDTO dto) {

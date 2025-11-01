@@ -127,7 +127,7 @@ public class UsuarioServiceImpl implements UsuarioService{
 			pessoas = List.of(pessoa);
 		}
 
-		return pessoas.stream().map(p -> UsuarioResponseDTO.builder().login(p.getUsuario().getLogin()).id(p.getId())
+		return pessoas.stream().map(p -> UsuarioResponseDTO.builder().login(p.getUsuario().getLogin()).id(p.getUsuario().getId())
 				.identificacao(p.getIdentificacao()).nome(p.getNome()).email(p.getEmail()).telefone(p.getTelefone())
 				.tpPessoa(p.getTpPessoa())
 				.ativo(p.getAtivo().booleanValue())

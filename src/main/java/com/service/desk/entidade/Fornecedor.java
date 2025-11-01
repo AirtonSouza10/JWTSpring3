@@ -1,6 +1,6 @@
 package com.service.desk.entidade;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
@@ -12,8 +12,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -47,10 +45,8 @@ public class Fornecedor{
     @Column(nullable = false)
     private Boolean ativo = true;
     
-	@Temporal(TemporalType.DATE)
-	private Date dtInclusao;
-	@Temporal(TemporalType.DATE)
-	private Date dtAtualizacao;
+	private LocalDate dtInclusao;
+	private LocalDate dtAtualizacao;
     
     @OneToMany(mappedBy = "fornecedor", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Telefone> telefones;

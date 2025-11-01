@@ -1,7 +1,7 @@
 package com.service.desk.dto;
 
 import java.math.BigDecimal;
-import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -25,7 +25,7 @@ public class NotaFiscalResponseDTO {
     private BigDecimal valorJuros;
     private BigDecimal valorMulta;
 
-    private Date dtCompra;
+    private LocalDate dtCompra;
 
     private Long fornecedorId;
     private String fornecedorNome;

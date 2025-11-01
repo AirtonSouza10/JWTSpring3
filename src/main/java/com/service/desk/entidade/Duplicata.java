@@ -1,8 +1,8 @@
 package com.service.desk.entidade;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
@@ -15,8 +15,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -44,11 +42,8 @@ public class Duplicata{
     private BigDecimal valorTotal;
     
 	
-    @Temporal(TemporalType.DATE)
-    private Date dtCriacao;
-    
-    @Temporal(TemporalType.DATE)
-    private Date dtAtualizacao;
+    private LocalDate dtCriacao;
+    private LocalDate dtAtualizacao;
     
     @ManyToOne
     @JoinColumn(name = "forma_pagamento_id", nullable = true)

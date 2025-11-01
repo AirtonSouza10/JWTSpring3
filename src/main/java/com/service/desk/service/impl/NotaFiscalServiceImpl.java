@@ -1,5 +1,6 @@
 package com.service.desk.service.impl;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
@@ -206,6 +207,7 @@ public class NotaFiscalServiceImpl implements NotaFiscalService {
         nf.setValorJuros(dto.getValorJuros());
         nf.setValorMulta(dto.getValorMulta());
         nf.setDtCompra(dto.getDtCompra());
+        nf.setDtInclusao(LocalDate.now());
         nf.setFornecedor(fornecedor);
         nf.setTipo(tipoNota);
         nf.setFilial(filial);
@@ -252,7 +254,7 @@ public class NotaFiscalServiceImpl implements NotaFiscalService {
         notaFiscal.setValorJuros(dto.getValorJuros());
         notaFiscal.setValorMulta(dto.getValorMulta());
         notaFiscal.setDtCompra(dto.getDtCompra());
-        notaFiscal.setDtAtualizacao(new java.sql.Date(System.currentTimeMillis()));
+        notaFiscal.setDtAtualizacao(LocalDate.now());
 
         if (dto.getFornecedorId() != null) {
             var fornecedor = fornecedorRepository.findById(dto.getFornecedorId())

@@ -1,5 +1,6 @@
 package com.service.desk.service.impl;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,6 +54,7 @@ public class TipoPagamentoServiceImpl implements TipoPagamentoService {
     public void salvarTipoPagamento(TipoPagamentoRequestDTO tipoPagamentoRequestDTO) {
         var tipoPagamento = TipoPagamento.builder()
                 .descricao(tipoPagamentoRequestDTO.getDescricao())
+                .dtInclusao(LocalDate.now())
                 .build();
 
         tipoPagamentoRepository.save(tipoPagamento);	
@@ -64,6 +66,7 @@ public class TipoPagamentoServiceImpl implements TipoPagamentoService {
         var formaPagamento = tipoPagamentoRepository.findById(id).orElseThrow();
 
         formaPagamento.setDescricao(tipoPagamentoRequestDTO.getDescricao());
+        formaPagamento.setDtAtualizacao(LocalDate.now());
 
         tipoPagamentoRepository.save(formaPagamento);   	
     }

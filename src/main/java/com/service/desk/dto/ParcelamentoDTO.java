@@ -1,7 +1,7 @@
 package com.service.desk.dto;
 
 import java.math.BigDecimal;
-import java.sql.Date;
+import java.time.LocalDate;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,8 +14,8 @@ public class ParcelamentoDTO {
     private Long id;
     private String numeroParcela;
     private BigDecimal valorTotal;
-    private Date dtVencimento;
-    private Date dtCriacao;
-    private Date dtAtualizacao;
+    private LocalDate dtVencimento;
+    private LocalDate dtCriacao;
+    private LocalDate dtAtualizacao;
     private Long duplicataId;
 }

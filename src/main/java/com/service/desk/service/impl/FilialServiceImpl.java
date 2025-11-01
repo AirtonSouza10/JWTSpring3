@@ -1,5 +1,6 @@
 package com.service.desk.service.impl;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,6 +65,7 @@ public class FilialServiceImpl implements FilialService {
         		.email(dto.getEmail())
         		.nome(dto.getNome())
         		.ativo(true)
+        		.dtInclusao(LocalDate.now())
                 .build();
 
         filialRepository.save(filial);	
@@ -78,6 +80,7 @@ public class FilialServiceImpl implements FilialService {
         filial.setIdentificacao(dto.getIdentificacao());
         filial.setTpIdentificacao(dto.getIdentificacao().length() == 11 ? 4 : 3);
         filial.setEmail(dto.getEmail());
+        filial.setDtAtualizacao(LocalDate.now());
 
         filialRepository.save(filial);   	
     }

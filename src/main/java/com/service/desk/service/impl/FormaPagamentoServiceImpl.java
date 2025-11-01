@@ -1,5 +1,6 @@
 package com.service.desk.service.impl;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,9 +15,7 @@ import com.service.desk.service.service.FormaPagamentoService;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 
-@Log4j2
 @Service
 @RequiredArgsConstructor
 public class FormaPagamentoServiceImpl implements FormaPagamentoService {
@@ -63,6 +62,7 @@ public class FormaPagamentoServiceImpl implements FormaPagamentoService {
                 .qtdeParcelas(formaPagamentoRequestDTO.getQtdeParcelas())
 				.prazoPrimeiraParcela(formaPagamentoRequestDTO.getPrazoPrimeiraParcela())
 				.intervaloParcelas(formaPagamentoRequestDTO.getIntervaloParcelas())
+				.dtInclusao(LocalDate.now())
                 .build();
 
         formaPagamentoRepository.save(formaPagamento);	
@@ -77,6 +77,7 @@ public class FormaPagamentoServiceImpl implements FormaPagamentoService {
         formaPagamento.setQtdeParcelas(formaPagamentoRequestDTO.getQtdeParcelas());
         formaPagamento.setPrazoPrimeiraParcela(formaPagamentoRequestDTO.getPrazoPrimeiraParcela());
         formaPagamento.setIntervaloParcelas(formaPagamentoRequestDTO.getIntervaloParcelas());
+        formaPagamento.setDtAtualizacao(LocalDate.now());
 
         formaPagamentoRepository.save(formaPagamento);   	
     }

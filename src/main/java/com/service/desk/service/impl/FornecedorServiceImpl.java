@@ -1,5 +1,6 @@
 package com.service.desk.service.impl;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -94,6 +95,7 @@ public class FornecedorServiceImpl implements FornecedorService {
                 .tpIdentificacao(dto.getIdentificacao().length() ==11 ? 4 : 3)
                 .email(dto.getEmail())
                 .ativo(true)
+                .dtInclusao(LocalDate.now())
                 .build();
 
         var telefones = dto.getTelefones().stream().map(telDto -> {
@@ -144,6 +146,7 @@ public class FornecedorServiceImpl implements FornecedorService {
         fornecedor.setTpIdentificacao(dto.getIdentificacao().length() == 11 ? 4 : 3);
         fornecedor.setEmail(dto.getEmail());
         fornecedor.setAtivo(dto.getAtivo());
+        fornecedor.setDtAtualizacao(LocalDate.now());
 
         // Certifique-se de que as listas são mutáveis
         if (fornecedor.getTelefones() == null) {

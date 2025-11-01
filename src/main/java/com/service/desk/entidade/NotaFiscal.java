@@ -1,7 +1,7 @@
 package com.service.desk.entidade;
 
 import java.math.BigDecimal;
-import java.sql.Date;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,8 +16,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -66,13 +64,10 @@ public class NotaFiscal{
     @Column(nullable = true)
     private BigDecimal valorIpi;
 
-    @Temporal(TemporalType.DATE)
-    private Date dtCompra;
+    private LocalDate dtCompra;
     
-	@Temporal(TemporalType.DATE)
-	private Date dtInclusao;
-	@Temporal(TemporalType.DATE)
-	private Date dtAtualizacao;
+	private LocalDate dtInclusao;
+	private LocalDate dtAtualizacao;
 
     @ManyToOne
     @JoinColumn(name = "fornecedor_id", nullable = false)

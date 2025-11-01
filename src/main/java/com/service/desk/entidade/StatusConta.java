@@ -1,7 +1,7 @@
 package com.service.desk.entidade;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDate;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -9,8 +9,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -32,8 +30,6 @@ public class StatusConta implements Serializable {
 	private Long id;
 
 	private String descricao;
-	@Temporal(TemporalType.DATE)
-	private Date dtInclusao;
-	@Temporal(TemporalType.DATE)
-	private Date dtAtualizacao;	
+	private LocalDate dtInclusao;
+	private LocalDate dtAtualizacao;	
 }

@@ -1,5 +1,6 @@
 package com.service.desk.service.impl;
 
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -10,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import com.service.desk.dto.DuplicataRequestDTO;
 import com.service.desk.dto.DuplicataResponseDTO;
@@ -23,15 +25,14 @@ import com.service.desk.exceptions.NegocioException;
 import com.service.desk.repository.DuplicataRepository;
 import com.service.desk.repository.FormaPagamentoRepository;
 import com.service.desk.repository.NotaFiscalRepository;
+import com.service.desk.repository.ParcelaPrevistaNotaRepository;
 import com.service.desk.repository.ParcelaRepository;
 import com.service.desk.service.service.DuplicataService;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 
-@Log4j2
 @Service
 @RequiredArgsConstructor
 public class DuplicataServiceImpl implements DuplicataService {
@@ -48,6 +49,9 @@ public class DuplicataServiceImpl implements DuplicataService {
     
     @Autowired
     private NotaFiscalRepository notaFiscalRepository;
+    
+    @Autowired
+    private ParcelaPrevistaNotaRepository parcelaPrevistaNotaRepository;
 
     @Override
     public List<DuplicataResponseDTO> listarDuplicatas() {
@@ -62,16 +66,16 @@ public class DuplicataServiceImpl implements DuplicataService {
                 .juros(d.getJuros())
                 .valorTotal(d.getValorTotal())
                 .formaPagamentoId(Objects.nonNull(d.getFormaPagamento()) ? d.getFormaPagamento().getId() : null)
-                .dtCriacao(d.getDtCriacao() != null ? new java.sql.Date(d.getDtCriacao().getTime()) : null)
-                .dtAtualizacao(d.getDtAtualizacao() != null ? new java.sql.Date(d.getDtAtualizacao().getTime()) : null)
+                .dtCriacao(d.getDtCriacao() != null ? d.getDtCriacao() : null)
+                .dtAtualizacao(d.getDtAtualizacao() != null ? d.getDtAtualizacao() : null)
                 .parcelas(d.getParcelas() != null ? d.getParcelas().stream().map(p ->
                         ParcelamentoDTO.builder()
                                 .id(p.getId())
                                 .numeroParcela(p.getNumeroParcela())
                                 .valorTotal(p.getValorTotal())
-                                .dtVencimento(p.getDtVencimento() != null ? new java.sql.Date(p.getDtVencimento().getTime()) : null)
-                                .dtCriacao(p.getDtCriacao() != null ? new java.sql.Date(p.getDtCriacao().getTime()) : null)
-                                .dtAtualizacao(p.getDtAtualizacao() != null ? new java.sql.Date(p.getDtAtualizacao().getTime()) : null)
+                                .dtVencimento(p.getDtVencimento() != null ? p.getDtVencimento() : null)
+                                .dtCriacao(p.getDtCriacao() != null ? p.getDtCriacao() : null)
+                                .dtAtualizacao(p.getDtAtualizacao() != null ? p.getDtAtualizacao() : null)
                                 .duplicataId(d.getId())
                                 .build()
                 ).collect(Collectors.toList()) : null)
@@ -106,16 +110,16 @@ public class DuplicataServiceImpl implements DuplicataService {
                 .juros(d.getJuros())
                 .valorTotal(d.getValorTotal())
                 .formaPagamentoId(Objects.nonNull(d.getFormaPagamento()) ? d.getFormaPagamento().getId() : null)
-                .dtCriacao(d.getDtCriacao() != null ? new java.sql.Date(d.getDtCriacao().getTime()) : null)
-                .dtAtualizacao(d.getDtAtualizacao() != null ? new java.sql.Date(d.getDtAtualizacao().getTime()) : null)
+                .dtCriacao(d.getDtCriacao() != null ? d.getDtCriacao() : null)
+                .dtAtualizacao(d.getDtAtualizacao() != null ? d.getDtAtualizacao() : null)
                 .parcelas(d.getParcelas() != null ? d.getParcelas().stream().map(p ->
                         ParcelamentoDTO.builder()
                                 .id(p.getId())
                                 .numeroParcela(p.getNumeroParcela())
                                 .valorTotal(p.getValorTotal())
-                                .dtVencimento(p.getDtVencimento() != null ? new java.sql.Date(p.getDtVencimento().getTime()) : null)
-                                .dtCriacao(p.getDtCriacao() != null ? new java.sql.Date(p.getDtCriacao().getTime()) : null)
-                                .dtAtualizacao(p.getDtAtualizacao() != null ? new java.sql.Date(p.getDtAtualizacao().getTime()) : null)
+                                .dtVencimento(p.getDtVencimento() != null ? p.getDtVencimento() : null)
+                                .dtCriacao(p.getDtCriacao() != null ? p.getDtCriacao() : null)
+                                .dtAtualizacao(p.getDtAtualizacao() != null ? p.getDtAtualizacao() : null)
                                 .duplicataId(d.getId())
                                 .build()
                 ).collect(Collectors.toList()) : null)
@@ -150,16 +154,16 @@ public class DuplicataServiceImpl implements DuplicataService {
                 .juros(d.getJuros())
                 .valorTotal(d.getValorTotal())
                 .formaPagamentoId(Objects.nonNull(d.getFormaPagamento()) ? d.getFormaPagamento().getId() : null)
-                .dtCriacao(d.getDtCriacao() != null ? new java.sql.Date(d.getDtCriacao().getTime()) : null)
-                .dtAtualizacao(d.getDtAtualizacao() != null ? new java.sql.Date(d.getDtAtualizacao().getTime()) : null)
+                .dtCriacao(d.getDtCriacao() != null ? d.getDtCriacao() : null)
+                .dtAtualizacao(d.getDtAtualizacao() != null ? d.getDtAtualizacao() : null)
                 .parcelas(d.getParcelas() != null ? d.getParcelas().stream().map(p ->
                         ParcelamentoDTO.builder()
                                 .id(p.getId())
                                 .numeroParcela(p.getNumeroParcela())
                                 .valorTotal(p.getValorTotal())
-                                .dtVencimento(p.getDtVencimento() != null ? new java.sql.Date(p.getDtVencimento().getTime()) : null)
-                                .dtCriacao(p.getDtCriacao() != null ? new java.sql.Date(p.getDtCriacao().getTime()) : null)
-                                .dtAtualizacao(p.getDtAtualizacao() != null ? new java.sql.Date(p.getDtAtualizacao().getTime()) : null)
+                                .dtVencimento(p.getDtVencimento() != null ? p.getDtVencimento() : null)
+                                .dtCriacao(p.getDtCriacao() != null ? p.getDtCriacao() : null)
+                                .dtAtualizacao(p.getDtAtualizacao() != null ? p.getDtAtualizacao() : null)
                                 .duplicataId(d.getId())
                                 .build()
                 ).collect(Collectors.toList()) : null)
@@ -190,9 +194,9 @@ public class DuplicataServiceImpl implements DuplicataService {
                         .id(p.getId())
                         .numeroParcela(p.getNumeroParcela())
                         .valorTotal(p.getValorTotal())
-                        .dtVencimento(p.getDtVencimento() != null ? new java.sql.Date(p.getDtVencimento().getTime()) : null)
-                        .dtCriacao(p.getDtCriacao() != null ? new java.sql.Date(p.getDtCriacao().getTime()) : null)
-                        .dtAtualizacao(p.getDtAtualizacao() != null ? new java.sql.Date(p.getDtAtualizacao().getTime()) : null)
+                        .dtVencimento(p.getDtVencimento() != null ? p.getDtVencimento() : null)
+                        .dtCriacao(p.getDtCriacao() != null ? p.getDtCriacao() : null)
+                        .dtAtualizacao(p.getDtAtualizacao() != null ? p.getDtAtualizacao() : null)
                         .duplicataId(duplicata.getId())
                         .build()
         ).collect(Collectors.toList());
@@ -220,8 +224,8 @@ public class DuplicataServiceImpl implements DuplicataService {
                 .multa(duplicata.getMulta())
                 .valorTotal(duplicata.getValorTotal())
                 .formaPagamentoId(duplicata.getFormaPagamento().getId())
-                .dtCriacao(duplicata.getDtCriacao() != null ? new java.sql.Date(duplicata.getDtCriacao().getTime()) : null)
-                .dtAtualizacao(duplicata.getDtAtualizacao() != null ? new java.sql.Date(duplicata.getDtAtualizacao().getTime()) : null)
+                .dtCriacao(duplicata.getDtCriacao() != null ? duplicata.getDtCriacao() : null)
+                .dtAtualizacao(duplicata.getDtAtualizacao() != null ? duplicata.getDtAtualizacao() : null)
                 .parcelas(parcelasDTO)
                 .notasFiscais(notaFiscalResponseDTO)
                 .build();
@@ -239,13 +243,16 @@ public class DuplicataServiceImpl implements DuplicataService {
         duplicata.setValorTotal(dto.getValorTotal());
         var formaPagamento = formaPagamentoRepository.findById(dto.getFormaPagamentoId()).orElseThrow();
         duplicata.setFormaPagamento(formaPagamento);
-        duplicata.setDtCriacao(new java.util.Date());
+        duplicata.setDtCriacao(LocalDate.now());
         
         // Notas fiscais associadas
         if (dto.getNotasFiscais() != null && !dto.getNotasFiscais().isEmpty()) {
             List<NotaFiscal> notas = dto.getNotasFiscais().stream()
                 .map(nfDto -> {
                     NotaFiscal nf = notaFiscalRepository.findById(nfDto.getId()).orElseThrow();
+                    if (!CollectionUtils.isEmpty(nf.getParcelasPrevistas())) {
+                    	parcelaPrevistaNotaRepository.deleteAll(nf.getParcelasPrevistas());
+                    }
                     nf.setDuplicata(duplicata);
                     return nf;
                 })
@@ -265,7 +272,7 @@ public class DuplicataServiceImpl implements DuplicataService {
                 parcela.setNumeroParcela(parcDto.getNumeroParcela());
                 parcela.setValorTotal(parcDto.getValorTotal());
                 parcela.setDtVencimento(parcDto.getDtVencimento());
-                parcela.setDtCriacao(new java.util.Date());
+                parcela.setDtCriacao(LocalDate.now());
                 parcelaRepository.save(parcela);
             }
         }
@@ -285,17 +292,24 @@ public class DuplicataServiceImpl implements DuplicataService {
         duplicata.setValorTotal(dto.getValorTotal());
         var formaPagamento = formaPagamentoRepository.findById(dto.getFormaPagamentoId()).orElseThrow(() -> new NegocioException(MensagemEnum.MSGE010.getKey()));
         duplicata.setFormaPagamento(formaPagamento);
-        duplicata.setDtAtualizacao(new java.util.Date());
+        duplicata.setDtAtualizacao(LocalDate.now());
         
 
         // Atualizar notas fiscais associadas
-        List<NotaFiscal> novasNotas = (dto.getNotasFiscais() != null && !dto.getNotasFiscais().isEmpty())
-        	    ? dto.getNotasFiscais().stream()
-        	        .map(nfDto -> notaFiscalRepository.findById(nfDto.getId())
-        	            .orElseThrow(() -> new NegocioException(MensagemEnum.MSGE010.getKey())))
-        	        .peek(nf -> nf.setDuplicata(duplicata))
-        	        .toList()
-        	    : List.of();
+        List<NotaFiscal> novasNotas = 
+        	    (dto.getNotasFiscais() != null && !dto.getNotasFiscais().isEmpty())
+        	        ? dto.getNotasFiscais().stream()
+        	            .map(nfDto -> notaFiscalRepository.findById(nfDto.getId())
+        	                .orElseThrow(() -> new NegocioException(MensagemEnum.MSGE010.getKey())))
+        	            .peek(nf -> {
+        	                // Se houver parcelas previstas, exclui antes de associar à duplicata
+        	                if (!CollectionUtils.isEmpty(nf.getParcelasPrevistas())) {
+        	                    parcelaPrevistaNotaRepository.deleteAll(nf.getParcelasPrevistas());
+        	                }
+        	                nf.setDuplicata(duplicata);
+        	            })
+        	            .toList()
+        	        : List.of();
 
         // Desvincular as antigas
         duplicata.getNotasFiscais().forEach(nf -> nf.setDuplicata(null));
@@ -374,9 +388,9 @@ public class DuplicataServiceImpl implements DuplicataService {
                         .id(p.getId())
                         .numeroParcela(p.getNumeroParcela())
                         .valorTotal(p.getValorTotal())
-                        .dtVencimento(p.getDtVencimento() != null ? new java.sql.Date(p.getDtVencimento().getTime()) : null)
-                        .dtCriacao(p.getDtCriacao() != null ? new java.sql.Date(p.getDtCriacao().getTime()) : null)
-                        .dtAtualizacao(p.getDtAtualizacao() != null ? new java.sql.Date(p.getDtAtualizacao().getTime()) : null)
+                        .dtVencimento(p.getDtVencimento() != null ? p.getDtVencimento() : null)
+                        .dtCriacao(p.getDtCriacao() != null ? p.getDtCriacao() : null)
+                        .dtAtualizacao(p.getDtAtualizacao() != null ? p.getDtAtualizacao() : null)
                         .duplicataId(duplicata.getId())
                         .build())
                 .collect(Collectors.toList());
@@ -404,8 +418,8 @@ public class DuplicataServiceImpl implements DuplicataService {
                 .multa(duplicata.getMulta())
                 .valorTotal(duplicata.getValorTotal())
                 .formaPagamentoId(duplicata.getFormaPagamento().getId())
-                .dtCriacao(duplicata.getDtCriacao() != null ? new java.sql.Date(duplicata.getDtCriacao().getTime()) : null)
-                .dtAtualizacao(duplicata.getDtAtualizacao() != null ? new java.sql.Date(duplicata.getDtAtualizacao().getTime()) : null)
+                .dtCriacao(duplicata.getDtCriacao() != null ? duplicata.getDtCriacao() : null)
+                .dtAtualizacao(duplicata.getDtAtualizacao() != null ? duplicata.getDtAtualizacao() : null)
                 .parcelas(parcelasDTO)
                 .notasFiscais(notaFiscalResponseDTO)
                 .build();

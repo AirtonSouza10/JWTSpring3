@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 
+import com.service.desk.dto.DuplicataDiaResponseDTO;
 import com.service.desk.dto.DuplicataRequestDTO;
 import com.service.desk.dto.DuplicataResponseDTO;
 
@@ -24,5 +25,9 @@ public interface DuplicataService {
 	Page<DuplicataResponseDTO> buscarDuplicatasPorNumeroPaginadas(String numero, int pagina, int tamanho);
 
 	List<DuplicataResponseDTO> buscarDuplicataPorDescricao(String descricao);
+
+	List<DuplicataDiaResponseDTO> obterContasPagarDia();
+
+	List<DuplicataDiaResponseDTO> obterContasPagarVencida();
 
 }

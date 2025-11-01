@@ -16,4 +16,5 @@ public interface DuplicataRepository extends JpaRepository<Duplicata, Long> {
     Page<Duplicata> findByDescricaoContaining(String numero, Pageable pageable);
     
     List<Duplicata> findByDescricaoContaining(String descricao);
+
 }

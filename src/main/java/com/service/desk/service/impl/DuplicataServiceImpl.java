@@ -1,6 +1,7 @@
 package com.service.desk.service.impl;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import com.service.desk.dto.DuplicataDiaResponseDTO;
 import com.service.desk.dto.DuplicataRequestDTO;
 import com.service.desk.dto.DuplicataResponseDTO;
 import com.service.desk.dto.NotaFiscalResponseDTO;
@@ -380,6 +382,64 @@ public class DuplicataServiceImpl implements DuplicataService {
         return duplicatas.stream()
                          .map(this::mapToDTO)
                          .collect(Collectors.toList());
+    }
+    
+    @Override
+    public List<DuplicataDiaResponseDTO> obterContasPagarDia() {
+        var hoje = LocalDate.now();
+
+        var parcelas = parcelaRepository.findByDtVencimento(hoje);
+        var listaParcelas = new ArrayList<>(parcelas.stream().map(p -> DuplicataDiaResponseDTO.builder()
+                .id(p.getDuplicata().getId())
+                .descricao(p.getDuplicata().getDescricao())
+                .valor(p.getValorTotal())
+                .situacao(p.getStatus() == null ? "Em Aberto" : p.getStatus().getDescricao())
+                .dtVencimento(p.getDtVencimento())
+                .build())
+            .toList());
+
+        var parcelasPrevistas = parcelaPrevistaNotaRepository.findByDtVencimentoPrevisto(hoje);
+        var listaParcelasPrevistas = parcelasPrevistas.stream().map(p -> DuplicataDiaResponseDTO.builder()
+                .id(p.getId())
+                .descricao(p.getNotaFiscal().getNumero())
+                .valor(p.getValorPrevisto())
+                .situacao("Em Aberto")
+                .dtVencimento(p.getDtVencimentoPrevisto())
+                .build())
+            .toList();
+
+        listaParcelas.addAll(listaParcelasPrevistas);
+
+        return listaParcelas;
+    }
+        
+    @Override
+    public List<DuplicataDiaResponseDTO> obterContasPagarVencida() {
+        var hoje = LocalDate.now();
+
+        var parcelas = parcelaRepository.findByDtVencimentoBefore(hoje);
+        var listaParcelas = new ArrayList<>(parcelas.stream().map(p -> DuplicataDiaResponseDTO.builder()
+                .id(p.getDuplicata().getId())
+                .descricao(p.getDuplicata().getDescricao())
+                .valor(p.getValorTotal())
+                .situacao(p.getStatus() == null ? "Vencida" : p.getStatus().getDescricao())
+                .dtVencimento(p.getDtVencimento())
+                .build())
+            .toList());
+
+        var parcelasPrevistas = parcelaPrevistaNotaRepository.findByDtVencimentoPrevistoBefore(hoje);
+        var listaParcelasPrevistas = parcelasPrevistas.stream().map(p -> DuplicataDiaResponseDTO.builder()
+                .id(p.getId())
+                .descricao(p.getNotaFiscal().getNumero())
+                .valor(p.getValorPrevisto())
+                .situacao("Prevista Vencida")
+                .dtVencimento(p.getDtVencimentoPrevisto())
+                .build())
+            .toList();
+
+        listaParcelas.addAll(listaParcelasPrevistas);
+
+        return listaParcelas;
     }
 
     private DuplicataResponseDTO mapToDTO(Duplicata duplicata) {

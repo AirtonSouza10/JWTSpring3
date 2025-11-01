@@ -29,7 +29,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(RequestMappingConstants.DUPLICATA_END_POINT)
-@Tag(name = "nota Fiscal", description = "End points de nota fiscal")
+@Tag(name = "Duplicata", description = "End points de duplicata")
 public class DuplicataController extends ControllerServiceDesk{
 
 	@Autowired
@@ -99,5 +99,19 @@ public class DuplicataController extends ControllerServiceDesk{
     public ResponseServiceDesk buscarPorDescricaoSemPaginacao(@RequestParam String descricao) {
         List<DuplicataResponseDTO> duplicatas = duplicataService.buscarDuplicataPorDescricao(descricao);
         return new ResponseServiceDesk(duplicatas);
+    }
+    
+    @Operation(summary = "Buscar duplicata dia")
+    @GetMapping("/dia")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseServiceDesk obterContasPagarDia() {
+        return new ResponseServiceDesk(duplicataService.obterContasPagarDia());
+    }
+        
+    @Operation(summary = "Buscar conta a pagar vencida")
+    @GetMapping("/vencida")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseServiceDesk obterContasPagarVencida() {
+        return new ResponseServiceDesk(duplicataService.obterContasPagarVencida());
     }
 }

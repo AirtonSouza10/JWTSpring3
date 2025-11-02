@@ -53,6 +53,10 @@ public class Duplicata{
     @JoinColumn(name = "fornecedor_id", nullable = true)
     private Fornecedor fornecedor;
     
+    @ManyToOne
+    @JoinColumn(name = "filial_id", nullable = true)
+    private Filial filial;
+    
     @OneToMany(mappedBy = "duplicata", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Parcela> parcelas = new ArrayList<>();
     

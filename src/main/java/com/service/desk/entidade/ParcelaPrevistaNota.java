@@ -28,6 +28,8 @@ public class ParcelaPrevistaNota{
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "parcela_prevista_nota_seq")
     @SequenceGenerator(name = "parcela_prevista_nota_seq", sequenceName = "parcela_prevista_nota_seq", allocationSize = 1)
     private Long id;
+	
+	private String numeroParcela;
 
     @ManyToOne
     @JoinColumn(name="nota_fiscal_id", nullable=false)

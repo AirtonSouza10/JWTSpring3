@@ -219,13 +219,13 @@ public class NotaFiscalServiceImpl implements NotaFiscalService {
         }
 
         notaFiscalRepository.save(nf);
-
         if (dto.getParcelasPrevistas() != null && !dto.getParcelasPrevistas().isEmpty()) {
             for (var parcelaDto : dto.getParcelasPrevistas()) {
                 var parcelaPrevista = ParcelaPrevistaNota.builder()
                         .notaFiscal(nf)
                         .dtVencimentoPrevisto(parcelaDto.getDtVencimentoPrevisto())
                         .valorPrevisto(parcelaDto.getValorPrevisto())
+                        .numeroParcela(parcelaDto.getNumeroParcela())
                         .build();
                 parcelaPrevistaNotaRepository.save(parcelaPrevista);
             }
@@ -306,6 +306,7 @@ public class NotaFiscalServiceImpl implements NotaFiscalService {
                     if (existente != null) {
                         existente.setDtVencimentoPrevisto(parcelaDto.getDtVencimentoPrevisto());
                         existente.setValorPrevisto(parcelaDto.getValorPrevisto());
+                        existente.setNumeroParcela(parcelaDto.getNumeroParcela());
                         parcelaPrevistaNotaRepository.save(existente);
                     }
                 } else {
@@ -313,6 +314,7 @@ public class NotaFiscalServiceImpl implements NotaFiscalService {
                             .notaFiscal(notaFiscal)
                             .dtVencimentoPrevisto(parcelaDto.getDtVencimentoPrevisto())
                             .valorPrevisto(parcelaDto.getValorPrevisto())
+                            .numeroParcela(parcelaDto.getNumeroParcela())
                             .build();
                     parcelaPrevistaNotaRepository.save(nova);
                 }

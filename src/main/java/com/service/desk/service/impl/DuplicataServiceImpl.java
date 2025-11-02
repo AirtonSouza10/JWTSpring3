@@ -27,6 +27,7 @@ import com.service.desk.entidade.Parcela;
 import com.service.desk.enumerator.MensagemEnum;
 import com.service.desk.exceptions.NegocioException;
 import com.service.desk.repository.DuplicataRepository;
+import com.service.desk.repository.FilialRepository;
 import com.service.desk.repository.FormaPagamentoRepository;
 import com.service.desk.repository.FornecedorRepository;
 import com.service.desk.repository.NotaFiscalRepository;
@@ -61,6 +62,9 @@ public class DuplicataServiceImpl implements DuplicataService {
     
     @Autowired
     private FornecedorRepository fornecedorRepository;
+    
+    @Autowired
+    private FilialRepository filialRepository;
 
     @Override
     public List<DuplicataResponseDTO> listarDuplicatas() {
@@ -76,6 +80,8 @@ public class DuplicataServiceImpl implements DuplicataService {
                 .valorTotal(d.getValorTotal())
                 .formaPagamentoId(Objects.nonNull(d.getFormaPagamento()) ? d.getFormaPagamento().getId() : null)
                 .fornecedorId(Objects.nonNull(d.getFornecedor()) ? d.getFornecedor().getId() : null)
+                .filialId(Objects.nonNull(d.getFilial()) ? d.getFilial().getId() : null)
+                .dsFilial(Objects.nonNull(d.getFilial()) ? d.getFilial().getNome() : null)
                 .dsFornecedor(Objects.nonNull(d.getFornecedor()) ? d.getFornecedor().getNome() : null)
                 .dtCriacao(d.getDtCriacao() != null ? d.getDtCriacao() : null)
                 .dtAtualizacao(d.getDtAtualizacao() != null ? d.getDtAtualizacao() : null)
@@ -122,7 +128,9 @@ public class DuplicataServiceImpl implements DuplicataService {
                 .valorTotal(d.getValorTotal())
                 .formaPagamentoId(Objects.nonNull(d.getFormaPagamento()) ? d.getFormaPagamento().getId() : null)
                 .fornecedorId(Objects.nonNull(d.getFornecedor()) ? d.getFornecedor().getId() : null)
+                .filialId(Objects.nonNull(d.getFilial()) ? d.getFilial().getId() : null)
                 .dsFornecedor(Objects.nonNull(d.getFornecedor()) ? d.getFornecedor().getNome() : null)
+                .dsFilial(Objects.nonNull(d.getFilial()) ? d.getFilial().getNome() : null)
                 .dtCriacao(d.getDtCriacao() != null ? d.getDtCriacao() : null)
                 .dtAtualizacao(d.getDtAtualizacao() != null ? d.getDtAtualizacao() : null)
                 .parcelas(d.getParcelas() != null ? d.getParcelas().stream().map(p ->
@@ -168,6 +176,8 @@ public class DuplicataServiceImpl implements DuplicataService {
                 .valorTotal(d.getValorTotal())
                 .formaPagamentoId(Objects.nonNull(d.getFormaPagamento()) ? d.getFormaPagamento().getId() : null)
                 .fornecedorId(Objects.nonNull(d.getFornecedor()) ? d.getFornecedor().getId() : null)
+                .filialId(Objects.nonNull(d.getFilial()) ? d.getFilial().getId() : null)
+                .dsFilial(Objects.nonNull(d.getFilial()) ? d.getFilial().getNome() : null)
                 .dsFornecedor(Objects.nonNull(d.getFornecedor()) ? d.getFornecedor().getNome() : null)
                 .dtCriacao(d.getDtCriacao() != null ? d.getDtCriacao() : null)
                 .dtAtualizacao(d.getDtAtualizacao() != null ? d.getDtAtualizacao() : null)
@@ -240,6 +250,8 @@ public class DuplicataServiceImpl implements DuplicataService {
                 .valorTotal(duplicata.getValorTotal())
                 .formaPagamentoId(duplicata.getFormaPagamento().getId())
                 .fornecedorId(duplicata.getFornecedor().getId())
+                .filialId(Objects.nonNull(duplicata.getFilial()) ? duplicata.getFilial().getId() : null)
+                .dsFilial(Objects.nonNull(duplicata.getFilial()) ? duplicata.getFilial().getNome() : null)
                 .dsFornecedor(duplicata.getFornecedor().getNome())
                 .dtCriacao(duplicata.getDtCriacao() != null ? duplicata.getDtCriacao() : null)
                 .dtAtualizacao(duplicata.getDtAtualizacao() != null ? duplicata.getDtAtualizacao() : null)
@@ -260,8 +272,10 @@ public class DuplicataServiceImpl implements DuplicataService {
         duplicata.setValorTotal(dto.getValorTotal());
         var formaPagamento = formaPagamentoRepository.findById(dto.getFormaPagamentoId()).orElseThrow();
         var fornecedor = fornecedorRepository.findById(dto.getFornecedorId()).orElseThrow();
+        var filial = filialRepository.findById(dto.getFilialId()).orElseThrow();
         duplicata.setFornecedor(fornecedor);
         duplicata.setFormaPagamento(formaPagamento);
+        duplicata.setFilial(filial);
         duplicata.setDtCriacao(LocalDate.now());
         
         // Notas fiscais associadas
@@ -311,8 +325,10 @@ public class DuplicataServiceImpl implements DuplicataService {
         duplicata.setValorTotal(dto.getValorTotal());
         var formaPagamento = formaPagamentoRepository.findById(dto.getFormaPagamentoId()).orElseThrow(() -> new NegocioException(MensagemEnum.MSGE010.getKey()));
         var fornecedor = fornecedorRepository.findById(dto.getFornecedorId()).orElseThrow();
+        var filial = filialRepository.findById(dto.getFilialId()).orElseThrow();
         duplicata.setFornecedor(fornecedor);
         duplicata.setFormaPagamento(formaPagamento);
+        duplicata.setFilial(filial);
         duplicata.setDtAtualizacao(LocalDate.now());
         
 
@@ -411,6 +427,7 @@ public class DuplicataServiceImpl implements DuplicataService {
         var listaParcelas = new ArrayList<>(parcelas.stream().map(p -> DuplicataDiaResponseDTO.builder()
                 .id(p.getDuplicata().getId())
                 .fornecedor(p.getDuplicata().getFornecedor().getNome())
+                .filial(p.getDuplicata().getFilial().getNome())
                 .identificacaoFornecedor(p.getDuplicata().getFornecedor().getIdentificacao())
                 .descricao(p.getNumeroParcela())
                 .valor(p.getValorTotal())
@@ -424,8 +441,9 @@ public class DuplicataServiceImpl implements DuplicataService {
         var parcelasPrevistas = parcelaPrevistaNotaRepository.findByDtVencimentoPrevisto(hoje);
         var listaParcelasPrevistas = parcelasPrevistas.stream().map(p -> DuplicataDiaResponseDTO.builder()
                 .id(p.getId())
-                .descricao(p.getNotaFiscal().getNumero())
+                .descricao(p.getNotaFiscal().getNumero()+" - " + p.getNumeroParcela())
                 .fornecedor(p.getNotaFiscal().getFornecedor().getNome())
+                .filial(p.getNotaFiscal().getFilial().getNome())
                 .identificacaoFornecedor(p.getNotaFiscal().getFornecedor().getIdentificacao())
                 .valor(p.getValorPrevisto())
                 .situacao("Em Aberto")
@@ -448,6 +466,7 @@ public class DuplicataServiceImpl implements DuplicataService {
                 .id(p.getDuplicata().getId())
                 .identificacaoFornecedor(p.getDuplicata().getFornecedor().getIdentificacao())
                 .fornecedor(p.getDuplicata().getFornecedor().getNome())
+                .filial(p.getDuplicata().getFilial().getNome())
                 .descricao(p.getDuplicata().getDescricao())
                 .valor(p.getValorTotal())
                 .situacao(p.getStatus() == null ? "Vencida" : p.getStatus().getDescricao())
@@ -462,7 +481,8 @@ public class DuplicataServiceImpl implements DuplicataService {
                 .id(p.getId())
                 .identificacaoFornecedor(p.getNotaFiscal().getFornecedor().getIdentificacao())
                 .fornecedor(p.getNotaFiscal().getFornecedor().getNome())
-                .descricao(p.getNotaFiscal().getNumero())
+                .filial(p.getNotaFiscal().getFilial().getNome())
+                .descricao(p.getNotaFiscal().getNumero()+" - " + p.getNumeroParcela())
                 .valor(p.getValorPrevisto())
                 .situacao("Prevista Vencida")
                 .dtVencimento(p.getDtVencimentoPrevisto())
@@ -523,7 +543,9 @@ public class DuplicataServiceImpl implements DuplicataService {
                 .valorTotal(duplicata.getValorTotal())
                 .formaPagamentoId(duplicata.getFormaPagamento().getId())
                 .fornecedorId(duplicata.getFornecedor().getId())
+                .filialId(duplicata.getFilial().getId())
                 .dsFornecedor(duplicata.getFornecedor().getNome())
+                .dsFilial(duplicata.getFilial().getNome())
                 .dtCriacao(duplicata.getDtCriacao() != null ? duplicata.getDtCriacao() : null)
                 .dtAtualizacao(duplicata.getDtAtualizacao() != null ? duplicata.getDtAtualizacao() : null)
                 .parcelas(parcelasDTO)

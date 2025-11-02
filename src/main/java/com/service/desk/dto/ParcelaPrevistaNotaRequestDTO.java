@@ -14,4 +14,5 @@ public class ParcelaPrevistaNotaRequestDTO {
     private Long id;
     private LocalDate dtVencimentoPrevisto;
     private BigDecimal valorPrevisto;
+    private String numeroParcela;
 }

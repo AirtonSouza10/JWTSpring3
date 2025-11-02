@@ -82,7 +82,7 @@ public class NotaFiscal{
     private Pessoa pessoa;
     
     @ManyToOne
-    @JoinColumn(name = "filial_id", nullable = false)
+    @JoinColumn(name = "filial_id", nullable = true)
     private Filial filial;
     
     @ManyToOne

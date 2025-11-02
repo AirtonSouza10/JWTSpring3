@@ -12,6 +12,7 @@ import lombok.Data;
 @AllArgsConstructor
 public class DuplicataDiaResponseDTO {
     private Long id;
+    private String filial;
     private String descricao;
     private String fornecedor;
     private String identificacaoFornecedor;

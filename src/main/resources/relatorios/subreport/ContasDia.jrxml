@@ -11,13 +11,14 @@
 	<field name="valorFormatado" class="java.lang.String"/>
 	<field name="dtVendimentoFormatada" class="java.lang.String"/>
 	<field name="situacao" class="java.lang.String"/>
+	<field name="filial" class="java.lang.String"/>
 	<background>
 		<band/>
 	</background>
 	<title>
 		<band height="22">
 			<staticText>
-				<reportElement x="0" y="0" width="166" height="15" uuid="cbe4a02f-9224-4ac9-8f50-8a9a0c2eb9a6">
+				<reportElement x="90" y="0" width="106" height="15" uuid="cbe4a02f-9224-4ac9-8f50-8a9a0c2eb9a6">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -29,7 +30,7 @@
 				<text><![CDATA[DESCRIÇÃO]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="167" y="0" width="225" height="15" uuid="f62cc326-e838-4fbd-bc3c-d9b772d51bb5">
+				<reportElement x="200" y="0" width="192" height="15" uuid="f62cc326-e838-4fbd-bc3c-d9b772d51bb5">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -88,27 +89,39 @@
 				</textElement>
 				<text><![CDATA[SITUAÇÃO]]></text>
 			</staticText>
+			<staticText>
+				<reportElement x="0" y="0" width="90" height="15" uuid="5ad0d7ca-f0b7-4767-a704-a136421ae31e">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[FILIAL]]></text>
+			</staticText>
 		</band>
 	</title>
 	<detail>
 		<band height="17" splitType="Stretch">
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<textField>
-				<reportElement x="0" y="0" width="166" height="15" uuid="bd1d445b-505a-4a13-8961-b5166d72e523">
+				<reportElement x="90" y="0" width="106" height="15" uuid="bd1d445b-505a-4a13-8961-b5166d72e523">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement verticalAlignment="Middle">
-					<font size="9"/>
+					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{descricao}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="167" y="2" width="225" height="15" uuid="b19dae8d-072e-4ead-9482-c744f6a307b5">
+				<reportElement x="200" y="2" width="192" height="15" uuid="b19dae8d-072e-4ead-9482-c744f6a307b5">
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement verticalAlignment="Middle">
-					<font size="9"/>
+					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{fornecedor}]]></textFieldExpression>
 			</textField>
@@ -118,7 +131,7 @@
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement verticalAlignment="Middle">
-					<font size="9"/>
+					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{identificacaoFornecedor}]]></textFieldExpression>
 			</textField>
@@ -128,7 +141,7 @@
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement verticalAlignment="Middle">
-					<font size="9"/>
+					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{valorFormatado}]]></textFieldExpression>
 			</textField>
@@ -139,7 +152,7 @@
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement verticalAlignment="Middle">
-					<font size="9"/>
+					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{dtVendimentoFormatada}]]></textFieldExpression>
 			</textField>
@@ -149,9 +162,17 @@
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<textElement verticalAlignment="Middle">
-					<font size="9"/>
+					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{situacao}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="0" width="90" height="15" uuid="be239155-8fc9-408e-81df-0c73ba4cac3c">
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{filial}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>

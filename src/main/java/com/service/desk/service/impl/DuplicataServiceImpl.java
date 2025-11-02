@@ -73,6 +73,7 @@ public class DuplicataServiceImpl implements DuplicataService {
                 .valorTotal(d.getValorTotal())
                 .formaPagamentoId(Objects.nonNull(d.getFormaPagamento()) ? d.getFormaPagamento().getId() : null)
                 .fornecedorId(Objects.nonNull(d.getFornecedor()) ? d.getFornecedor().getId() : null)
+                .dsFornecedor(Objects.nonNull(d.getFornecedor()) ? d.getFornecedor().getNome() : null)
                 .dtCriacao(d.getDtCriacao() != null ? d.getDtCriacao() : null)
                 .dtAtualizacao(d.getDtAtualizacao() != null ? d.getDtAtualizacao() : null)
                 .parcelas(d.getParcelas() != null ? d.getParcelas().stream().map(p ->
@@ -118,6 +119,7 @@ public class DuplicataServiceImpl implements DuplicataService {
                 .valorTotal(d.getValorTotal())
                 .formaPagamentoId(Objects.nonNull(d.getFormaPagamento()) ? d.getFormaPagamento().getId() : null)
                 .fornecedorId(Objects.nonNull(d.getFornecedor()) ? d.getFornecedor().getId() : null)
+                .dsFornecedor(Objects.nonNull(d.getFornecedor()) ? d.getFornecedor().getNome() : null)
                 .dtCriacao(d.getDtCriacao() != null ? d.getDtCriacao() : null)
                 .dtAtualizacao(d.getDtAtualizacao() != null ? d.getDtAtualizacao() : null)
                 .parcelas(d.getParcelas() != null ? d.getParcelas().stream().map(p ->
@@ -163,6 +165,7 @@ public class DuplicataServiceImpl implements DuplicataService {
                 .valorTotal(d.getValorTotal())
                 .formaPagamentoId(Objects.nonNull(d.getFormaPagamento()) ? d.getFormaPagamento().getId() : null)
                 .fornecedorId(Objects.nonNull(d.getFornecedor()) ? d.getFornecedor().getId() : null)
+                .dsFornecedor(Objects.nonNull(d.getFornecedor()) ? d.getFornecedor().getNome() : null)
                 .dtCriacao(d.getDtCriacao() != null ? d.getDtCriacao() : null)
                 .dtAtualizacao(d.getDtAtualizacao() != null ? d.getDtAtualizacao() : null)
                 .parcelas(d.getParcelas() != null ? d.getParcelas().stream().map(p ->
@@ -234,6 +237,7 @@ public class DuplicataServiceImpl implements DuplicataService {
                 .valorTotal(duplicata.getValorTotal())
                 .formaPagamentoId(duplicata.getFormaPagamento().getId())
                 .fornecedorId(duplicata.getFornecedor().getId())
+                .dsFornecedor(duplicata.getFornecedor().getNome())
                 .dtCriacao(duplicata.getDtCriacao() != null ? duplicata.getDtCriacao() : null)
                 .dtAtualizacao(duplicata.getDtAtualizacao() != null ? duplicata.getDtAtualizacao() : null)
                 .parcelas(parcelasDTO)
@@ -499,6 +503,7 @@ public class DuplicataServiceImpl implements DuplicataService {
                 .valorTotal(duplicata.getValorTotal())
                 .formaPagamentoId(duplicata.getFormaPagamento().getId())
                 .fornecedorId(duplicata.getFornecedor().getId())
+                .dsFornecedor(duplicata.getFornecedor().getNome())
                 .dtCriacao(duplicata.getDtCriacao() != null ? duplicata.getDtCriacao() : null)
                 .dtAtualizacao(duplicata.getDtAtualizacao() != null ? duplicata.getDtAtualizacao() : null)
                 .parcelas(parcelasDTO)

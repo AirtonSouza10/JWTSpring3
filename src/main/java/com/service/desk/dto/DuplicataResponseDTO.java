@@ -23,6 +23,7 @@ public class DuplicataResponseDTO {
     private LocalDate dtAtualizacao;
     private Long formaPagamentoId;
     private Long fornecedorId;
+    private String dsFornecedor;
     private List<ParcelamentoDTO> parcelas;
     private List<NotaFiscalResponseDTO> notasFiscais;
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 
 import com.service.desk.dto.DuplicataDiaResponseDTO;
+import com.service.desk.dto.DuplicataDiaVencidoResponseDTO;
 import com.service.desk.dto.DuplicataRequestDTO;
 import com.service.desk.dto.DuplicataResponseDTO;
 
@@ -29,5 +30,7 @@ public interface DuplicataService {
 	List<DuplicataDiaResponseDTO> obterContasPagarDia();
 
 	List<DuplicataDiaResponseDTO> obterContasPagarVencida();
+
+	DuplicataDiaVencidoResponseDTO obterContasPagarDiaAndVencidas();
 
 }

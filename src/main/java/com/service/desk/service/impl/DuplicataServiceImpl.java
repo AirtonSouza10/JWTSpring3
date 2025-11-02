@@ -3,6 +3,7 @@ package com.service.desk.service.impl;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import com.service.desk.dto.DuplicataDiaResponseDTO;
+import com.service.desk.dto.DuplicataDiaVencidoResponseDTO;
 import com.service.desk.dto.DuplicataRequestDTO;
 import com.service.desk.dto.DuplicataResponseDTO;
 import com.service.desk.dto.NotaFiscalResponseDTO;
@@ -31,6 +33,7 @@ import com.service.desk.repository.NotaFiscalRepository;
 import com.service.desk.repository.ParcelaPrevistaNotaRepository;
 import com.service.desk.repository.ParcelaRepository;
 import com.service.desk.service.service.DuplicataService;
+import com.service.desk.utils.FuxoCaixaUtils;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -409,10 +412,12 @@ public class DuplicataServiceImpl implements DuplicataService {
                 .id(p.getDuplicata().getId())
                 .fornecedor(p.getDuplicata().getFornecedor().getNome())
                 .identificacaoFornecedor(p.getDuplicata().getFornecedor().getIdentificacao())
-                .descricao(p.getDuplicata().getDescricao())
+                .descricao(p.getNumeroParcela())
                 .valor(p.getValorTotal())
                 .situacao(p.getStatus() == null ? "Em Aberto" : p.getStatus().getDescricao())
                 .dtVencimento(p.getDtVencimento())
+                .dtVendimentoFormatada(FuxoCaixaUtils.formatarData(p.getDtVencimento()))
+                .valorFormatado(FuxoCaixaUtils.formatarValorBR(p.getValorTotal()))
                 .build())
             .toList());
 
@@ -425,11 +430,12 @@ public class DuplicataServiceImpl implements DuplicataService {
                 .valor(p.getValorPrevisto())
                 .situacao("Em Aberto")
                 .dtVencimento(p.getDtVencimentoPrevisto())
+                .dtVendimentoFormatada(FuxoCaixaUtils.formatarData(p.getDtVencimentoPrevisto()))
                 .build())
             .toList();
 
         listaParcelas.addAll(listaParcelasPrevistas);
-
+        
         return listaParcelas;
     }
         
@@ -446,6 +452,8 @@ public class DuplicataServiceImpl implements DuplicataService {
                 .valor(p.getValorTotal())
                 .situacao(p.getStatus() == null ? "Vencida" : p.getStatus().getDescricao())
                 .dtVencimento(p.getDtVencimento())
+                .dtVendimentoFormatada(FuxoCaixaUtils.formatarData(p.getDtVencimento()))
+                .valorFormatado(FuxoCaixaUtils.formatarValorBR(p.getValorTotal()))
                 .build())
             .toList());
 
@@ -458,12 +466,24 @@ public class DuplicataServiceImpl implements DuplicataService {
                 .valor(p.getValorPrevisto())
                 .situacao("Prevista Vencida")
                 .dtVencimento(p.getDtVencimentoPrevisto())
+                .dtVendimentoFormatada(FuxoCaixaUtils.formatarData(p.getDtVencimentoPrevisto()))
+                .valorFormatado(FuxoCaixaUtils.formatarValorBR(p.getValorPrevisto()))
                 .build())
             .toList();
 
         listaParcelas.addAll(listaParcelasPrevistas);
+        
+        listaParcelas.sort(Comparator.comparing(DuplicataDiaResponseDTO::getDtVencimento));
 
         return listaParcelas;
+    }
+    
+    @Override
+    public DuplicataDiaVencidoResponseDTO obterContasPagarDiaAndVencidas() {
+    	return DuplicataDiaVencidoResponseDTO.builder()
+    			.dia(obterContasPagarDia())
+    			.vencidos(obterContasPagarVencida())
+    			.build();
     }
 
     private DuplicataResponseDTO mapToDTO(Duplicata duplicata) {

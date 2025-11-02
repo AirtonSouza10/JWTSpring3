@@ -16,6 +16,8 @@ public class DuplicataDiaResponseDTO {
     private String fornecedor;
     private String identificacaoFornecedor;
     private BigDecimal valor;
+    private String valorFormatado;
     private String situacao;
     private LocalDate dtVencimento;
+    private String dtVendimentoFormatada;
 }

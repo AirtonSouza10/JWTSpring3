@@ -1,10 +1,19 @@
 package com.service.desk.controller;
 
+import java.io.IOException;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Page;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,6 +34,14 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import net.sf.jasperreports.engine.JREmptyDataSource;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.engine.util.JRLoader;
 
 @RestController
 @RequiredArgsConstructor
@@ -113,5 +130,38 @@ public class DuplicataController extends ControllerServiceDesk{
     @ResponseStatus(HttpStatus.OK)
     public ResponseServiceDesk obterContasPagarVencida() {
         return new ResponseServiceDesk(duplicataService.obterContasPagarVencida());
+    }
+   
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Gera relatório de contas a pagar do dia em PDF")
+    @GetMapping("/relatorio-dia")
+    public ResponseEntity<byte[]> gerarRelatorioDia() throws JRException, IOException {
+        var contasDoDiaVencidas = duplicataService.obterContasPagarDiaAndVencidas();
+
+        JRBeanCollectionDataSource dataSourceDia = new JRBeanCollectionDataSource(contasDoDiaVencidas.getDia());
+        JRBeanCollectionDataSource dataSourceVencidas = new JRBeanCollectionDataSource(contasDoDiaVencidas.getVencidos());
+
+        Map<String, Object> parametros = new HashMap<>();
+        parametros.put("TITULO_RELATORIO", "Relatório de Contas a Pagar do Dia");
+        parametros.put("DATA_EMISSAO", new Date());
+        parametros.put("DATASOURCE_DIA", dataSourceDia);
+        parametros.put("DATASOURCE_VENCIDAS", dataSourceVencidas);
+
+        JasperReport jasperReport = (JasperReport) JRLoader.loadObject(
+            new ClassPathResource("relatorios/ContasPagarDia.jasper").getInputStream()
+        );
+
+        adicionarParametroBase(parametros, null);
+        // Aqui usamos JREmptyDataSource porque os dados reais virão dos sub-relatórios
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, new JREmptyDataSource());
+
+        byte[] pdf = JasperExportManager.exportReportToPdf(jasperPrint);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDisposition(ContentDisposition.builder("inline")
+                .filename("relatorio-contas-dia.pdf").build());
+
+        return new ResponseEntity<>(pdf, headers, HttpStatus.OK);
     }
 }

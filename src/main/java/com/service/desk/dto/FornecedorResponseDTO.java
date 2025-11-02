@@ -12,6 +12,7 @@ import lombok.Data;
 public class FornecedorResponseDTO {
     private Long id;
     private String nome;
+    private String razao;
     private String identificacao;
     private Integer tpIdentificacao;
     private List<TelefoneDTO> telefones;

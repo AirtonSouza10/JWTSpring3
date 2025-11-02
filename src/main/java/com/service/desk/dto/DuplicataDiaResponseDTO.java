@@ -13,6 +13,8 @@ import lombok.Data;
 public class DuplicataDiaResponseDTO {
     private Long id;
     private String descricao;
+    private String fornecedor;
+    private String identificacaoFornecedor;
     private BigDecimal valor;
     private String situacao;
     private LocalDate dtVencimento;

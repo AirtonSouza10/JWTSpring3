@@ -22,6 +22,7 @@ public class DuplicataRequestDTO {
     private Date dtCriacao;
     private Date dtAtualizacao;
     private Long formaPagamentoId;
+    private Long fornecedorId;
     private List<ParcelamentoDTO> parcelas;
     private List<NotaFiscalResponseDTO> notasFiscais;
 }

@@ -72,6 +72,7 @@ public class FornecedorServiceImpl implements FornecedorService {
     				.telefones(telefonesList)
     				.enderecos(enderecosList)
     				.nome(f.getNome())
+    				.razao(f.getRazao())
     				.email(f.getEmail())
     				.ativo(f.getAtivo())
     				.build();
@@ -95,6 +96,7 @@ public class FornecedorServiceImpl implements FornecedorService {
                 .tpIdentificacao(dto.getIdentificacao().length() ==11 ? 4 : 3)
                 .email(dto.getEmail())
                 .ativo(true)
+                .razao(dto.getRazao())
                 .dtInclusao(LocalDate.now())
                 .build();
 
@@ -142,6 +144,7 @@ public class FornecedorServiceImpl implements FornecedorService {
         Fornecedor fornecedor = fornecedorRepository.findById(id).orElseThrow();
 
         fornecedor.setNome(dto.getNome());
+        fornecedor.setRazao(dto.getRazao());
         fornecedor.setIdentificacao(dto.getIdentificacao());
         fornecedor.setTpIdentificacao(dto.getIdentificacao().length() == 11 ? 4 : 3);
         fornecedor.setEmail(dto.getEmail());
@@ -226,6 +229,7 @@ public class FornecedorServiceImpl implements FornecedorService {
         return FornecedorResponseDTO.builder()
                 .id(fornecedor.getId())
                 .nome(fornecedor.getNome())
+                .razao(fornecedor.getRazao())
                 .identificacao(fornecedor.getIdentificacao())
                 .tpIdentificacao(fornecedor.getTpIdentificacao())
                 .telefones(telefonesList)

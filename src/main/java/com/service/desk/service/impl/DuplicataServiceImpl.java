@@ -26,6 +26,7 @@ import com.service.desk.enumerator.MensagemEnum;
 import com.service.desk.exceptions.NegocioException;
 import com.service.desk.repository.DuplicataRepository;
 import com.service.desk.repository.FormaPagamentoRepository;
+import com.service.desk.repository.FornecedorRepository;
 import com.service.desk.repository.NotaFiscalRepository;
 import com.service.desk.repository.ParcelaPrevistaNotaRepository;
 import com.service.desk.repository.ParcelaRepository;
@@ -54,6 +55,9 @@ public class DuplicataServiceImpl implements DuplicataService {
     
     @Autowired
     private ParcelaPrevistaNotaRepository parcelaPrevistaNotaRepository;
+    
+    @Autowired
+    private FornecedorRepository fornecedorRepository;
 
     @Override
     public List<DuplicataResponseDTO> listarDuplicatas() {
@@ -68,6 +72,7 @@ public class DuplicataServiceImpl implements DuplicataService {
                 .juros(d.getJuros())
                 .valorTotal(d.getValorTotal())
                 .formaPagamentoId(Objects.nonNull(d.getFormaPagamento()) ? d.getFormaPagamento().getId() : null)
+                .fornecedorId(Objects.nonNull(d.getFornecedor()) ? d.getFornecedor().getId() : null)
                 .dtCriacao(d.getDtCriacao() != null ? d.getDtCriacao() : null)
                 .dtAtualizacao(d.getDtAtualizacao() != null ? d.getDtAtualizacao() : null)
                 .parcelas(d.getParcelas() != null ? d.getParcelas().stream().map(p ->
@@ -112,6 +117,7 @@ public class DuplicataServiceImpl implements DuplicataService {
                 .juros(d.getJuros())
                 .valorTotal(d.getValorTotal())
                 .formaPagamentoId(Objects.nonNull(d.getFormaPagamento()) ? d.getFormaPagamento().getId() : null)
+                .fornecedorId(Objects.nonNull(d.getFornecedor()) ? d.getFornecedor().getId() : null)
                 .dtCriacao(d.getDtCriacao() != null ? d.getDtCriacao() : null)
                 .dtAtualizacao(d.getDtAtualizacao() != null ? d.getDtAtualizacao() : null)
                 .parcelas(d.getParcelas() != null ? d.getParcelas().stream().map(p ->
@@ -156,6 +162,7 @@ public class DuplicataServiceImpl implements DuplicataService {
                 .juros(d.getJuros())
                 .valorTotal(d.getValorTotal())
                 .formaPagamentoId(Objects.nonNull(d.getFormaPagamento()) ? d.getFormaPagamento().getId() : null)
+                .fornecedorId(Objects.nonNull(d.getFornecedor()) ? d.getFornecedor().getId() : null)
                 .dtCriacao(d.getDtCriacao() != null ? d.getDtCriacao() : null)
                 .dtAtualizacao(d.getDtAtualizacao() != null ? d.getDtAtualizacao() : null)
                 .parcelas(d.getParcelas() != null ? d.getParcelas().stream().map(p ->
@@ -226,6 +233,7 @@ public class DuplicataServiceImpl implements DuplicataService {
                 .multa(duplicata.getMulta())
                 .valorTotal(duplicata.getValorTotal())
                 .formaPagamentoId(duplicata.getFormaPagamento().getId())
+                .fornecedorId(duplicata.getFornecedor().getId())
                 .dtCriacao(duplicata.getDtCriacao() != null ? duplicata.getDtCriacao() : null)
                 .dtAtualizacao(duplicata.getDtAtualizacao() != null ? duplicata.getDtAtualizacao() : null)
                 .parcelas(parcelasDTO)
@@ -244,6 +252,8 @@ public class DuplicataServiceImpl implements DuplicataService {
         duplicata.setMulta(dto.getMulta());
         duplicata.setValorTotal(dto.getValorTotal());
         var formaPagamento = formaPagamentoRepository.findById(dto.getFormaPagamentoId()).orElseThrow();
+        var fornecedor = fornecedorRepository.findById(dto.getFornecedorId()).orElseThrow();
+        duplicata.setFornecedor(fornecedor);
         duplicata.setFormaPagamento(formaPagamento);
         duplicata.setDtCriacao(LocalDate.now());
         
@@ -293,6 +303,8 @@ public class DuplicataServiceImpl implements DuplicataService {
         duplicata.setJuros(dto.getJuros());
         duplicata.setValorTotal(dto.getValorTotal());
         var formaPagamento = formaPagamentoRepository.findById(dto.getFormaPagamentoId()).orElseThrow(() -> new NegocioException(MensagemEnum.MSGE010.getKey()));
+        var fornecedor = fornecedorRepository.findById(dto.getFornecedorId()).orElseThrow();
+        duplicata.setFornecedor(fornecedor);
         duplicata.setFormaPagamento(formaPagamento);
         duplicata.setDtAtualizacao(LocalDate.now());
         
@@ -391,6 +403,8 @@ public class DuplicataServiceImpl implements DuplicataService {
         var parcelas = parcelaRepository.findByDtVencimento(hoje);
         var listaParcelas = new ArrayList<>(parcelas.stream().map(p -> DuplicataDiaResponseDTO.builder()
                 .id(p.getDuplicata().getId())
+                .fornecedor(p.getDuplicata().getFornecedor().getNome())
+                .identificacaoFornecedor(p.getDuplicata().getFornecedor().getIdentificacao())
                 .descricao(p.getDuplicata().getDescricao())
                 .valor(p.getValorTotal())
                 .situacao(p.getStatus() == null ? "Em Aberto" : p.getStatus().getDescricao())
@@ -402,6 +416,8 @@ public class DuplicataServiceImpl implements DuplicataService {
         var listaParcelasPrevistas = parcelasPrevistas.stream().map(p -> DuplicataDiaResponseDTO.builder()
                 .id(p.getId())
                 .descricao(p.getNotaFiscal().getNumero())
+                .fornecedor(p.getNotaFiscal().getFornecedor().getNome())
+                .identificacaoFornecedor(p.getNotaFiscal().getFornecedor().getIdentificacao())
                 .valor(p.getValorPrevisto())
                 .situacao("Em Aberto")
                 .dtVencimento(p.getDtVencimentoPrevisto())
@@ -420,6 +436,8 @@ public class DuplicataServiceImpl implements DuplicataService {
         var parcelas = parcelaRepository.findByDtVencimentoBefore(hoje);
         var listaParcelas = new ArrayList<>(parcelas.stream().map(p -> DuplicataDiaResponseDTO.builder()
                 .id(p.getDuplicata().getId())
+                .identificacaoFornecedor(p.getDuplicata().getFornecedor().getIdentificacao())
+                .fornecedor(p.getDuplicata().getFornecedor().getNome())
                 .descricao(p.getDuplicata().getDescricao())
                 .valor(p.getValorTotal())
                 .situacao(p.getStatus() == null ? "Vencida" : p.getStatus().getDescricao())
@@ -430,6 +448,8 @@ public class DuplicataServiceImpl implements DuplicataService {
         var parcelasPrevistas = parcelaPrevistaNotaRepository.findByDtVencimentoPrevistoBefore(hoje);
         var listaParcelasPrevistas = parcelasPrevistas.stream().map(p -> DuplicataDiaResponseDTO.builder()
                 .id(p.getId())
+                .identificacaoFornecedor(p.getNotaFiscal().getFornecedor().getIdentificacao())
+                .fornecedor(p.getNotaFiscal().getFornecedor().getNome())
                 .descricao(p.getNotaFiscal().getNumero())
                 .valor(p.getValorPrevisto())
                 .situacao("Prevista Vencida")
@@ -478,6 +498,7 @@ public class DuplicataServiceImpl implements DuplicataService {
                 .multa(duplicata.getMulta())
                 .valorTotal(duplicata.getValorTotal())
                 .formaPagamentoId(duplicata.getFormaPagamento().getId())
+                .fornecedorId(duplicata.getFornecedor().getId())
                 .dtCriacao(duplicata.getDtCriacao() != null ? duplicata.getDtCriacao() : null)
                 .dtAtualizacao(duplicata.getDtAtualizacao() != null ? duplicata.getDtAtualizacao() : null)
                 .parcelas(parcelasDTO)

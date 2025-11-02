@@ -32,6 +32,9 @@ public class Fornecedor{
 
     @Column(nullable = false)
     private String nome;
+    
+    @Column(nullable = true)
+    private String razao;
 
     @Column(nullable = false)
     private String identificacao;

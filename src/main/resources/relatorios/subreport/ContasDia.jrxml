@@ -18,7 +18,7 @@
 	<title>
 		<band height="22">
 			<staticText>
-				<reportElement mode="Opaque" x="720" y="0" width="122" height="15" backcolor="#E6E6E6" uuid="09aa2b0d-e373-4179-953d-b662c1d456e0">
+				<reportElement mode="Opaque" x="720" y="0" width="80" height="15" backcolor="#E6E6E6" uuid="09aa2b0d-e373-4179-953d-b662c1d456e0">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -78,7 +78,7 @@
 				<text><![CDATA[FORNECEDOR]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Opaque" x="130" y="0" width="104" height="15" backcolor="#E6E6E6" uuid="f70a538e-f422-4103-adac-20aaa2eba965">
+				<reportElement mode="Opaque" x="130" y="0" width="105" height="15" backcolor="#E6E6E6" uuid="f70a538e-f422-4103-adac-20aaa2eba965">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -107,9 +107,10 @@
 		<band height="17" splitType="Stretch">
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<textField>
-				<reportElement x="720" y="0" width="119" height="15" uuid="d7f6898a-ad1e-4572-a0fb-9fb67bcf4d4a">
+				<reportElement x="720" y="0" width="80" height="15" uuid="d7f6898a-ad1e-4572-a0fb-9fb67bcf4d4a">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement verticalAlignment="Middle">
 					<font size="8"/>

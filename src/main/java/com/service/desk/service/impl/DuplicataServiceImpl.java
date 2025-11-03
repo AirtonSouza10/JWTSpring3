@@ -467,7 +467,7 @@ public class DuplicataServiceImpl implements DuplicataService {
                 .identificacaoFornecedor(p.getDuplicata().getFornecedor().getIdentificacao())
                 .fornecedor(p.getDuplicata().getFornecedor().getNome())
                 .filial(p.getDuplicata().getFilial().getNome())
-                .descricao(p.getDuplicata().getDescricao())
+                .descricao(p.getNumeroParcela())
                 .valor(p.getValorTotal())
                 .situacao(p.getStatus() == null ? "Vencida" : p.getStatus().getDescricao())
                 .dtVencimento(p.getDtVencimento())

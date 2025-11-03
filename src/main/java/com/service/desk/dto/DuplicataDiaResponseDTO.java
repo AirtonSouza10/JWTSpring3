@@ -20,5 +20,6 @@ public class DuplicataDiaResponseDTO {
     private String valorFormatado;
     private String situacao;
     private LocalDate dtVencimento;
-    private String dtVendimentoFormatada;
+    private String dtVendimentoFormatada;    
+    private String nrParcela;
 }

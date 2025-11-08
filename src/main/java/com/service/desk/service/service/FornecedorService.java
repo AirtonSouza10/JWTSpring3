@@ -20,6 +20,4 @@ public interface FornecedorService {
 	FornecedorResponseDTO buscarPorId(Long id);
 
 	Page<FornecedorResponseDTO> listarFornecedoresPaginados(int pagina, int tamanho);
-
-	Page<FornecedorResponseDTO> buscarFornecedoresPorNomeOuCnpjPaginado(String termo, int pagina, int tamanho);
 }

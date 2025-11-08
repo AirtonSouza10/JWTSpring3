@@ -75,18 +75,6 @@ public class FornecedorController extends ControllerServiceDesk{
 	    return new ResponseServiceDesk(pagina);
 	}
 	
-	@Operation(summary = "Buscar fornecedores por nome ou CNPJ com paginação")
-	@GetMapping("/buscar")
-	@ResponseStatus(HttpStatus.OK)
-	public ResponseServiceDesk buscarFornecedoresPorNomeOuCnpj(
-	        @RequestParam String termo,
-	        @RequestParam(defaultValue = "0") int page,
-	        @RequestParam(defaultValue = "10") int size) {
-
-	    Page<FornecedorResponseDTO> pagina = fornecedorService.buscarFornecedoresPorNomeOuCnpjPaginado(termo, page, size);
-	    return new ResponseServiceDesk(pagina);
-	}
-
 	@Operation(summary = "Atualiza dados do fornecedor")
 	@PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)

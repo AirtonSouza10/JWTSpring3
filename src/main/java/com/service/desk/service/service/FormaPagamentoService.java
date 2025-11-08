@@ -2,6 +2,8 @@ package com.service.desk.service.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+
 import com.service.desk.dto.FormaPagamentoRequestDTO;
 import com.service.desk.dto.FormaPagamentoResponseDTO;
 
@@ -16,5 +18,7 @@ public interface FormaPagamentoService {
 	FormaPagamentoResponseDTO buscarPorId(Long id);
 
 	void deletarFormaPagamento(Long id);
+
+	Page<FormaPagamentoResponseDTO> listarFormasPagamentoPaginadas(int pagina, int tamanho);
 
 }

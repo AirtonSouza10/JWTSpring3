@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.service.desk.dto.FormaPagamentoRequestDTO;
@@ -39,6 +42,20 @@ public class FormaPagamentoServiceImpl implements FormaPagamentoService {
     		listaFormasPagamento.add(formaPagamento);
     	});
     	return listaFormasPagamento;
+    }
+    
+    @Override
+    public Page<FormaPagamentoResponseDTO> listarFormasPagamentoPaginadas(int pagina, int tamanho) {
+        Pageable pageable = PageRequest.of(pagina, tamanho);
+        Page<FormaPagamento> formasPage = formaPagamentoRepository.findAll(pageable);
+
+        return formasPage.map(f -> FormaPagamentoResponseDTO.builder()
+                .id(f.getId())
+                .descricao(f.getDescricao())
+                .qtdeParcelas(f.getQtdeParcelas())
+                .prazoPrimeiraParcela(f.getPrazoPrimeiraParcela())
+                .intervaloParcelas(f.getIntervaloParcelas())
+                .build());
     }
     
     @Override

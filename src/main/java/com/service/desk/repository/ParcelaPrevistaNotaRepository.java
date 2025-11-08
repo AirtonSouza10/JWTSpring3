@@ -17,4 +17,6 @@ public interface ParcelaPrevistaNotaRepository extends JpaRepository<ParcelaPrev
     List<ParcelaPrevistaNota> findByDtVencimentoPrevisto(LocalDate dtVencimentoPrevisto);
     
     List<ParcelaPrevistaNota> findByDtVencimentoPrevistoBefore(LocalDate dtVencimentoPrevisto);
+    
+    List<ParcelaPrevistaNota> findByNotaFiscalFilialId(Long filialId);
 }

@@ -8,6 +8,7 @@ import com.service.desk.dto.DuplicataDiaResponseDTO;
 import com.service.desk.dto.DuplicataDiaVencidoResponseDTO;
 import com.service.desk.dto.DuplicataRequestDTO;
 import com.service.desk.dto.DuplicataResponseDTO;
+import com.service.desk.dto.RelatorioContasAbertasResponseDTO;
 
 public interface DuplicataService {
 
@@ -32,5 +33,7 @@ public interface DuplicataService {
 	List<DuplicataDiaResponseDTO> obterContasPagarVencida();
 
 	DuplicataDiaVencidoResponseDTO obterContasPagarDiaAndVencidas();
+
+	RelatorioContasAbertasResponseDTO gerarRelatorioContasEmAbertoPorFilial(Long idFilial);
 
 }

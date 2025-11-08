@@ -1,11 +1,18 @@
 package com.service.desk.service.impl;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +28,7 @@ import com.service.desk.dto.DuplicataRequestDTO;
 import com.service.desk.dto.DuplicataResponseDTO;
 import com.service.desk.dto.NotaFiscalResponseDTO;
 import com.service.desk.dto.ParcelamentoDTO;
+import com.service.desk.dto.RelatorioContasAbertasResponseDTO;
 import com.service.desk.entidade.Duplicata;
 import com.service.desk.entidade.NotaFiscal;
 import com.service.desk.entidade.Parcela;
@@ -429,7 +437,7 @@ public class DuplicataServiceImpl implements DuplicataService {
                 .fornecedor(p.getDuplicata().getFornecedor().getNome())
                 .filial(p.getDuplicata().getFilial().getNome())
                 .identificacaoFornecedor(p.getDuplicata().getFornecedor().getIdentificacao())
-                .descricao(p.getNumeroParcela())
+                .descricao(Objects.nonNull(p.getNumeroParcela()) ?  p.getNumeroParcela() : p.getDuplicata().getDescricao())
                 .valor(p.getValorTotal())
                 .situacao(p.getStatus() == null ? "Em Aberto" : p.getStatus().getDescricao())
                 .dtVencimento(p.getDtVencimento())
@@ -467,7 +475,7 @@ public class DuplicataServiceImpl implements DuplicataService {
                 .identificacaoFornecedor(p.getDuplicata().getFornecedor().getIdentificacao())
                 .fornecedor(p.getDuplicata().getFornecedor().getNome())
                 .filial(p.getDuplicata().getFilial().getNome())
-                .descricao(p.getNumeroParcela())
+                .descricao(Objects.nonNull(p.getNumeroParcela()) ?  p.getNumeroParcela() : p.getDuplicata().getDescricao())
                 .valor(p.getValorTotal())
                 .situacao(p.getStatus() == null ? "Vencida" : p.getStatus().getDescricao())
                 .dtVencimento(p.getDtVencimento())
@@ -550,6 +558,88 @@ public class DuplicataServiceImpl implements DuplicataService {
                 .dtAtualizacao(duplicata.getDtAtualizacao() != null ? duplicata.getDtAtualizacao() : null)
                 .parcelas(parcelasDTO)
                 .notasFiscais(notaFiscalResponseDTO)
+                .build();
+    }
+    
+    @Override
+    public RelatorioContasAbertasResponseDTO gerarRelatorioContasEmAbertoPorFilial(Long idFilial) {
+
+        var duplicatas = duplicataRepository.findByFilialId(idFilial);
+
+        var parcelasEmAberto = duplicatas.stream()
+            .flatMap(d -> d.getParcelas().stream()
+                .filter(p -> p.getStatus() == null ||
+                            p.getStatus().getDescricao().equalsIgnoreCase("Em Aberto"))
+                .map(p -> new Object[] {
+                    d.getFornecedor().getNome(),
+                    p.getDtVencimento(),
+                    p.getValorTotal()
+                })
+            )
+            .collect(Collectors.toList());
+
+        var parcelasPrevistas = parcelaPrevistaNotaRepository.findByNotaFiscalFilialId(idFilial).stream()
+            .map(p -> new Object[] {
+                p.getNotaFiscal().getFornecedor().getNome(),
+                p.getDtVencimentoPrevisto(),
+                p.getValorPrevisto()
+            })
+            .collect(Collectors.toList());
+
+        parcelasEmAberto.addAll(parcelasPrevistas);
+
+        // Agrupa por mês/ano (nome por extenso + ano)
+        Map<YearMonth, List<Object[]>> agrupadoPorMes = parcelasEmAberto.stream()
+            .collect(Collectors.groupingBy(item -> {
+                LocalDate data = (LocalDate) item[1];
+                return YearMonth.of(data.getYear(), data.getMonth());
+            }, TreeMap::new, Collectors.toList())); // TreeMap mantém ordenação natural crescente
+
+        List<RelatorioContasAbertasResponseDTO.RelatorioMesDTO> meses = new ArrayList<>();
+        BigDecimal totalGeral = BigDecimal.ZERO;
+        Locale locale = new Locale("pt", "BR");
+
+        for (var entry : agrupadoPorMes.entrySet()) {
+            YearMonth ym = entry.getKey();
+            String mesExtenso = ym.getMonth().getDisplayName(TextStyle.FULL, locale);
+            String mesAno = mesExtenso + "/" + ym.getYear();
+
+            List<Object[]> registrosMes = entry.getValue();
+
+            Map<String, BigDecimal> subtotalPorFornecedor = registrosMes.stream()
+                .collect(Collectors.groupingBy(
+                    item -> (String) item[0],
+                    LinkedHashMap::new,
+                    Collectors.mapping(
+                        item -> (BigDecimal) item[2],
+                        Collectors.reducing(BigDecimal.ZERO, BigDecimal::add)
+                    )
+                ));
+
+            List<RelatorioContasAbertasResponseDTO.FornecedorValorDTO> fornecedores =
+                subtotalPorFornecedor.entrySet().stream()
+                    .map(e -> RelatorioContasAbertasResponseDTO.FornecedorValorDTO.builder()
+                            .fornecedor(e.getKey())
+                            .valor(e.getValue())
+                            .build())
+                    .toList();
+
+            BigDecimal subtotal = fornecedores.stream()
+                .map(RelatorioContasAbertasResponseDTO.FornecedorValorDTO::getValor)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            totalGeral = totalGeral.add(subtotal);
+
+            meses.add(RelatorioContasAbertasResponseDTO.RelatorioMesDTO.builder()
+                    .mesAno(mesAno)
+                    .fornecedores(fornecedores)
+                    .subtotal(subtotal)
+                    .build());
+        }
+
+        return RelatorioContasAbertasResponseDTO.builder()
+                .meses(meses)
+                .totalGeral(totalGeral)
                 .build();
     }
 }

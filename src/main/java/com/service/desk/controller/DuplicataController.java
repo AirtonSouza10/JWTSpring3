@@ -164,4 +164,11 @@ public class DuplicataController extends ControllerServiceDesk{
 
         return new ResponseEntity<>(pdf, headers, HttpStatus.OK);
     }
+
+    @Operation(summary = "Relatório de contas a pagar em aberto por filial")
+    @GetMapping("/relatorio-aberto-filial/{idFilial}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseServiceDesk relatorioContasEmAbertoPorFilial(@PathVariable Long idFilial) {
+        return new ResponseServiceDesk(duplicataService.gerarRelatorioContasEmAbertoPorFilial(idFilial));
+    }
 }

@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -18,10 +19,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.service.desk.dto.FornecedorRequestDTO;
+import com.service.desk.dto.FornecedorResponseDTO;
 import com.service.desk.enumerator.MensagemEnum;
 import com.service.desk.service.service.FornecedorService;
 
@@ -60,6 +63,29 @@ public class FornecedorController extends ControllerServiceDesk{
 		fornecedorService.salvarFornecedores(dto);
         return new ResponseServiceDesk(responseSucesso(MensagemEnum.MSGS001));
     }
+	
+	@Operation(summary = "Listar fornecedores paginados")
+	@GetMapping("/paginados")
+	@ResponseStatus(HttpStatus.OK)
+	public ResponseServiceDesk listarFornecedoresPaginados(
+	        @RequestParam(defaultValue = "0") int page,
+	        @RequestParam(defaultValue = "10") int size) {
+
+	    Page<FornecedorResponseDTO> pagina = fornecedorService.listarFornecedoresPaginados(page, size);
+	    return new ResponseServiceDesk(pagina);
+	}
+	
+	@Operation(summary = "Buscar fornecedores por nome ou CNPJ com paginação")
+	@GetMapping("/buscar")
+	@ResponseStatus(HttpStatus.OK)
+	public ResponseServiceDesk buscarFornecedoresPorNomeOuCnpj(
+	        @RequestParam String termo,
+	        @RequestParam(defaultValue = "0") int page,
+	        @RequestParam(defaultValue = "10") int size) {
+
+	    Page<FornecedorResponseDTO> pagina = fornecedorService.buscarFornecedoresPorNomeOuCnpjPaginado(termo, page, size);
+	    return new ResponseServiceDesk(pagina);
+	}
 
 	@Operation(summary = "Atualiza dados do fornecedor")
 	@PutMapping("/{id}")

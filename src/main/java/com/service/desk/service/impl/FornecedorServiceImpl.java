@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.service.desk.dto.EnderecoDTO;
@@ -245,6 +248,97 @@ public class FornecedorServiceImpl implements FornecedorService {
         var fornecedor = fornecedorRepository.findById(id).orElseThrow();
         fornecedor.setAtivo(ativo);
         fornecedorRepository.save(fornecedor);
+    }
+    
+    @Override
+    public Page<FornecedorResponseDTO> listarFornecedoresPaginados(int pagina, int tamanho) {
+        Pageable pageable = PageRequest.of(pagina, tamanho);
+        Page<Fornecedor> fornecedoresPage = fornecedorRepository.findAll(pageable);
+
+        return fornecedoresPage.map(f -> {
+            var telefonesList = f.getTelefones().stream().map(t -> TelefoneDTO.builder()
+                    .id(t.getId())
+                    .numero(t.getNumero())
+                    .tpTelefone(TelefoneTipoDTO.builder()
+                            .id(t.getTpTelefone().getId())
+                            .descricao(t.getTpTelefone().getDescricao())
+                            .build())
+                    .build()).toList();
+
+            var enderecosList = f.getEnderecos().stream().map(e -> EnderecoDTO.builder()
+                    .id(e.getId())
+                    .logradouro(e.getLogradouro())
+                    .complemento(e.getComplemento())
+                    .numero(e.getNumero())
+                    .cidade(e.getCidade())
+                    .estado(e.getEstado())
+                    .bairro(e.getBairro())
+                    .uf(e.getUf())
+                    .cep(e.getCep())
+                    .tipoEndereco(EnderecoTipoDTO.builder()
+                            .id(e.getEnderecoTipo().getId())
+                            .descricao(e.getEnderecoTipo().getDescricao())
+                            .build())
+                    .build()).toList();
+
+            return FornecedorResponseDTO.builder()
+                    .id(f.getId())
+                    .identificacao(f.getIdentificacao())
+                    .tpIdentificacao(f.getTpIdentificacao())
+                    .telefones(telefonesList)
+                    .enderecos(enderecosList)
+                    .nome(f.getNome())
+                    .razao(f.getRazao())
+                    .email(f.getEmail())
+                    .ativo(f.getAtivo())
+                    .build();
+        });
+    }
+
+    @Override
+    public Page<FornecedorResponseDTO> buscarFornecedoresPorNomeOuCnpjPaginado(String termo, int pagina, int tamanho) {
+        Pageable pageable = PageRequest.of(pagina, tamanho);
+        Page<Fornecedor> fornecedoresPage = fornecedorRepository
+                .findByNomeContainingIgnoreCaseOrIdentificacaoContaining(termo, termo, pageable);
+
+        return fornecedoresPage.map(f -> {
+            var telefonesList = f.getTelefones().stream().map(t -> TelefoneDTO.builder()
+                    .id(t.getId())
+                    .numero(t.getNumero())
+                    .tpTelefone(TelefoneTipoDTO.builder()
+                            .id(t.getTpTelefone().getId())
+                            .descricao(t.getTpTelefone().getDescricao())
+                            .build())
+                    .build()).toList();
+
+            var enderecosList = f.getEnderecos().stream().map(e -> EnderecoDTO.builder()
+                    .id(e.getId())
+                    .logradouro(e.getLogradouro())
+                    .complemento(e.getComplemento())
+                    .numero(e.getNumero())
+                    .cidade(e.getCidade())
+                    .estado(e.getEstado())
+                    .bairro(e.getBairro())
+                    .uf(e.getUf())
+                    .cep(e.getCep())
+                    .tipoEndereco(EnderecoTipoDTO.builder()
+                            .id(e.getEnderecoTipo().getId())
+                            .descricao(e.getEnderecoTipo().getDescricao())
+                            .build())
+                    .build()).toList();
+
+            return FornecedorResponseDTO.builder()
+                    .id(f.getId())
+                    .identificacao(f.getIdentificacao())
+                    .tpIdentificacao(f.getTpIdentificacao())
+                    .telefones(telefonesList)
+                    .enderecos(enderecosList)
+                    .nome(f.getNome())
+                    .razao(f.getRazao())
+                    .email(f.getEmail())
+                    .ativo(f.getAtivo())
+                    .build();
+        });
     }
 
 }

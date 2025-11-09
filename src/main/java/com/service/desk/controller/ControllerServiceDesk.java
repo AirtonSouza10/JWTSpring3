@@ -17,7 +17,6 @@ import net.sf.jasperreports.engine.JRDataSource;
 @RestController
 @RequestMapping(RequestMappingConstants.HEALTH_ENO_POINT)
 public class ControllerServiceDesk {
-	private static final String PATH_SUBREPORT = "relatorios/subreport/";
 	
 	@Autowired
 	private MensagemUtils mensagemUtils;
@@ -36,6 +35,7 @@ public class ControllerServiceDesk {
 	}
 	
 	protected void adicionarParametroBase(Map<String, Object> parameters, JRDataSource dataSource) throws IOException {
+	    String PATH_SUBREPORT = getClass().getResource("/relatorios/subreport/").getPath() + "/";
 		parameters.put("SUBREPORT_PATH", PATH_SUBREPORT);
 		parameters.put("datasource", dataSource);
 	}

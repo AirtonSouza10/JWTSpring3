@@ -603,7 +603,7 @@ public class DuplicataServiceImpl implements DuplicataService {
         for (var entry : agrupadoPorMes.entrySet()) {
             YearMonth ym = entry.getKey();
             String mesExtenso = ym.getMonth().getDisplayName(TextStyle.FULL, locale);
-            String mesAno = mesExtenso + "/" + ym.getYear();
+            String mesAno = (mesExtenso + "/" + ym.getYear()).toUpperCase();
 
             List<Object[]> registrosMes = entry.getValue();
 
@@ -622,6 +622,7 @@ public class DuplicataServiceImpl implements DuplicataService {
                     .map(e -> RelatorioContasAbertasResponseDTO.FornecedorValorDTO.builder()
                             .fornecedor(e.getKey())
                             .valor(e.getValue())
+                            .valorFormatado(FuxoCaixaUtils.formatarValorBR(e.getValue()))
                             .build())
                     .toList();
 
@@ -635,6 +636,7 @@ public class DuplicataServiceImpl implements DuplicataService {
                     .mesAno(mesAno)
                     .fornecedores(fornecedores)
                     .subtotal(subtotal)
+                    .subtotalformatado(FuxoCaixaUtils.formatarValorBR(subtotal))
                     .build());
         }
 
@@ -642,6 +644,7 @@ public class DuplicataServiceImpl implements DuplicataService {
         		.filial(filial.getNome())
                 .meses(meses)
                 .totalGeral(totalGeral)
+                .totalGeralFormatado(FuxoCaixaUtils.formatarValorBR(totalGeral))
                 .build();
     }
 }

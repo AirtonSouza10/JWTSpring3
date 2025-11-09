@@ -183,9 +183,9 @@ public class DuplicataController extends ControllerServiceDesk{
         JRBeanCollectionDataSource dataSourceMeses = new JRBeanCollectionDataSource(relatorio.getMeses());
 
         Map<String, Object> parametros = new HashMap<>();
-        parametros.put("TITULO_RELATORIO", "Relatório de Contas a Pagar em Aberto - Filial: " + relatorio.getFilial());
+        parametros.put("TITULO_RELATORIO", "Relatório de Contas a Pagar - " + relatorio.getFilial());
         parametros.put("DATA_EMISSAO", new Date());
-        parametros.put("TOTAL_GERAL", relatorio.getTotalGeral());
+        parametros.put("TOTAL_GERAL", relatorio.getTotalGeralFormatado());
         parametros.put("DATASOURCE_MESES", dataSourceMeses);
 
         JasperReport jasperReport = (JasperReport) JRLoader.loadObject(

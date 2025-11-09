@@ -16,6 +16,7 @@ public class RelatorioContasAbertasResponseDTO {
 	private String filial;
     private List<RelatorioMesDTO> meses;
     private BigDecimal totalGeral;
+    private String totalGeralFormatado;
 
     @Data
     @AllArgsConstructor
@@ -25,6 +26,7 @@ public class RelatorioContasAbertasResponseDTO {
         private String mesAno;
         private List<FornecedorValorDTO> fornecedores;
         private BigDecimal subtotal;
+        private String subtotalformatado;
     }
 
     @Data
@@ -34,5 +36,6 @@ public class RelatorioContasAbertasResponseDTO {
     public static class FornecedorValorDTO {
         private String fornecedor;
         private BigDecimal valor;
+        private String valorFormatado;
     }
 }

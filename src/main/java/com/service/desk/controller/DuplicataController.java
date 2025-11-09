@@ -171,4 +171,38 @@ public class DuplicataController extends ControllerServiceDesk{
     public ResponseServiceDesk relatorioContasEmAbertoPorFilial(@PathVariable Long idFilial) {
         return new ResponseServiceDesk(duplicataService.gerarRelatorioContasEmAbertoPorFilial(idFilial));
     }
+    
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Gera relatório de contas a pagar em aberto por filial em PDF")
+    @GetMapping("/relatorio-contas-pagar-filial/{idFilial}")
+    public ResponseEntity<byte[]> gerarRelatorioContasEmAbertoPorFilialPDF(@PathVariable Long idFilial)
+            throws JRException, IOException {
+
+        var relatorio = duplicataService.gerarRelatorioContasEmAbertoPorFilial(idFilial);
+
+        JRBeanCollectionDataSource dataSourceMeses = new JRBeanCollectionDataSource(relatorio.getMeses());
+
+        Map<String, Object> parametros = new HashMap<>();
+        parametros.put("TITULO_RELATORIO", "Relatório de Contas a Pagar em Aberto - Filial: " + relatorio.getFilial());
+        parametros.put("DATA_EMISSAO", new Date());
+        parametros.put("TOTAL_GERAL", relatorio.getTotalGeral());
+        parametros.put("DATASOURCE_MESES", dataSourceMeses);
+
+        JasperReport jasperReport = (JasperReport) JRLoader.loadObject(
+            new ClassPathResource("relatorios/ContasPagarFilial.jasper").getInputStream()
+        );
+
+        adicionarParametroBase(parametros, null);
+
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, new JREmptyDataSource());
+
+        byte[] pdf = JasperExportManager.exportReportToPdf(jasperPrint);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDisposition(ContentDisposition.builder("inline")
+                .filename("relatorioContasPagarFilial.pdf").build());
+
+        return new ResponseEntity<>(pdf, headers, HttpStatus.OK);
+    }
 }

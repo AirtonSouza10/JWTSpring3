@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class RelatorioContasAbertasResponseDTO {
+	private String filial;
     private List<RelatorioMesDTO> meses;
     private BigDecimal totalGeral;
 

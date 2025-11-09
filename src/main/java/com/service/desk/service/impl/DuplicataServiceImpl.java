@@ -563,6 +563,7 @@ public class DuplicataServiceImpl implements DuplicataService {
     
     @Override
     public RelatorioContasAbertasResponseDTO gerarRelatorioContasEmAbertoPorFilial(Long idFilial) {
+        var filial = filialRepository.findById(idFilial).orElseThrow();
 
         var duplicatas = duplicataRepository.findByFilialId(idFilial);
 
@@ -638,6 +639,7 @@ public class DuplicataServiceImpl implements DuplicataService {
         }
 
         return RelatorioContasAbertasResponseDTO.builder()
+        		.filial(filial.getNome())
                 .meses(meses)
                 .totalGeral(totalGeral)
                 .build();

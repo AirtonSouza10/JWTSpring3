@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.service.desk.dto.BaixaParcelaRequestDTO;
 import com.service.desk.dto.DuplicataRequestDTO;
 import com.service.desk.dto.DuplicataResponseDTO;
 import com.service.desk.enumerator.MensagemEnum;
@@ -94,6 +95,21 @@ public class DuplicataController extends ControllerServiceDesk{
     public ResponseServiceDesk atualizarNota(@PathVariable Long id , @Valid @RequestBody DuplicataRequestDTO dto) {
 		duplicataService.atualizarDuplicata(id,dto);
         return new ResponseServiceDesk(responseSucesso(MensagemEnum.MSGS001));
+    }
+	
+	@Operation(summary = "Baixa parcela por id")
+	@PutMapping("/baixa")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseServiceDesk baixarParcela(@Valid @RequestBody BaixaParcelaRequestDTO dto) {
+		duplicataService.baixarParcela(dto);
+        return new ResponseServiceDesk(responseSucesso(MensagemEnum.MSGS001));
+    }
+	
+	@Operation(summary = "buscar Parcela por id")
+	@GetMapping("/buscar-parcela/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseServiceDesk buscarParcelaPorId(@PathVariable Long id) {
+        return new ResponseServiceDesk(duplicataService.buscarParcelaPorId(id));
     }
 	
     @Operation(summary = "Exclui uma nota fiscal pelo ID")

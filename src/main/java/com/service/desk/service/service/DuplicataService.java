@@ -4,10 +4,12 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 
+import com.service.desk.dto.BaixaParcelaRequestDTO;
 import com.service.desk.dto.DuplicataDiaResponseDTO;
 import com.service.desk.dto.DuplicataDiaVencidoResponseDTO;
 import com.service.desk.dto.DuplicataRequestDTO;
 import com.service.desk.dto.DuplicataResponseDTO;
+import com.service.desk.dto.ParcelaResponseDTO;
 import com.service.desk.dto.RelatorioContasAbertasResponseDTO;
 
 public interface DuplicataService {
@@ -35,5 +37,9 @@ public interface DuplicataService {
 	DuplicataDiaVencidoResponseDTO obterContasPagarDiaAndVencidas();
 
 	RelatorioContasAbertasResponseDTO gerarRelatorioContasEmAbertoPorFilial(Long idFilial);
+
+	void baixarParcela(BaixaParcelaRequestDTO dto);
+
+	ParcelaResponseDTO buscarParcelaPorId(Long id);
 
 }

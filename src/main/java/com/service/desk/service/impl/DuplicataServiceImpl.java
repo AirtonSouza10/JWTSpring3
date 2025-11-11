@@ -22,17 +22,21 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import com.service.desk.dto.BaixaParcelaRequestDTO;
 import com.service.desk.dto.DuplicataDiaResponseDTO;
 import com.service.desk.dto.DuplicataDiaVencidoResponseDTO;
 import com.service.desk.dto.DuplicataRequestDTO;
 import com.service.desk.dto.DuplicataResponseDTO;
 import com.service.desk.dto.NotaFiscalResponseDTO;
+import com.service.desk.dto.ParcelaResponseDTO;
 import com.service.desk.dto.ParcelamentoDTO;
 import com.service.desk.dto.RelatorioContasAbertasResponseDTO;
 import com.service.desk.entidade.Duplicata;
 import com.service.desk.entidade.NotaFiscal;
 import com.service.desk.entidade.Parcela;
+import com.service.desk.entidade.StatusConta;
 import com.service.desk.enumerator.MensagemEnum;
+import com.service.desk.enumerator.StatusContaEnum;
 import com.service.desk.exceptions.NegocioException;
 import com.service.desk.repository.DuplicataRepository;
 import com.service.desk.repository.FilialRepository;
@@ -41,6 +45,8 @@ import com.service.desk.repository.FornecedorRepository;
 import com.service.desk.repository.NotaFiscalRepository;
 import com.service.desk.repository.ParcelaPrevistaNotaRepository;
 import com.service.desk.repository.ParcelaRepository;
+import com.service.desk.repository.StatusContaRepository;
+import com.service.desk.repository.TipoPagamentoRepository;
 import com.service.desk.service.service.DuplicataService;
 import com.service.desk.utils.FuxoCaixaUtils;
 
@@ -73,6 +79,12 @@ public class DuplicataServiceImpl implements DuplicataService {
     
     @Autowired
     private FilialRepository filialRepository;
+    
+    @Autowired
+    private TipoPagamentoRepository tipoPagamentoRepository;
+    
+    @Autowired
+    private StatusContaRepository statusContaRepository;
 
     @Override
     public List<DuplicataResponseDTO> listarDuplicatas() {
@@ -313,6 +325,7 @@ public class DuplicataServiceImpl implements DuplicataService {
                 parcela.setNumeroParcela(parcDto.getNumeroParcela());
                 parcela.setValorTotal(parcDto.getValorTotal());
                 parcela.setDtVencimento(parcDto.getDtVencimento());
+                parcela.setStatus(StatusConta.builder().id(StatusContaEnum.EM_ABERTO.getId()).descricao(StatusContaEnum.EM_ABERTO.getDescricao()).build());
                 parcela.setDtCriacao(LocalDate.now());
                 parcelaRepository.save(parcela);
             }
@@ -432,14 +445,16 @@ public class DuplicataServiceImpl implements DuplicataService {
         var hoje = LocalDate.now();
 
         var parcelas = parcelaRepository.findByDtVencimento(hoje);
-        var listaParcelas = new ArrayList<>(parcelas.stream().map(p -> DuplicataDiaResponseDTO.builder()
-                .id(p.getDuplicata().getId())
+        var listaParcelas = new ArrayList<>(parcelas.stream()
+                .filter(p -> statusNotPago(p))
+        		.map(p -> DuplicataDiaResponseDTO.builder()
+                .id(p.getId())
                 .fornecedor(p.getDuplicata().getFornecedor().getNome())
                 .filial(p.getDuplicata().getFilial().getNome())
                 .identificacaoFornecedor(p.getDuplicata().getFornecedor().getIdentificacao())
                 .descricao(Objects.nonNull(p.getNumeroParcela()) ?  p.getNumeroParcela() : p.getDuplicata().getDescricao())
                 .valor(p.getValorTotal())
-                .situacao(p.getStatus() == null ? "Em Aberto" : p.getStatus().getDescricao())
+                .situacao(emAberto(p)  ? "Em Aberto" : p.getStatus().getDescricao())
                 .dtVencimento(p.getDtVencimento())
                 .dtVendimentoFormatada(FuxoCaixaUtils.formatarData(p.getDtVencimento()))
                 .valorFormatado(FuxoCaixaUtils.formatarValorBR(p.getValorTotal()))
@@ -457,6 +472,7 @@ public class DuplicataServiceImpl implements DuplicataService {
                 .situacao("Em Aberto")
                 .dtVencimento(p.getDtVencimentoPrevisto())
                 .dtVendimentoFormatada(FuxoCaixaUtils.formatarData(p.getDtVencimentoPrevisto()))
+                .isPrevista(true)
                 .build())
             .toList();
 
@@ -464,20 +480,32 @@ public class DuplicataServiceImpl implements DuplicataService {
         
         return listaParcelas;
     }
+
+	private boolean statusNotPago(Parcela p) {
+		return Objects.isNull(p.getStatus()) 
+				|| (!StatusContaEnum.CANCELADO.getId().equals(p.getStatus().getId()) &&
+					!StatusContaEnum.PAGO.getId().equals(p.getStatus().getId()));
+	}
+
+	private boolean emAberto(Parcela p) {
+		return Objects.isNull(p.getStatus()) || StatusContaEnum.EM_ABERTO.getId().equals(p.getStatus().getId());
+	}
         
     @Override
     public List<DuplicataDiaResponseDTO> obterContasPagarVencida() {
         var hoje = LocalDate.now();
 
         var parcelas = parcelaRepository.findByDtVencimentoBefore(hoje);
-        var listaParcelas = new ArrayList<>(parcelas.stream().map(p -> DuplicataDiaResponseDTO.builder()
-                .id(p.getDuplicata().getId())
+        var listaParcelas = new ArrayList<>(parcelas.stream()
+        		.filter(p -> statusNotPago(p))
+        		.map(p -> DuplicataDiaResponseDTO.builder()
+                .id(p.getId())
                 .identificacaoFornecedor(p.getDuplicata().getFornecedor().getIdentificacao())
                 .fornecedor(p.getDuplicata().getFornecedor().getNome())
                 .filial(p.getDuplicata().getFilial().getNome())
                 .descricao(Objects.nonNull(p.getNumeroParcela()) ?  p.getNumeroParcela() : p.getDuplicata().getDescricao())
                 .valor(p.getValorTotal())
-                .situacao(p.getStatus() == null ? "Vencida" : p.getStatus().getDescricao())
+                .situacao(emAberto(p) ? "Vencida" : p.getStatus().getDescricao())
                 .dtVencimento(p.getDtVencimento())
                 .dtVendimentoFormatada(FuxoCaixaUtils.formatarData(p.getDtVencimento()))
                 .valorFormatado(FuxoCaixaUtils.formatarValorBR(p.getValorTotal()))
@@ -496,6 +524,7 @@ public class DuplicataServiceImpl implements DuplicataService {
                 .dtVencimento(p.getDtVencimentoPrevisto())
                 .dtVendimentoFormatada(FuxoCaixaUtils.formatarData(p.getDtVencimentoPrevisto()))
                 .valorFormatado(FuxoCaixaUtils.formatarValorBR(p.getValorPrevisto()))
+                .isPrevista(true)
                 .build())
             .toList();
 
@@ -646,5 +675,39 @@ public class DuplicataServiceImpl implements DuplicataService {
                 .totalGeral(totalGeral)
                 .totalGeralFormatado(FuxoCaixaUtils.formatarValorBR(totalGeral))
                 .build();
+    }
+    
+    @Override
+    @Transactional
+    public void baixarParcela(BaixaParcelaRequestDTO dto) {
+    	var parcela = parcelaRepository.findById(dto.getId());
+    	if(parcela.isPresent()) {
+    		var parcelaDuplicata = parcela.get();
+    		parcelaDuplicata.setDtAtualizacao(LocalDate.now());
+    		parcelaDuplicata.setDtBaixa(LocalDate.now());
+    		parcelaDuplicata.setDtPagamento(dto.getDtPagamento());
+    		parcelaDuplicata.setObservacao(dto.getObservacao());
+    		parcelaDuplicata.setValorPago(dto.getValorPago());
+    		var status = statusContaRepository.findById(StatusContaEnum.PAGO.getId()).orElseThrow();
+    		parcelaDuplicata.setStatus(status);
+    		if(Objects.nonNull(dto.getTipoPagamentoId())) {
+    			var tipoPagamento = tipoPagamentoRepository.findById(dto.getTipoPagamentoId());
+    			parcelaDuplicata.setTipoPagamento(tipoPagamento.get());
+ 
+    		}
+    		parcelaRepository.save(parcelaDuplicata);
+    	}
+    }
+    
+    @Override
+    @Transactional
+    public ParcelaResponseDTO buscarParcelaPorId(Long id) {
+    	var parcela = parcelaRepository.findById(id).orElseThrow();
+    	return ParcelaResponseDTO.builder()
+    			.valor(parcela.getValorTotal())
+    			.observacao(parcela.getObservacao())
+    			.tipoPagamentoId(Objects.nonNull(parcela.getTipoPagamento()) ? parcela.getTipoPagamento().getId() : null)
+    			.dsTipoPagamento(Objects.nonNull(parcela.getTipoPagamento()) ? parcela.getTipoPagamento().getDescricao() : null)
+    			.build();
     }
 }

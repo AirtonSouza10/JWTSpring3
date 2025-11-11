@@ -22,4 +22,5 @@ public class DuplicataDiaResponseDTO {
     private LocalDate dtVencimento;
     private String dtVendimentoFormatada;    
     private String nrParcela;
+    private boolean isPrevista;
 }

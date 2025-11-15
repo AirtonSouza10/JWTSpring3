@@ -26,11 +26,11 @@ public interface NotaFiscalRepository extends JpaRepository<NotaFiscal, Long> {
     
     @Query("SELECT n FROM NotaFiscal n " +
     	       "WHERE n.filial.id = :idFilial " +
-    	       "AND n.dtCompra BETWEEN :dataInicial AND :dataFinal")
+    	       "AND n.dtCompra BETWEEN :dataInicial AND :dataFinal ORDER BY n.dtCompra ASC")
     	List<NotaFiscal> findByFilialAndPeriodo(Long idFilial, LocalDate dataInicial, LocalDate dataFinal);
 
     @Query("SELECT n FROM NotaFiscal n " +
-    	       "WHERE n.dtCompra BETWEEN :dataInicial AND :dataFinal")
+    	       "WHERE n.dtCompra BETWEEN :dataInicial AND :dataFinal ORDER BY n.dtCompra ASC")
     	List<NotaFiscal> findByPeriodo(LocalDate dataInicial, LocalDate dataFinal);
 
 }

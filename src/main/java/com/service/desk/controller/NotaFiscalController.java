@@ -1,13 +1,23 @@
 package com.service.desk.controller;
 
+import java.io.IOException;
 import java.time.LocalDate;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,6 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.service.desk.dto.NotaFiscalRequestDTO;
 import com.service.desk.dto.NotaFiscalResponseDTO;
+import com.service.desk.dto.ProtocoloContabilidadeResponseDTO;
 import com.service.desk.enumerator.MensagemEnum;
 import com.service.desk.service.service.NotaFiscalService;
 
@@ -28,6 +39,14 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import net.sf.jasperreports.engine.JREmptyDataSource;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.engine.util.JRLoader;
 
 @RestController
 @RequiredArgsConstructor
@@ -127,4 +146,46 @@ public class NotaFiscalController extends ControllerServiceDesk{
                 notaFiscalService.listarRelatorioFilialPeriodo(idFilial, dataInicial, dataFinal)
         );
     }
+    
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Gera relatório de protocolos de notas fiscais por filial e período em PDF")
+    @GetMapping("/relatorio-notas-filial-periodo")
+    public ResponseEntity<byte[]> gerarRelatorioNotasFilialPeriodoPDF(
+            @RequestParam(required = false) Long idFilial,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicial,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFinal
+    ) throws JRException, IOException {
+
+       	var dtoProtocolo = notaFiscalService.listarRelatorioFilialPeriodo(idFilial, dataInicial, dataFinal);
+
+        JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(dtoProtocolo.getNotaFiscal());
+
+        Map<String, Object> parametros = new HashMap<>();
+        parametros.put("TITULO_RELATORIO", "PROTOCOLO DE ENVIO PARA CONTABILIDADE");
+        parametros.put("DATA_EMISSAO", new Date());
+        parametros.put("DATA_INICIAL", dataInicial);
+        parametros.put("DATA_FINAL", dataFinal);
+        parametros.put("FILIAL", dtoProtocolo.getFilial().getNome());
+        parametros.put("FILIAL_ID", dtoProtocolo.getFilial().getIdentificacao());
+        parametros.put("DATASET_NOTAS", dataSource);
+
+        JasperReport jasperReport = (JasperReport) JRLoader.loadObject(
+                new ClassPathResource("relatorios/ProtocoloNotas.jasper").getInputStream()
+        );
+
+        adicionarParametroBase(parametros, null);
+
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parametros, new JREmptyDataSource());
+
+        byte[] pdf = JasperExportManager.exportReportToPdf(jasperPrint);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDisposition(ContentDisposition.builder("inline")
+                .filename("relatorioProtocoloNotas.pdf")
+                .build());
+
+        return new ResponseEntity<>(pdf, headers, HttpStatus.OK);
+    }
+
 }

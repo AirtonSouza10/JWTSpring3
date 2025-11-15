@@ -13,14 +13,14 @@
 	<title>
 		<band height="50">
 			<frame>
-				<reportElement mode="Opaque" x="0" y="0" width="800" height="50" backcolor="#006699" uuid="03670447-590d-4d8f-9aa5-9578afc359e0">
+				<reportElement mode="Opaque" x="0" y="0" width="800" height="50" backcolor="#C7C7C7" uuid="03670447-590d-4d8f-9aa5-9578afc359e0">
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 				<staticText>
-					<reportElement x="0" y="3" width="800" height="43" forecolor="#FFFFFF" uuid="543f9ca0-ad25-43a4-a0d8-ee4379ce94bf">
+					<reportElement x="0" y="3" width="800" height="43" forecolor="#080000" uuid="543f9ca0-ad25-43a4-a0d8-ee4379ce94bf">
 						<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					</reportElement>
 					<textElement>

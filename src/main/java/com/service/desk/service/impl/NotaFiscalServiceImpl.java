@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
+import org.antlr.v4.runtime.misc.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,6 +28,7 @@ import com.service.desk.repository.ParcelaPrevistaNotaRepository;
 import com.service.desk.repository.PessoaRepository;
 import com.service.desk.repository.TipoNotaRepository;
 import com.service.desk.service.service.NotaFiscalService;
+import com.service.desk.utils.FuxoCaixaUtils;
 import com.service.desk.utils.UsuarioLogadoUtil;
 
 import jakarta.transaction.Transactional;
@@ -463,11 +465,13 @@ public class NotaFiscalServiceImpl implements NotaFiscalService {
                             .chave(nota.getChave())
                             .descricaoObs(nota.getDescricaoObs())
                             .valorTotal(nota.getValorTotal())
+                            .valorFormatado(FuxoCaixaUtils.formatarValorBR(nota.getValorTotal()))
                             .valorDesconto(nota.getValorDesconto())
                             .valorIcms(nota.getValorIcms())
                             .valorJuros(nota.getValorJuros())
                             .valorMulta(nota.getValorMulta())
                             .dtCompra(nota.getDtCompra())
+                            .dtCompraFormatada(FuxoCaixaUtils.formatarData(nota.getDtCompra()))
                             .fornecedorId(nota.getFornecedor() != null ? nota.getFornecedor().getId() : null)
                             .fornecedorNome(nota.getFornecedor() != null ? nota.getFornecedor().getNome() : null)
                             .tipoNotaId(nota.getTipo() != null ? nota.getTipo().getId() : null)

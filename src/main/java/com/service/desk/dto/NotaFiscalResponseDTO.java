@@ -20,12 +20,14 @@ public class NotaFiscalResponseDTO {
     private String descricaoObs;
 
     private BigDecimal valorTotal;
+    private String valorFormatado;
     private BigDecimal valorDesconto;
     private BigDecimal valorIcms;
     private BigDecimal valorJuros;
     private BigDecimal valorMulta;
 
     private LocalDate dtCompra;
+    private String dtCompraFormatada;
 
     private Long fornecedorId;
     private String fornecedorNome;

@@ -24,8 +24,10 @@ public class DuplicataResponseDTO {
     private Long formaPagamentoId;
     private Long fornecedorId;
     private Long filialId;
+    private Long tipoId;
     private String dsFornecedor;
     private String dsFilial;
+    private String dsTipo;
     private List<ParcelamentoDTO> parcelas;
     private List<NotaFiscalResponseDTO> notasFiscais;
 }

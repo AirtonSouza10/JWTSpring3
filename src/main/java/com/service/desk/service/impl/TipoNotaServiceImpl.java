@@ -14,9 +14,7 @@ import com.service.desk.service.service.TipoNotaService;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 
-@Log4j2
 @Service
 @RequiredArgsConstructor
 public class TipoNotaServiceImpl implements TipoNotaService {
@@ -29,12 +27,12 @@ public class TipoNotaServiceImpl implements TipoNotaService {
     	var listaTiposNota = new ArrayList<TipoNotaResponseDTO>();
     	var tiposNota = tipoNotaRepository.findAll();
     	tiposNota.forEach(f->{    		    			
-    		var tipoPagamento = TipoNotaResponseDTO.builder()
+    		var tipoNota = TipoNotaResponseDTO.builder()
     				.id(f.getId())
     				.descricao(f.getDescricao())
     				.build();
     		
-    		listaTiposNota.add(tipoPagamento);
+    		listaTiposNota.add(tipoNota);
     	});
     	return listaTiposNota;
     }

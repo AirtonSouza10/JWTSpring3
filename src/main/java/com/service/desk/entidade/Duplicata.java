@@ -57,6 +57,10 @@ public class Duplicata{
     @JoinColumn(name = "filial_id", nullable = true)
     private Filial filial;
     
+    @ManyToOne
+    @JoinColumn(name = "tipo_id", nullable = true)
+    private Tipo tipo;
+    
     @OneToMany(mappedBy = "duplicata", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Parcela> parcelas = new ArrayList<>();
     

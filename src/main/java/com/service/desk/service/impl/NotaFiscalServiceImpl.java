@@ -9,9 +9,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.service.desk.dto.FilialResponseDTO;
 import com.service.desk.dto.NotaFiscalRequestDTO;
 import com.service.desk.dto.NotaFiscalResponseDTO;
 import com.service.desk.dto.ParcelaPrevistaNotaResponseDTO;
+import com.service.desk.dto.ProtocoloContabilidadeResponseDTO;
 import com.service.desk.entidade.NotaFiscal;
 import com.service.desk.entidade.ParcelaPrevistaNota;
 import com.service.desk.enumerator.MensagemEnum;
@@ -426,5 +428,90 @@ public class NotaFiscalServiceImpl implements NotaFiscalService {
                     .build();
         }).toList();
     }
+    
+    @Override
+    public List<NotaFiscalResponseDTO> listarNotasPorFilialEPeriodo(
+            Long idFilial,
+            LocalDate dataInicial,
+            LocalDate dataFinal) {
+
+        List<NotaFiscal> notas;
+
+        if (idFilial != null) {
+            notas = notaFiscalRepository.findByFilialAndPeriodo(idFilial, dataInicial, dataFinal);
+        } else {
+            notas = notaFiscalRepository.findByPeriodo(dataInicial, dataFinal);
+        }
+
+        return notas.stream()
+                .map(nota -> {
+                    List<ParcelaPrevistaNotaResponseDTO> parcelasPrevistasDTO =
+                            nota.getParcelasPrevistas() != null
+                                    ? nota.getParcelasPrevistas().stream()
+                                    .map(parcela -> ParcelaPrevistaNotaResponseDTO.builder()
+                                            .id(parcela.getId())
+                                            .dtVencimentoPrevisto(parcela.getDtVencimentoPrevisto())
+                                            .valorPrevisto(parcela.getValorPrevisto())
+                                            .build())
+                                    .toList()
+                                    : List.of();
+
+                    return NotaFiscalResponseDTO.builder()
+                            .id(nota.getId())
+                            .numero(nota.getNumero())
+                            .serie(nota.getSerie())
+                            .chave(nota.getChave())
+                            .descricaoObs(nota.getDescricaoObs())
+                            .valorTotal(nota.getValorTotal())
+                            .valorDesconto(nota.getValorDesconto())
+                            .valorIcms(nota.getValorIcms())
+                            .valorJuros(nota.getValorJuros())
+                            .valorMulta(nota.getValorMulta())
+                            .dtCompra(nota.getDtCompra())
+                            .fornecedorId(nota.getFornecedor() != null ? nota.getFornecedor().getId() : null)
+                            .fornecedorNome(nota.getFornecedor() != null ? nota.getFornecedor().getNome() : null)
+                            .tipoNotaId(nota.getTipo() != null ? nota.getTipo().getId() : null)
+                            .pessoaId(nota.getPessoa() != null ? nota.getPessoa().getId() : null)
+                            .filialId(nota.getFilial() != null ? nota.getFilial().getId() : null)
+                            .formaPagamentoId(nota.getFormaPagamento() != null ? nota.getFormaPagamento().getId() : null)
+                            .duplicataId(nota.getDuplicata() != null ? nota.getDuplicata().getId() : null)
+                            .dsDuplicata(nota.getDuplicata() != null ? nota.getDuplicata().getDescricao() : null)
+                            .parcelasPrevistas(parcelasPrevistasDTO)
+                            .build();
+                })
+                .toList();
+    }
+
+    @Override
+    public ProtocoloContabilidadeResponseDTO listarRelatorioFilialPeriodo(
+            Long idFilial,
+            LocalDate dataInicial,
+            LocalDate dataFinal) {
+
+        FilialResponseDTO filialDTO;
+
+        if (idFilial != null) {
+            var f = filialRepository.findById(idFilial).orElseThrow();
+
+            filialDTO = FilialResponseDTO.builder()
+                            .id(f.getId())
+                            .nome(f.getNome())
+                            .identificacao(f.getIdentificacao())
+                            .build();
+        } else {
+        	filialDTO = FilialResponseDTO.builder()
+                    .nome("GERAL")
+                    .build();
+        }
+
+        List<NotaFiscalResponseDTO> notas =
+                listarNotasPorFilialEPeriodo(idFilial, dataInicial, dataFinal);
+
+        return ProtocoloContabilidadeResponseDTO.builder()
+                .filial(filialDTO)
+                .notaFiscal(notas)
+                .build();
+    }
+
 	
 }

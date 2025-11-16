@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +30,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.service.desk.dto.NotaFiscalRequestDTO;
 import com.service.desk.dto.NotaFiscalResponseDTO;
-import com.service.desk.dto.ProtocoloContabilidadeResponseDTO;
 import com.service.desk.enumerator.MensagemEnum;
 import com.service.desk.service.service.NotaFiscalService;
 

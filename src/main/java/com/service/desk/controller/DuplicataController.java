@@ -16,7 +16,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,6 +30,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.service.desk.dto.BaixaParcelaRequestDTO;
 import com.service.desk.dto.DuplicataRequestDTO;
 import com.service.desk.dto.DuplicataResponseDTO;
+import com.service.desk.dto.FiltroRelatorioCustomizadoDTO;
+import com.service.desk.dto.RelatorioCustomizadoResponseDTO;
 import com.service.desk.dto.RelatorioParcelasPagasPorTipoDTO;
 import com.service.desk.enumerator.MensagemEnum;
 import com.service.desk.service.service.DuplicataService;
@@ -291,5 +292,52 @@ public class DuplicataController extends ControllerServiceDesk{
 
         return new ResponseEntity<>(pdf, headers, HttpStatus.OK);
     }
+    
+    @Operation(summary = "Relatório personalizado")
+    @PostMapping("/relatorio-customizado")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseServiceDesk gerarRelatorio(@RequestBody FiltroRelatorioCustomizadoDTO filtro) {
+        return new ResponseServiceDesk(duplicataService.gerarRelatorioCustomizado(filtro));
+    }
+    
+    @Operation(summary = "Gera relatório personalizado em PDF")
+    @PostMapping("/relatorio-customizado/pdf")
+    public ResponseEntity<byte[]> gerarRelatorioCustomizadoPDF(
+            @RequestBody FiltroRelatorioCustomizadoDTO filtro
+    ) throws JRException, IOException {
+
+        List<RelatorioCustomizadoResponseDTO> relatorio =
+                duplicataService.gerarRelatorioCustomizado(filtro);
+        JRBeanCollectionDataSource dataSource =
+                new JRBeanCollectionDataSource(relatorio);
+
+        Map<String, Object> parametros = new HashMap<>();
+        parametros.put("TITULO_RELATORIO", "RELATÓRIO PERSONALIZADO - CONTAS A PAGAR");
+        parametros.put("DATA_EMISSAO", new Date());
+        parametros.put("DATASOURCE", dataSource);
+
+        JasperReport jasperReport = (JasperReport) JRLoader.loadObject(
+                new ClassPathResource("relatorios/RelatorioPersonalizado.jasper")
+                        .getInputStream()
+        );
+
+        adicionarParametroBase(parametros, null);
+
+        JasperPrint jasperPrint =
+                JasperFillManager.fillReport(jasperReport, parametros, new JREmptyDataSource());
+
+        byte[] pdf = JasperExportManager.exportReportToPdf(jasperPrint);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDisposition(
+                ContentDisposition.builder("inline")
+                        .filename("relatorio_personalizado.pdf")
+                        .build()
+        );
+
+        return new ResponseEntity<>(pdf, headers, HttpStatus.OK);
+    }
+
 
 }

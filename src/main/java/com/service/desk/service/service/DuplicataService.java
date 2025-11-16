@@ -10,8 +10,10 @@ import com.service.desk.dto.DuplicataDiaResponseDTO;
 import com.service.desk.dto.DuplicataDiaVencidoResponseDTO;
 import com.service.desk.dto.DuplicataRequestDTO;
 import com.service.desk.dto.DuplicataResponseDTO;
+import com.service.desk.dto.FiltroRelatorioCustomizadoDTO;
 import com.service.desk.dto.ParcelaResponseDTO;
 import com.service.desk.dto.RelatorioContasAbertasResponseDTO;
+import com.service.desk.dto.RelatorioCustomizadoResponseDTO;
 import com.service.desk.dto.RelatorioParcelasPagasPorTipoDTO;
 
 public interface DuplicataService {
@@ -46,5 +48,7 @@ public interface DuplicataService {
 
 	List<RelatorioParcelasPagasPorTipoDTO> gerarRelatorioParcelasPagasPorTipo(Long idFilial, LocalDate dataInicial,
 			LocalDate dataFinal);
+
+	List<RelatorioCustomizadoResponseDTO> gerarRelatorioCustomizado(FiltroRelatorioCustomizadoDTO f);
 
 }

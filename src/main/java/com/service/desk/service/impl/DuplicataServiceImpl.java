@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.TextStyle;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -19,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -27,10 +29,12 @@ import com.service.desk.dto.DuplicataDiaResponseDTO;
 import com.service.desk.dto.DuplicataDiaVencidoResponseDTO;
 import com.service.desk.dto.DuplicataRequestDTO;
 import com.service.desk.dto.DuplicataResponseDTO;
+import com.service.desk.dto.FiltroRelatorioCustomizadoDTO;
 import com.service.desk.dto.NotaFiscalResponseDTO;
 import com.service.desk.dto.ParcelaResponseDTO;
 import com.service.desk.dto.ParcelamentoDTO;
 import com.service.desk.dto.RelatorioContasAbertasResponseDTO;
+import com.service.desk.dto.RelatorioCustomizadoResponseDTO;
 import com.service.desk.dto.RelatorioParcelasPagasPorTipoDTO;
 import com.service.desk.entidade.Duplicata;
 import com.service.desk.entidade.NotaFiscal;
@@ -787,5 +791,92 @@ public class DuplicataServiceImpl implements DuplicataService {
 
         return resultado;
     }
+    
+    @Override
+    public List<RelatorioCustomizadoResponseDTO> gerarRelatorioCustomizado(FiltroRelatorioCustomizadoDTO f) {
 
+        Specification<Parcela> spec = Specification.allOf();
+
+        if (f.getIdFilial() != null) {
+            spec = spec.and((root, query, cb) ->
+                cb.equal(root.get("duplicata").get("filial").get("id"), f.getIdFilial())
+            );
+        }
+
+        if (f.getIdStatusConta() != null) {
+            spec = spec.and((root, query, cb) ->
+                cb.equal(root.get("status").get("id"), f.getIdStatusConta())
+            );
+        }
+
+        if (f.getIdFornecedor() != null) {
+            spec = spec.and((root, query, cb) ->
+                cb.equal(root.get("duplicata").get("fornecedor").get("id"), f.getIdFornecedor())
+            );
+        }
+
+        if (f.getIdTipoNota() != null) {
+            spec = spec.and((root, query, cb) ->
+                cb.equal(
+                    root.join("duplicata").join("notasFiscais")
+                        .get("tipo").get("id"),
+                    f.getIdTipoNota()
+                )
+            );
+        }
+
+        if (f.getIdTipoDuplicata() != null) {
+            spec = spec.and((root, query, cb) ->
+                cb.equal(root.get("duplicata").get("tipo").get("id"), f.getIdTipoDuplicata())
+            );
+        }
+
+        if (f.getIdTipoPagamento() != null) {
+            spec = spec.and((root, query, cb) ->
+                cb.equal(root.get("tipoPagamento").get("id"), f.getIdTipoPagamento())
+            );
+        }
+
+        if (f.getDataInicial() != null) {
+            spec = spec.and((root, query, cb) ->
+                cb.greaterThanOrEqualTo(root.get("dtVencimento"), f.getDataInicial())
+            );
+        }
+
+        if (f.getDataFinal() != null) {
+            spec = spec.and((root, query, cb) ->
+                cb.lessThanOrEqualTo(root.get("dtVencimento"), f.getDataFinal())
+            );
+        }
+
+        List<Parcela> parcelas = parcelaRepository.findAll(spec);
+
+        return parcelas.stream().map(this::toDTO).toList();
+    }
+
+
+
+    private RelatorioCustomizadoResponseDTO toDTO(Parcela p) {
+        Duplicata d = p.getDuplicata();
+
+        NotaFiscal nf = d.getNotasFiscais().isEmpty() ? null : d.getNotasFiscais().get(0);
+
+        Long prazo = null;
+        if (nf != null && nf.getDtCompra() != null) {
+            prazo = ChronoUnit.DAYS.between(nf.getDtCompra(), p.getDtVencimento());
+        }
+
+        return RelatorioCustomizadoResponseDTO.builder()
+                .loja(d.getFilial() != null ? d.getFilial().getNome() : "")
+                .fornecedor(d.getFornecedor() != null ? d.getFornecedor().getNome() : "")
+                .tituloDuplicata(d.getDescricao())
+                .prazo(prazo)
+                .numeroParcela(p.getNumeroParcela() != null ? p.getNumeroParcela() : p.getDuplicata().getDescricao())
+                .valorParcela(p.getValorTotal())
+                .valorParcelaFormatada(FuxoCaixaUtils.formatarValorBR(p.getValorTotal()))
+                .dtVencimento(p.getDtVencimento())
+                .dtVencimentoFormatada(FuxoCaixaUtils.formatarData(p.getDtVencimento()))
+                .status(p.getStatus() != null ? p.getStatus().getDescricao() : "Em Aberto")
+                .build();
+    }
 }

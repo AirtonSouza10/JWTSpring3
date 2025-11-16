@@ -1,6 +1,7 @@
 package com.service.desk.controller;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -9,11 +10,13 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Page;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,6 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.service.desk.dto.BaixaParcelaRequestDTO;
 import com.service.desk.dto.DuplicataRequestDTO;
 import com.service.desk.dto.DuplicataResponseDTO;
+import com.service.desk.dto.RelatorioParcelasPagasPorTipoDTO;
 import com.service.desk.enumerator.MensagemEnum;
 import com.service.desk.service.service.DuplicataService;
 
@@ -221,4 +225,71 @@ public class DuplicataController extends ControllerServiceDesk{
 
         return new ResponseEntity<>(pdf, headers, HttpStatus.OK);
     }
+    
+    @Operation(summary = "Relatório de parcelas pagas por tipo de título")
+    @GetMapping("/relatorio-parcelas-pagas")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseServiceDesk relatorioParcelasPagasPorTipo(
+            @RequestParam Long idFilial,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicial,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFinal) {
+
+        return new ResponseServiceDesk(
+            duplicataService.gerarRelatorioParcelasPagasPorTipo(idFilial, dataInicial, dataFinal)
+        );
+    }
+    
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Gera relatório de parcelas pagas por tipo em PDF")
+    @GetMapping("/relatorio-parcelas-pagas-por-tipo/{idFilial}")
+    public ResponseEntity<byte[]> gerarRelatorioParcelasPagasPorTipoPDF(
+            @PathVariable Long idFilial,
+            @RequestParam LocalDate dataInicial,
+            @RequestParam LocalDate dataFinal
+    ) throws JRException, IOException {
+
+        List<RelatorioParcelasPagasPorTipoDTO> relatorio =
+                duplicataService.gerarRelatorioParcelasPagasPorTipo(idFilial, dataInicial, dataFinal);
+        
+        var filial = "";
+        var identificacao = "";
+        
+        if(!relatorio.isEmpty()) {
+        	filial = relatorio.get(0).getFilial();
+        	identificacao = relatorio.get(0).getIdentificacao();
+        }
+
+        JRBeanCollectionDataSource dataSourceTipos =
+                new JRBeanCollectionDataSource(relatorio);
+
+        Map<String, Object> parametros = new HashMap<>();
+        parametros.put("TITULO_RELATORIO", "PROTOCOLO PARA ENVIO DA CONTABILIDADE");
+        parametros.put("FILIAL", filial);
+        parametros.put("IDENTIFICACAO", identificacao);
+        parametros.put("DATA_EMISSAO", new Date());
+        parametros.put("DATASOURCE_TIPOS", dataSourceTipos);
+
+        JasperReport jasperReport = (JasperReport) JRLoader.loadObject(
+            new ClassPathResource("relatorios/ProtocoloContasPagas.jasper")
+                .getInputStream()
+        );
+
+        adicionarParametroBase(parametros, null);
+
+        JasperPrint jasperPrint =
+                JasperFillManager.fillReport(jasperReport, parametros, new JREmptyDataSource());
+
+        byte[] pdf = JasperExportManager.exportReportToPdf(jasperPrint);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDisposition(
+                ContentDisposition.builder("inline")
+                        .filename("relatorioParcelasPagasPorTipo.pdf")
+                        .build()
+        );
+
+        return new ResponseEntity<>(pdf, headers, HttpStatus.OK);
+    }
+
 }

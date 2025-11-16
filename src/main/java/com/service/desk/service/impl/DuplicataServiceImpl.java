@@ -31,6 +31,7 @@ import com.service.desk.dto.NotaFiscalResponseDTO;
 import com.service.desk.dto.ParcelaResponseDTO;
 import com.service.desk.dto.ParcelamentoDTO;
 import com.service.desk.dto.RelatorioContasAbertasResponseDTO;
+import com.service.desk.dto.RelatorioParcelasPagasPorTipoDTO;
 import com.service.desk.entidade.Duplicata;
 import com.service.desk.entidade.NotaFiscal;
 import com.service.desk.entidade.Parcela;
@@ -726,4 +727,65 @@ public class DuplicataServiceImpl implements DuplicataService {
     			.dsTipoPagamento(Objects.nonNull(parcela.getTipoPagamento()) ? parcela.getTipoPagamento().getDescricao() : null)
     			.build();
     }
+    
+    @Override
+    public List<RelatorioParcelasPagasPorTipoDTO> gerarRelatorioParcelasPagasPorTipo(
+            Long idFilial,
+            LocalDate dataInicial,
+            LocalDate dataFinal) {
+
+        var filial = filialRepository.findById(idFilial).orElseThrow();
+
+        var duplicatas = duplicataRepository.findByFilialId(idFilial);
+
+        List<Parcela> parcelasPagas = duplicatas.stream()
+            .flatMap(d -> d.getParcelas().stream())
+            .filter(p ->
+                p.getStatus() != null &&
+                StatusContaEnum.PAGO.getId().equals(p.getStatus().getId()) &&
+                p.getDtPagamento() != null &&
+                !p.getDtPagamento().isBefore(dataInicial) &&
+                !p.getDtPagamento().isAfter(dataFinal)
+            )
+            .toList();
+
+        Map<Long, List<Parcela>> agrupadoPorTipo = parcelasPagas.stream()
+            .collect(Collectors.groupingBy(
+                p -> p.getDuplicata().getTipo().getId(),
+                TreeMap::new,
+                Collectors.toList()
+            ));
+
+        List<RelatorioParcelasPagasPorTipoDTO> resultado = new ArrayList<>();
+
+        for (var entry : agrupadoPorTipo.entrySet()) {
+
+            Long tipoTituloId = entry.getKey();
+            var dsTipo = tipoRepository.findById(tipoTituloId).orElseThrow();
+            String tipoTitulo = dsTipo.getDescricao();
+            List<Parcela> parcelasDoTipo = entry.getValue();
+
+            List<RelatorioParcelasPagasPorTipoDTO.ParcelaPagaDTO> parcelasDTO =
+                parcelasDoTipo.stream()
+                    .map(p -> RelatorioParcelasPagasPorTipoDTO.ParcelaPagaDTO.builder()
+                            .descricao(p.getNumeroParcela() != null ? p.getNumeroParcela() : p.getDuplicata().getDescricao())
+                            .dataPagamento(p.getDtPagamento())
+                            .dataPagamentoFormatado(FuxoCaixaUtils.formatarData(p.getDtPagamento()))
+                            .valorPago(p.getValorPago())
+                            .valorPagoFormatado(FuxoCaixaUtils.formatarValorBR(p.getValorPago()))
+                            .fornecedor(p.getDuplicata().getFornecedor().getNome())
+                            .build()
+                    ).toList();
+
+            resultado.add(RelatorioParcelasPagasPorTipoDTO.builder()
+                    .filial(filial.getNome())
+                    .identificacao(filial.getIdentificacao())
+                    .tipoTitulo(tipoTitulo)
+                    .parcelas(parcelasDTO)
+                    .build());
+        }
+
+        return resultado;
+    }
+
 }

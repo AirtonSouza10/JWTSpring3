@@ -455,7 +455,7 @@ public class DuplicataServiceImpl implements DuplicataService {
     
     @Override
     public List<DuplicataResponseDTO> buscarDuplicataPorDescricao(String descricao) {
-        List<Duplicata> duplicatas = duplicataRepository.findByDescricaoContaining(descricao);
+        List<Duplicata> duplicatas = duplicataRepository.findByDescricaoContainingIgnoreCase(descricao);
         return duplicatas.stream()
                          .map(this::mapToDTO)
                          .collect(Collectors.toList());

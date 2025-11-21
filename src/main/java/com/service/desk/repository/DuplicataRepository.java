@@ -1,6 +1,7 @@
 package com.service.desk.repository;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,5 +19,9 @@ public interface DuplicataRepository extends JpaRepository<Duplicata, Long> {
     List<Duplicata> findByDescricaoContainingIgnoreCase(String descricao);
     
     List<Duplicata> findByFilialId(Long filialId);
+    
+    Page<Duplicata> findByIdIn(Set<Long> ids, Pageable pageable);
+    
+    List<Duplicata> findByIdIn(Set<Long> ids);
 
 }

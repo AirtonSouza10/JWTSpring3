@@ -33,4 +33,6 @@ public interface NotaFiscalRepository extends JpaRepository<NotaFiscal, Long> {
     	       "WHERE n.dtCompra BETWEEN :dataInicial AND :dataFinal ORDER BY n.dtCompra ASC")
     	List<NotaFiscal> findByPeriodo(LocalDate dataInicial, LocalDate dataFinal);
 
+    List<NotaFiscal> findByNumeroContainingIgnoreCase(String numero);
+
 }

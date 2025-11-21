@@ -8,16 +8,19 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -25,13 +28,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import com.service.desk.dto.BaixaParcelaRequestDTO;
+import com.service.desk.dto.DuplicataBuscaGeralDTO;
 import com.service.desk.dto.DuplicataDiaResponseDTO;
 import com.service.desk.dto.DuplicataDiaVencidoResponseDTO;
 import com.service.desk.dto.DuplicataRequestDTO;
 import com.service.desk.dto.DuplicataResponseDTO;
 import com.service.desk.dto.FiltroRelatorioCustomizadoDTO;
 import com.service.desk.dto.NotaFiscalResponseDTO;
+import com.service.desk.dto.NotaFiscalResumoDTO;
+import com.service.desk.dto.ParcelaBuscaGeralDTO;
 import com.service.desk.dto.ParcelaResponseDTO;
+import com.service.desk.dto.ParcelaResumoDTO;
 import com.service.desk.dto.ParcelamentoDTO;
 import com.service.desk.dto.RelatorioContasAbertasResponseDTO;
 import com.service.desk.dto.RelatorioCustomizadoResponseDTO;
@@ -879,4 +886,233 @@ public class DuplicataServiceImpl implements DuplicataService {
                 .status(p.getStatus() != null ? p.getStatus().getDescricao() : "Em Aberto")
                 .build();
     }
+    
+    @Override
+    public Page<DuplicataBuscaGeralDTO> buscarGeral(String termo, int pagina, int tamanho) {
+
+        Pageable pageable = PageRequest.of(pagina, tamanho);
+
+        List<Duplicata> duplicatasDescricao =
+                duplicataRepository.findByDescricaoContainingIgnoreCase(termo);
+
+        List<Parcela> parcelas =
+                parcelaRepository.findByNumeroParcelaContainingIgnoreCase(termo);
+
+        List<NotaFiscal> notas =
+                notaFiscalRepository.findByNumeroContainingIgnoreCase(termo);
+
+        Set<Long> duplicataIds = new HashSet<>();
+
+        duplicataIds.addAll(duplicatasDescricao.stream().map(Duplicata::getId).toList());
+        duplicataIds.addAll(parcelas.stream().map(p -> p.getDuplicata().getId()).toList());
+        duplicataIds.addAll(notas.stream()
+                .filter(n -> n.getDuplicata() != null)
+                .map(n -> n.getDuplicata().getId())
+                .toList()
+        );
+
+        Page<Duplicata> pageDuplicatas =
+                duplicataRepository.findByIdIn(duplicataIds, pageable);
+
+        return pageDuplicatas.map(duplicata -> {
+
+            String termoLower = termo.toLowerCase();
+            List<Parcela> parcelasDaDuplicata = duplicata.getParcelas();
+
+            Set<Long> parcelaIds = new HashSet<>();
+            List<ParcelaResumoDTO> parcelasDTO = new ArrayList<>();
+
+
+            if (duplicata.getDescricao() != null &&
+                duplicata.getDescricao().toLowerCase().contains(termoLower)) {
+
+                parcelasDaDuplicata.forEach(p -> {
+                    if (parcelaIds.add(p.getId())) {
+                        parcelasDTO.add(toParcelaDTO(p));
+                    }
+                });
+            }
+
+            duplicata.getParcelas().stream()
+                    .filter(p -> p.getNumeroParcela() != null &&
+                                 p.getNumeroParcela().contains(termo))
+                    .forEach(p -> {
+                        if (parcelaIds.add(p.getId())) {
+                            parcelasDTO.add(toParcelaDTO(p));
+                        }
+                    });
+
+            boolean matchNota = duplicata.getNotasFiscais().stream()
+                    .anyMatch(n -> n.getNumero() != null &&
+                                   n.getNumero().contains(termo));
+            if (matchNota) {
+                parcelasDaDuplicata.forEach(p -> {
+                    if (parcelaIds.add(p.getId())) {
+                        parcelasDTO.add(toParcelaDTO(p));
+                    }
+                });
+            }
+
+            if (parcelasDTO.isEmpty()) {
+                parcelasDaDuplicata.forEach(p -> {
+                    if (parcelaIds.add(p.getId())) {
+                        parcelasDTO.add(toParcelaDTO(p));
+                    }
+                });
+            }
+
+            List<NotaFiscalResumoDTO> notasDTO = duplicata.getNotasFiscais()
+                    .stream()
+                    .map(n -> NotaFiscalResumoDTO.builder()
+                            .id(n.getId())
+                            .numero(n.getNumero())
+                            .serie(n.getSerie())
+                            .chave(n.getChave())
+                            .dtCompra(n.getDtCompra())
+                            .valorTotal(n.getValorTotal())
+                            .fornecedorId(n.getFornecedor() != null ? n.getFornecedor().getId() : null)
+                            .fornecedorNome(n.getFornecedor() != null ? n.getFornecedor().getNome() : null)
+                            .filialId(n.getFilial() != null ? n.getFilial().getId() : null)
+                            .build()
+                    )
+                    .toList();
+
+            return DuplicataBuscaGeralDTO.builder()
+                    .duplicataId(duplicata.getId())
+                    .descricaoDuplicata(duplicata.getDescricao())
+
+                    .filialId(duplicata.getFilial() != null ? duplicata.getFilial().getId() : null)
+                    .dsFilial(duplicata.getFilial() != null ? duplicata.getFilial().getNome() : null)
+
+                    .fornecedorId(duplicata.getFornecedor() != null ? duplicata.getFornecedor().getId() : null)
+                    .dsFornecedor(duplicata.getFornecedor() != null ? duplicata.getFornecedor().getNome() : null)
+
+                    .parcelas(parcelasDTO)
+                    .notasFiscais(notasDTO)
+                    .build();
+        });
+    }
+
+    private ParcelaResumoDTO toParcelaDTO(Parcela p) {
+        return ParcelaResumoDTO.builder()
+                .id(p.getId())
+                .numeroParcela(p.getNumeroParcela())
+                .valorTotal(p.getValorTotal())
+                .dtVencimento(p.getDtVencimento())
+                .dtPagamento(p.getDtPagamento())
+                .status(p.getStatus() != null ? p.getStatus().getDescricao() : null)
+                .build();
+    }
+
+    @Override
+    public Page<ParcelaBuscaGeralDTO> buscarGeralParcela(String termo, int pagina, int tamanho) {
+
+        Pageable pageable = PageRequest.of(pagina, tamanho);
+
+        List<Duplicata> duplicatasDescricao =
+                duplicataRepository.findByDescricaoContainingIgnoreCase(termo);
+
+        List<Parcela> parcelasMatchNumero =
+                parcelaRepository.findByNumeroParcelaContainingIgnoreCase(termo);
+
+        List<NotaFiscal> notas =
+                notaFiscalRepository.findByNumeroContainingIgnoreCase(termo);
+
+        Set<Long> duplicataIds = new HashSet<>();
+        duplicataIds.addAll(duplicatasDescricao.stream().map(Duplicata::getId).toList());
+        duplicataIds.addAll(parcelasMatchNumero.stream().map(p -> p.getDuplicata().getId()).toList());
+        duplicataIds.addAll(notas.stream()
+                .filter(n -> n.getDuplicata() != null)
+                .map(n -> n.getDuplicata().getId())
+                .toList()
+        );
+
+        List<Duplicata> duplicatas = duplicataRepository.findByIdIn(duplicataIds);
+
+        List<Parcela> parcelasList = duplicatas.stream()
+                .flatMap(d -> d.getParcelas().stream())
+                .distinct()
+                .sorted(Comparator.comparing(Parcela::getDtVencimento))
+                .toList();
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), parcelasList.size());
+        List<Parcela> pageContent = parcelasList.subList(start, end);
+
+        Page<Parcela> page = new PageImpl<>(pageContent, pageable, parcelasList.size());
+
+        return page.map(parcela -> {
+            Duplicata d = parcela.getDuplicata();
+            return ParcelaBuscaGeralDTO.builder()
+                    .parcelaId(parcela.getId())
+                    .numeroParcela(parcela.getNumeroParcela())
+                    .valorTotal(parcela.getValorTotal())
+                    .dtVencimento(parcela.getDtVencimento())
+                    .dtPagamento(parcela.getDtPagamento())
+                    .status(parcela.getStatus() != null ? parcela.getStatus().getDescricao() : null)
+                    .duplicataId(d.getId())
+                    .descricaoDuplicata(d.getDescricao())
+                    .fornecedorId(d.getFornecedor() != null ? d.getFornecedor().getId() : null)
+                    .fornecedorNome(d.getFornecedor() != null ? d.getFornecedor().getNome() : null)
+                    .build();
+        });
+    }
+
+    @Override
+    public Page<ParcelaBuscaGeralDTO> buscarGeralParcelaAtivas(String termo, int pagina, int tamanho) {
+
+        Pageable pageable = PageRequest.of(pagina, tamanho);
+
+        List<Duplicata> duplicatasDescricao =
+                duplicataRepository.findByDescricaoContainingIgnoreCase(termo);
+
+        List<Parcela> parcelasMatchNumero =
+                parcelaRepository.findByNumeroParcelaContainingIgnoreCase(termo);
+
+        List<NotaFiscal> notas =
+                notaFiscalRepository.findByNumeroContainingIgnoreCase(termo);
+
+        Set<Long> duplicataIds = new HashSet<>();
+        duplicataIds.addAll(duplicatasDescricao.stream().map(Duplicata::getId).toList());
+        duplicataIds.addAll(parcelasMatchNumero.stream().map(p -> p.getDuplicata().getId()).toList());
+        duplicataIds.addAll(notas.stream()
+                .filter(n -> n.getDuplicata() != null)
+                .map(n -> n.getDuplicata().getId())
+                .toList()
+        );
+
+        List<Duplicata> duplicatas = duplicataRepository.findByIdIn(duplicataIds);
+
+        List<Parcela> parcelasList = duplicatas.stream()
+                .flatMap(d -> d.getParcelas().stream())
+                .filter(p -> Objects.isNull(p.getStatus()) || (Objects.nonNull(p.getStatus()) && 
+                		!StatusContaEnum.CANCELADO.getId().equals(p.getStatus().getId()) && !StatusContaEnum.PAGO.getId().equals(p.getStatus().getId())))
+                .distinct()
+                .sorted(Comparator.comparing(Parcela::getDtVencimento))
+                .toList();
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), parcelasList.size());
+        List<Parcela> pageContent = parcelasList.subList(start, end);
+
+        Page<Parcela> page = new PageImpl<>(pageContent, pageable, parcelasList.size());
+
+        return page.map(parcela -> {
+            Duplicata d = parcela.getDuplicata();
+            return ParcelaBuscaGeralDTO.builder()
+                    .parcelaId(parcela.getId())
+                    .numeroParcela(parcela.getNumeroParcela())
+                    .valorTotal(parcela.getValorTotal())
+                    .dtVencimento(parcela.getDtVencimento())
+                    .dtPagamento(parcela.getDtPagamento())
+                    .status(parcela.getStatus() != null ? parcela.getStatus().getDescricao() : null)
+                    .duplicataId(d.getId())
+                    .descricaoDuplicata(d.getDescricao())
+                    .fornecedorId(d.getFornecedor() != null ? d.getFornecedor().getId() : null)
+                    .fornecedorNome(d.getFornecedor() != null ? d.getFornecedor().getNome() : null)
+                    .build();
+        });
+    }
+
+    
 }

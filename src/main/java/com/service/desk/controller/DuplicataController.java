@@ -338,6 +338,31 @@ public class DuplicataController extends ControllerServiceDesk{
 
         return new ResponseEntity<>(pdf, headers, HttpStatus.OK);
     }
+    
+    @Operation(summary = "Busca geral por descrição, número de parcela ou número de nota fiscal")
+    @GetMapping("/busca-geral")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseServiceDesk buscarGeral(
+            @RequestParam String termo,
+            @RequestParam(defaultValue = "0") int pagina,
+            @RequestParam(defaultValue = "10") int tamanho) {
 
+        var page =
+                duplicataService.buscarGeralParcela(termo, pagina, tamanho);
+
+        return new ResponseServiceDesk(page);
+    }
+
+    @Operation(summary = "Busca geral por parcelas ativas (não canceladas e não pagas)")
+    @GetMapping("/busca-geral-ativas")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseServiceDesk buscarGeralAtivas(
+            @RequestParam String termo,
+            @RequestParam(defaultValue = "0") int pagina,
+            @RequestParam(defaultValue = "10") int tamanho) {
+
+        var page = duplicataService.buscarGeralParcelaAtivas(termo, pagina, tamanho);
+        return new ResponseServiceDesk(page);
+    }
 
 }

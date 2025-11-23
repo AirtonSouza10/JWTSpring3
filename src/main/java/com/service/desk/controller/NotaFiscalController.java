@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.service.desk.dto.NotaFiscalRequestDTO;
 import com.service.desk.dto.NotaFiscalResponseDTO;
+import com.service.desk.dto.ParcelaPrevistaResponseDTO;
 import com.service.desk.enumerator.MensagemEnum;
 import com.service.desk.service.service.NotaFiscalService;
 
@@ -205,6 +206,19 @@ public class NotaFiscalController extends ControllerServiceDesk{
     @ResponseStatus(HttpStatus.OK)
     public ResponseServiceDesk listarParcelasPrevistas(@PathVariable Long id) {
         return  new ResponseServiceDesk(notaFiscalService.listarParcelasPrevistasPorNota(id));
+    }
+    
+    @Operation(summary = "Retorna parcelas previstas paginadas por data de vencimento")
+    @GetMapping("/parcelas-previstas")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseServiceDesk listarParcelasPrevistas(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<ParcelaPrevistaResponseDTO> parcelas = notaFiscalService.listarParcelasPrevistasPaginadas(pageable);
+
+        return new ResponseServiceDesk(parcelas);
     }
 
 }

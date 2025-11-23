@@ -22,18 +22,18 @@
 	<background>
 		<band/>
 	</background>
-	<detail>
+	<title>
 		<band height="20" splitType="Stretch">
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<frame>
-				<reportElement mode="Opaque" x="0" y="0" width="554" height="20" backcolor="#C7C7C7" uuid="e2b787f3-e01a-464a-b391-4f823fa95b55">
+				<reportElement mode="Opaque" x="0" y="0" width="554" height="20" backcolor="#C7C7C7" uuid="d645e9a0-8563-43c0-9069-37f1aa9b5154">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				</reportElement>
 				<staticText>
-					<reportElement x="0" y="0" width="200" height="20" uuid="a3dd6f96-6fe5-4a34-9a22-8e7da4154c6e">
+					<reportElement x="0" y="0" width="200" height="20" uuid="3aa80866-c5f3-4d09-a72f-51e5a37a02ea">
 						<property name="com.jaspersoft.studio.unit.x" value="px"/>
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					</reportElement>
@@ -41,7 +41,7 @@
 					<text><![CDATA[FORNECEDOR]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="200" y="0" width="150" height="20" uuid="d35ba169-44c5-4ec3-a84e-42b3a1f26551">
+					<reportElement x="200" y="0" width="150" height="20" uuid="11dbeb8e-074b-4df6-8a78-e2603816f802">
 						<property name="com.jaspersoft.studio.unit.x" value="px"/>
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					</reportElement>
@@ -49,7 +49,7 @@
 					<text><![CDATA[DESCRIÇÃO]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="350" y="0" width="100" height="20" uuid="2ddc2406-c226-4534-a59d-a6683acaee3d">
+					<reportElement x="350" y="0" width="100" height="20" uuid="f7ac9107-e4bd-4116-8a4b-ec4744718d9d">
 						<property name="com.jaspersoft.studio.unit.x" value="px"/>
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 						<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -58,7 +58,7 @@
 					<text><![CDATA[VALOR]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="451" y="0" width="100" height="20" uuid="9eaf6495-64da-46bc-ada2-514ab0936b0e">
+					<reportElement x="451" y="0" width="100" height="20" uuid="b200c53b-83db-46b6-b461-03ffa773abd8">
 						<property name="com.jaspersoft.studio.unit.x" value="px"/>
 						<property name="com.jaspersoft.studio.unit.height" value="px"/>
 						<property name="com.jaspersoft.studio.unit.width" value="px"/>
@@ -68,6 +68,8 @@
 				</staticText>
 			</frame>
 		</band>
+	</title>
+	<detail>
 		<band height="20">
 			<textField>
 				<reportElement x="0" y="0" width="200" height="20" uuid="b00e2a87-160f-4ea2-8797-874ff8b38fe3">
@@ -95,6 +97,7 @@
 				<reportElement x="451" y="0" width="100" height="20" uuid="39ed51a3-2b8a-49ff-9215-6ac477864f5b">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
+				<textElement textAlignment="Right"/>
 				<textFieldExpression><![CDATA[$F{dataPagamentoFormatado}]]></textFieldExpression>
 			</textField>
 		</band>

@@ -7,13 +7,16 @@ import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.service.desk.dto.FilialResponseDTO;
 import com.service.desk.dto.NotaFiscalRequestDTO;
 import com.service.desk.dto.NotaFiscalResponseDTO;
 import com.service.desk.dto.ParcelaPrevistaNotaResponseDTO;
+import com.service.desk.dto.ParcelaPrevistaResponseDTO;
 import com.service.desk.dto.ProtocoloContabilidadeResponseDTO;
 import com.service.desk.entidade.NotaFiscal;
 import com.service.desk.entidade.ParcelaPrevistaNota;
@@ -568,6 +571,19 @@ public class NotaFiscalServiceImpl implements NotaFiscalService {
                         .valorPrevisto(p.getValorPrevisto())
                         .build())
                 .toList();
+    }
+    
+    @Override
+    public Page<ParcelaPrevistaResponseDTO> listarParcelasPrevistasPaginadas(Pageable pageable) {
+        Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by("dtVencimentoPrevisto").ascending());
+
+        Page<ParcelaPrevistaNota> page = parcelaPrevistaNotaRepository.findAll(sortedPageable);
+
+        return page.map(parcela -> ParcelaPrevistaResponseDTO.builder()
+                .numeroNota(parcela.getNotaFiscal() != null ? parcela.getNotaFiscal().getNumero() : null)
+                .valor(parcela.getValorPrevisto())
+                .dtVencimento(parcela.getDtVencimentoPrevisto())
+                .build());
     }
 
 }

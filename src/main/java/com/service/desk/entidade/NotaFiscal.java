@@ -34,13 +34,13 @@ public class NotaFiscal{
     @SequenceGenerator(name = "nota_fiscal_seq", sequenceName = "nota_fiscal_seq", allocationSize = 1)
     private Long id;
 
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false, length = 255)
     private String numero;
 
     @Column(nullable = false, length = 5)
     private String serie;
 
-    @Column(nullable = false, unique = true, length = 44)
+    @Column(nullable = false, unique = true, length = 255)
     private String chave;
     
     @Column(length = 500)

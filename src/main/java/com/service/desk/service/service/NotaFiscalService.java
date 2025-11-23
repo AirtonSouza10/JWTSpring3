@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 
 import com.service.desk.dto.NotaFiscalRequestDTO;
 import com.service.desk.dto.NotaFiscalResponseDTO;
+import com.service.desk.dto.ParcelaPrevistaNotaResponseDTO;
 import com.service.desk.dto.ProtocoloContabilidadeResponseDTO;
 
 public interface NotaFiscalService {
@@ -33,4 +34,8 @@ public interface NotaFiscalService {
 			LocalDate dataFinal);
 
 	List<NotaFiscalResponseDTO> listarNotasPorFilialEPeriodo(Long idFilial, LocalDate dataInicial, LocalDate dataFinal);
+
+	Page<NotaFiscalResponseDTO> listarNotasFiscaisByNumero(String numero, Pageable pageable);
+
+	List<ParcelaPrevistaNotaResponseDTO> listarParcelasPrevistasPorNota(Long notaId);
 }

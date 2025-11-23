@@ -34,5 +34,7 @@ public interface NotaFiscalRepository extends JpaRepository<NotaFiscal, Long> {
     	List<NotaFiscal> findByPeriodo(LocalDate dataInicial, LocalDate dataFinal);
 
     List<NotaFiscal> findByNumeroContainingIgnoreCase(String numero);
+    
+    Page<NotaFiscal> findByNumeroContainingIgnoreCase(String numero, Pageable pageable);
 
 }

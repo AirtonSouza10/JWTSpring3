@@ -185,5 +185,26 @@ public class NotaFiscalController extends ControllerServiceDesk{
 
         return new ResponseEntity<>(pdf, headers, HttpStatus.OK);
     }
+    
+    @Operation(summary = "Lista notas fiscais paginadas pelo número da nota")
+    @GetMapping("/por-numero")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseServiceDesk listarNotasPorNumero(
+            @RequestParam String numero,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<NotaFiscalResponseDTO> notas = notaFiscalService.listarNotasFiscaisByNumero(numero, pageable);
+
+        return new ResponseServiceDesk(notas);
+    }
+    
+    @Operation(summary = "Lista previsao das notas fiscais")
+    @GetMapping("/{id}/parcelas-previstas")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseServiceDesk listarParcelasPrevistas(@PathVariable Long id) {
+        return  new ResponseServiceDesk(notaFiscalService.listarParcelasPrevistasPorNota(id));
+    }
 
 }

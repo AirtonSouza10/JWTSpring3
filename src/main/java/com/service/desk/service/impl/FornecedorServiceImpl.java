@@ -45,7 +45,7 @@ public class FornecedorServiceImpl implements FornecedorService {
     @Override
     public List<FornecedorResponseDTO> listarFornecdores() {
     	var listaFornecedores = new ArrayList<FornecedorResponseDTO>();
-    	var fornecedores = fornecedorRepository.findAll();
+    	var fornecedores = fornecedorRepository.findAllByOrderByNomeAsc();
     	fornecedores.forEach(f->{
     		var telefonesList = f.getTelefones().stream().map(t-> TelefoneDTO.builder()
     				.id(t.getId())

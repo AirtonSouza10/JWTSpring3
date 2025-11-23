@@ -1,10 +1,10 @@
 package com.service.desk.service.impl;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import org.antlr.v4.runtime.misc.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -517,5 +517,57 @@ public class NotaFiscalServiceImpl implements NotaFiscalService {
                 .build();
     }
 
-	
+    @Override
+    public Page<NotaFiscalResponseDTO> listarNotasFiscaisByNumero(String numero, Pageable pageable) {
+        Page<NotaFiscal> page = notaFiscalRepository.findByNumeroContainingIgnoreCase(numero, pageable);
+
+        return page.map(nota ->         {
+	        List<ParcelaPrevistaNotaResponseDTO> parcelasDTO = nota.getParcelasPrevistas() != null
+	        ? nota.getParcelasPrevistas().stream()
+	            .map(p -> ParcelaPrevistaNotaResponseDTO.builder()
+	                .id(p.getId())
+	                .dtVencimentoPrevisto(p.getDtVencimentoPrevisto())
+	                .valorPrevisto(p.getValorPrevisto())
+	                .build())
+	            .toList()
+	        : Collections.emptyList();
+
+            return NotaFiscalResponseDTO.builder()
+                    .id(nota.getId())
+                    .numero(nota.getNumero())
+                    .serie(nota.getSerie())
+                    .chave(nota.getChave())
+                    .descricaoObs(nota.getDescricaoObs())
+                    .valorTotal(nota.getValorTotal())
+                    .valorDesconto(nota.getValorDesconto())
+                    .valorIcms(nota.getValorIcms())
+                    .valorJuros(nota.getValorJuros())
+                    .valorMulta(nota.getValorMulta())
+                    .dtCompra(nota.getDtCompra())
+                    .fornecedorId(nota.getFornecedor() != null ? nota.getFornecedor().getId() : null)
+                    .fornecedorNome(nota.getFornecedor() != null ? nota.getFornecedor().getNome() : null)
+                    .tipoNotaId(nota.getTipo() != null ? nota.getTipo().getId() : null)
+                    .pessoaId(nota.getPessoa() != null ? nota.getPessoa().getId() : null)
+                    .filialId(nota.getFilial() != null ? nota.getFilial().getId() : null)
+                    .formaPagamentoId(nota.getFormaPagamento() != null ? nota.getFormaPagamento().getId() : null)
+                    .duplicataId(nota.getDuplicata() != null ? nota.getDuplicata().getId() : null)
+                    .dsDuplicata(nota.getDuplicata() != null ? nota.getDuplicata().getDescricao() : null)
+                    .parcelasPrevistas(parcelasDTO)
+                    .build();
+        });
+    }
+
+    @Override
+    public List<ParcelaPrevistaNotaResponseDTO> listarParcelasPrevistasPorNota(Long notaId) {
+        var parcelas = parcelaPrevistaNotaRepository.findByNotaFiscalId(notaId);
+
+        return parcelas.stream()
+                .map(p -> ParcelaPrevistaNotaResponseDTO.builder()
+                        .id(p.getId())
+                        .dtVencimentoPrevisto(p.getDtVencimentoPrevisto())
+                        .valorPrevisto(p.getValorPrevisto())
+                        .build())
+                .toList();
+    }
+
 }

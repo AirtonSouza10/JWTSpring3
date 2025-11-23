@@ -16,5 +16,7 @@ public interface FornecedorRepository extends JpaRepository<Fornecedor, Long> {
     List<Fornecedor> findByIdentificacaoAndIdNot(String identificacao, Long id);
     
     Page<Fornecedor> findById(Long id, Pageable pageable);
+    
+    List<Fornecedor> findAllByOrderByNomeAsc();
 
 }

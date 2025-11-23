@@ -857,6 +857,8 @@ public class DuplicataServiceImpl implements DuplicataService {
         }
 
         List<Parcela> parcelas = parcelaRepository.findAll(spec);
+        
+        Collections.sort(parcelas, Comparator.comparing(Parcela::getDtVencimento));
 
         return parcelas.stream().map(this::toDTO).toList();
     }
@@ -878,7 +880,7 @@ public class DuplicataServiceImpl implements DuplicataService {
                 .fornecedor(d.getFornecedor() != null ? d.getFornecedor().getNome() : "")
                 .tituloDuplicata(d.getDescricao())
                 .prazo(prazo)
-                .numeroParcela(p.getNumeroParcela() != null ? p.getNumeroParcela() : p.getDuplicata().getDescricao())
+                .numeroParcela(p.getNumeroParcela() != null && !p.getNumeroParcela().isEmpty()  ? p.getNumeroParcela() : p.getDuplicata().getDescricao())
                 .valorParcela(p.getValorTotal())
                 .valorParcelaFormatada(FuxoCaixaUtils.formatarValorBR(p.getValorTotal()))
                 .dtVencimento(p.getDtVencimento())

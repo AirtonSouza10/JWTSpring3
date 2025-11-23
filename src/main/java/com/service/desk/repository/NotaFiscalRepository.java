@@ -36,5 +36,8 @@ public interface NotaFiscalRepository extends JpaRepository<NotaFiscal, Long> {
     List<NotaFiscal> findByNumeroContainingIgnoreCase(String numero);
     
     Page<NotaFiscal> findByNumeroContainingIgnoreCase(String numero, Pageable pageable);
+    
+    Page<NotaFiscal> findByNumeroContainingIgnoreCaseOrFornecedorNomeContainingIgnoreCase(
+            String numero, String fornecedorNome, Pageable pageable);
 
 }

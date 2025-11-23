@@ -522,7 +522,7 @@ public class NotaFiscalServiceImpl implements NotaFiscalService {
 
     @Override
     public Page<NotaFiscalResponseDTO> listarNotasFiscaisByNumero(String numero, Pageable pageable) {
-        Page<NotaFiscal> page = notaFiscalRepository.findByNumeroContainingIgnoreCase(numero, pageable);
+        Page<NotaFiscal> page = notaFiscalRepository.findByNumeroContainingIgnoreCaseOrFornecedorNomeContainingIgnoreCase(numero, numero, pageable);
 
         return page.map(nota ->         {
 	        List<ParcelaPrevistaNotaResponseDTO> parcelasDTO = nota.getParcelasPrevistas() != null

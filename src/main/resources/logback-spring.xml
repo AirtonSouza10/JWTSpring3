@@ -1,19 +1,34 @@
 <configuration>
     <property name="LOG_PATH" value="logs"/>
 
-    <!-- Appender de arquivo: tudo vai para arquivo -->
+    <!-- Appender principal com rotação por dia + por tamanho -->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_PATH}/app.log</file>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${LOG_PATH}/app.%d{yyyy-MM-dd}.log</fileNamePattern>
-            <maxHistory>30</maxHistory>
+
+        <!-- Política híbrida: diária + tamanho -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- Exemplo de saída:
+                 logs/app.2025-11-23.0.log.gz
+                 logs/app.2025-11-23.1.log.gz
+            -->
+            <fileNamePattern>${LOG_PATH}/app.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+
+            <!-- Manter somente 7 dias -->
+            <maxHistory>7</maxHistory>
+
+            <!-- Limite total do diretório de logs -->
+            <totalSizeCap>50MB</totalSizeCap>
+
+            <!-- Limite por arquivo: 2MB -->
+            <maxFileSize>2MB</maxFileSize>
         </rollingPolicy>
+
         <encoder>
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
 
-    <!-- Appender de console: só logs INFO e acima -->
+    <!-- Console: apenas INFO+ -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>INFO</level>
@@ -23,13 +38,12 @@
         </encoder>
     </appender>
 
-    <!-- Root logger: tudo vai para arquivo, mas console só INFO+ -->
-    <root level="DEBUG">
+    <!-- Root em INFO -->
+    <root level="INFO">
         <appender-ref ref="FILE" />
         <appender-ref ref="CONSOLE" />
     </root>
 
-    <!-- Logger Spring Web: pode ficar em INFO no console -->
     <logger name="org.springframework.web" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
         <appender-ref ref="CONSOLE"/>

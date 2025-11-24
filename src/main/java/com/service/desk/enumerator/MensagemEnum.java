@@ -23,7 +23,8 @@ public enum MensagemEnum {
     MSGE013("MSGE013"),
     MSGE014("MSGE014"),
     MSGE015("MSGE015"),
-    MSGE016("MSGE016");
+    MSGE016("MSGE016"),
+    MSGE017("MSGE017");
 
     public String key;
 

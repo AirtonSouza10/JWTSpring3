@@ -18,5 +18,7 @@ public interface ParcelaRepository extends JpaRepository<Parcela, Long>, JpaSpec
     List<Parcela> findByDtVencimentoBefore(LocalDate data);
     
     List<Parcela> findByNumeroParcelaContainingIgnoreCase(String numero);
+    
+    boolean existsByDuplicataIdAndStatusId(Long duplicataId, Long statusId);
 
 }

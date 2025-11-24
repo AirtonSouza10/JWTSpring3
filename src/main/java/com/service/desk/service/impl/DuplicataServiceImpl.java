@@ -363,7 +363,18 @@ public class DuplicataServiceImpl implements DuplicataService {
     public void atualizarDuplicata(Long id, DuplicataRequestDTO dto) {
         var duplicata = duplicataRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Duplicata não encontrada para id " + id));
+        
+		boolean existeParcelaPaga = parcelaRepository.existsByDuplicataIdAndStatusId(duplicata.getId(),
+				StatusContaEnum.PAGO.getId());
 
+		var parcelasSalvas = parcelaRepository.findByDuplicataId(duplicata.getId());
+		int qtdAtual = parcelasSalvas.size();
+		int qtdNova = dto.getParcelas() != null ? dto.getParcelas().size() : 0;
+
+		if (existeParcelaPaga && qtdAtual != qtdNova) {
+		    throw new NegocioException(MensagemEnum.MSGE017.getKey());
+		}
+		
         duplicata.setDescricao(dto.getDescricao());
         duplicata.setValor(dto.getValor());
         duplicata.setDesconto(dto.getDesconto());

@@ -17,7 +17,7 @@ public class MensagemUtils {
     public String getMensagem(final String key, final Object... args){
         final String MSG_NAO_ENCONTARDA = "{0} -> Mensagem não encontrada.";
         try {
-            return messageSource.getMessage(key,args, Locale.forLanguageTag("pt-bR"));
+            return messageSource.getMessage(key,args, Locale.forLanguageTag("pt-BR"));
             } catch (Exception e) {
             LogManager.getLogger(MensagemEnum.class).warn(MessageFormat.format(MSG_NAO_ENCONTARDA,key));
         }

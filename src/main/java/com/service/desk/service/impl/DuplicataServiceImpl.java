@@ -101,187 +101,221 @@ public class DuplicataServiceImpl implements DuplicataService {
     
     @Autowired
     private TipoRepository tipoRepository;
-
+    
     @Override
     public List<DuplicataResponseDTO> listarDuplicatas() {
         var duplicatas = duplicataRepository.findAll();
 
-        return duplicatas.stream().map(d -> DuplicataResponseDTO.builder()
-                .id(d.getId())
-                .descricao(d.getDescricao())
-                .valor(d.getValor())
-                .desconto(d.getDesconto())
-                .multa(d.getMulta())
-                .juros(d.getJuros())
-                .valorTotal(d.getValorTotal())
-                .formaPagamentoId(Objects.nonNull(d.getFormaPagamento()) ? d.getFormaPagamento().getId() : null)
-                .fornecedorId(Objects.nonNull(d.getFornecedor()) ? d.getFornecedor().getId() : null)
-                .filialId(Objects.nonNull(d.getFilial()) ? d.getFilial().getId() : null)
-                .dsFilial(Objects.nonNull(d.getFilial()) ? d.getFilial().getNome() : null)
-                .dsFornecedor(Objects.nonNull(d.getFornecedor()) ? d.getFornecedor().getNome() : null)
-                .tipoId(Objects.nonNull(d.getTipo()) ?  d.getTipo().getId() : null)
-                .dsTipo(Objects.nonNull(d.getTipo()) ?  d.getTipo().getDescricao() : null)
-                .dtCriacao(d.getDtCriacao() != null ? d.getDtCriacao() : null)
-                .dtAtualizacao(d.getDtAtualizacao() != null ? d.getDtAtualizacao() : null)
-                .parcelas(d.getParcelas() != null ? d.getParcelas().stream().map(p ->
-                        ParcelamentoDTO.builder()
-                                .id(p.getId())
-                                .numeroParcela(p.getNumeroParcela())
-                                .valorTotal(p.getValorTotal())
-                                .dtVencimento(p.getDtVencimento() != null ? p.getDtVencimento() : null)
-                                .dtCriacao(p.getDtCriacao() != null ? p.getDtCriacao() : null)
-                                .dtAtualizacao(p.getDtAtualizacao() != null ? p.getDtAtualizacao() : null)
-                                .duplicataId(d.getId())
-                                .build()
-                ).collect(Collectors.toList()) : null)
-                .notasFiscais(d.getNotasFiscais() != null ? d.getNotasFiscais().stream().map(nf ->
-		                NotaFiscalResponseDTO.builder()
-		                        .id(nf.getId())
-		                        .chave(nf.getChave())
-		                        .numero(nf.getNumero())
-		                        .serie(nf.getSerie())
-		                        .dtCompra(nf.getDtCompra())
-		                        .fornecedorId(nf.getFornecedor().getId())
-		                        .fornecedorNome(nf.getFornecedor().getNome())
-		                        .filialId(nf.getFilial().getId())
-		                        .tipoNotaId(nf.getTipo().getId())
-		                        .valorTotal(nf.getValorTotal())
-		                        .build()
-		        ).collect(Collectors.toList()) : null)
-                .build()).toList();
+        return duplicatas.stream().map(d -> {
+
+            var parcelas = parcelaRepository.findByDuplicataId(d.getId());
+            var notasFiscais = notaFiscalRepository.findByDuplicataId(d.getId());
+
+            return DuplicataResponseDTO.builder()
+                    .id(d.getId())
+                    .descricao(d.getDescricao())
+                    .valor(d.getValor())
+                    .desconto(d.getDesconto())
+                    .multa(d.getMulta())
+                    .juros(d.getJuros())
+                    .valorTotal(d.getValorTotal())
+                    .formaPagamentoId(d.getFormaPagamento() != null ? d.getFormaPagamento().getId() : null)
+                    .fornecedorId(d.getFornecedor() != null ? d.getFornecedor().getId() : null)
+                    .filialId(d.getFilial() != null ? d.getFilial().getId() : null)
+                    .dsFilial(d.getFilial() != null ? d.getFilial().getNome() : null)
+                    .dsFornecedor(d.getFornecedor() != null ? d.getFornecedor().getNome() : null)
+                    .tipoId(d.getTipo() != null ? d.getTipo().getId() : null)
+                    .dsTipo(d.getTipo() != null ? d.getTipo().getDescricao() : null)
+                    .dtCriacao(d.getDtCriacao())
+                    .dtAtualizacao(d.getDtAtualizacao())
+
+                    .parcelas(parcelas.stream().map(p ->
+                            ParcelamentoDTO.builder()
+                                    .id(p.getId())
+                                    .numeroParcela(p.getNumeroParcela())
+                                    .valorTotal(p.getValorTotal())
+                                    .dtVencimento(p.getDtVencimento())
+                                    .dtCriacao(p.getDtCriacao())
+                                    .dtAtualizacao(p.getDtAtualizacao())
+                                    .duplicataId(d.getId())
+                                    .build()
+                    ).toList())
+
+                    .notasFiscais(notasFiscais.stream().map(nf ->
+                            NotaFiscalResponseDTO.builder()
+                                    .id(nf.getId())
+                                    .chave(nf.getChave())
+                                    .numero(nf.getNumero())
+                                    .serie(nf.getSerie())
+                                    .dtCompra(nf.getDtCompra())
+                                    .fornecedorId(nf.getFornecedor().getId())
+                                    .fornecedorNome(nf.getFornecedor().getNome())
+                                    .filialId(nf.getFilial().getId())
+                                    .tipoNotaId(nf.getTipo().getId())
+                                    .valorTotal(nf.getValorTotal())
+                                    .build()
+                    ).toList())
+
+                    .build();
+
+        }).toList();
     }
     
     @Override   
     public Page<DuplicataResponseDTO> listarDuplicatasPaginadas(int pagina, int tamanho) {
+
         Pageable pageable = PageRequest.of(pagina, tamanho);
         Page<Duplicata> duplicatasPage = duplicataRepository.findAll(pageable);
 
-        return duplicatasPage.map(d -> DuplicataResponseDTO.builder()
-                .id(d.getId())
-                .descricao(d.getDescricao())
-                .valor(d.getValor())
-                .desconto(d.getDesconto())
-                .multa(d.getMulta())
-                .juros(d.getJuros())
-                .valorTotal(d.getValorTotal())
-                .formaPagamentoId(Objects.nonNull(d.getFormaPagamento()) ? d.getFormaPagamento().getId() : null)
-                .fornecedorId(Objects.nonNull(d.getFornecedor()) ? d.getFornecedor().getId() : null)
-                .filialId(Objects.nonNull(d.getFilial()) ? d.getFilial().getId() : null)
-                .dsFornecedor(Objects.nonNull(d.getFornecedor()) ? d.getFornecedor().getNome() : null)
-                .dsFilial(Objects.nonNull(d.getFilial()) ? d.getFilial().getNome() : null)
-                .tipoId(Objects.nonNull(d.getTipo()) ?  d.getTipo().getId() : null)
-                .dsTipo(Objects.nonNull(d.getTipo()) ?  d.getTipo().getDescricao() : null)
-                .dtCriacao(d.getDtCriacao() != null ? d.getDtCriacao() : null)
-                .dtAtualizacao(d.getDtAtualizacao() != null ? d.getDtAtualizacao() : null)
-                .parcelas(d.getParcelas() != null ? d.getParcelas().stream().map(p ->
-                        ParcelamentoDTO.builder()
-                                .id(p.getId())
-                                .numeroParcela(p.getNumeroParcela())
-                                .valorTotal(p.getValorTotal())
-                                .dtVencimento(p.getDtVencimento() != null ? p.getDtVencimento() : null)
-                                .dtCriacao(p.getDtCriacao() != null ? p.getDtCriacao() : null)
-                                .dtAtualizacao(p.getDtAtualizacao() != null ? p.getDtAtualizacao() : null)
-                                .duplicataId(d.getId())
-                                .build()
-                ).collect(Collectors.toList()) : null)
-                .notasFiscais(d.getNotasFiscais() != null ? d.getNotasFiscais().stream().map(nf ->
-                        NotaFiscalResponseDTO.builder()
-                                .id(nf.getId())
-                                .chave(nf.getChave())
-                                .numero(nf.getNumero())
-                                .serie(nf.getSerie())
-                                .dtCompra(nf.getDtCompra())
-                                .fornecedorId(nf.getFornecedor().getId())
-                                .fornecedorNome(nf.getFornecedor().getNome())
-                                .filialId(nf.getFilial().getId())
-                                .tipoNotaId(nf.getTipo().getId())
-                                .valorTotal(nf.getValorTotal())
-                                .build()
-                ).collect(Collectors.toList()) : null)
-                .build());
+        return duplicatasPage.map(d -> {
+
+            var parcelas = parcelaRepository.findByDuplicataId(d.getId());
+            var notasFiscais = notaFiscalRepository.findByDuplicataId(d.getId());
+
+            return DuplicataResponseDTO.builder()
+                    .id(d.getId())
+                    .descricao(d.getDescricao())
+                    .valor(d.getValor())
+                    .desconto(d.getDesconto())
+                    .multa(d.getMulta())
+                    .juros(d.getJuros())
+                    .valorTotal(d.getValorTotal())
+                    .formaPagamentoId(d.getFormaPagamento() != null ? d.getFormaPagamento().getId() : null)
+                    .fornecedorId(d.getFornecedor() != null ? d.getFornecedor().getId() : null)
+                    .filialId(d.getFilial() != null ? d.getFilial().getId() : null)
+                    .dsFornecedor(d.getFornecedor() != null ? d.getFornecedor().getNome() : null)
+                    .dsFilial(d.getFilial() != null ? d.getFilial().getNome() : null)
+                    .tipoId(d.getTipo() != null ? d.getTipo().getId() : null)
+                    .dsTipo(d.getTipo() != null ? d.getTipo().getDescricao() : null)
+                    .dtCriacao(d.getDtCriacao())
+                    .dtAtualizacao(d.getDtAtualizacao())
+
+                    .parcelas(parcelas.stream().map(p ->
+                            ParcelamentoDTO.builder()
+                                    .id(p.getId())
+                                    .numeroParcela(p.getNumeroParcela())
+                                    .valorTotal(p.getValorTotal())
+                                    .dtVencimento(p.getDtVencimento())
+                                    .dtCriacao(p.getDtCriacao())
+                                    .dtAtualizacao(p.getDtAtualizacao())
+                                    .duplicataId(d.getId())
+                                    .build()
+                    ).toList())
+
+                    .notasFiscais(notasFiscais.stream().map(nf ->
+                            NotaFiscalResponseDTO.builder()
+                                    .id(nf.getId())
+                                    .chave(nf.getChave())
+                                    .numero(nf.getNumero())
+                                    .serie(nf.getSerie())
+                                    .dtCompra(nf.getDtCompra())
+                                    .fornecedorId(nf.getFornecedor().getId())
+                                    .fornecedorNome(nf.getFornecedor().getNome())
+                                    .filialId(nf.getFilial().getId())
+                                    .tipoNotaId(nf.getTipo().getId())
+                                    .valorTotal(nf.getValorTotal())
+                                    .build()
+                    ).toList())
+
+                    .build();
+        });
     }
 
     @Override 
     public Page<DuplicataResponseDTO> buscarDuplicatasPorNumeroPaginadas(String numero, int pagina, int tamanho) {
-        Pageable pageable = PageRequest.of(pagina, tamanho);
-        Page<Duplicata> duplicatasPage = duplicataRepository.findByDescricaoContaining(numero, pageable);
 
-        return duplicatasPage.map(d -> DuplicataResponseDTO.builder()
-                .id(d.getId())
-                .descricao(d.getDescricao())
-                .valor(d.getValor())
-                .desconto(d.getDesconto())
-                .multa(d.getMulta())
-                .juros(d.getJuros())
-                .valorTotal(d.getValorTotal())
-                .formaPagamentoId(Objects.nonNull(d.getFormaPagamento()) ? d.getFormaPagamento().getId() : null)
-                .fornecedorId(Objects.nonNull(d.getFornecedor()) ? d.getFornecedor().getId() : null)
-                .filialId(Objects.nonNull(d.getFilial()) ? d.getFilial().getId() : null)
-                .dsFilial(Objects.nonNull(d.getFilial()) ? d.getFilial().getNome() : null)
-                .dsFornecedor(Objects.nonNull(d.getFornecedor()) ? d.getFornecedor().getNome() : null)
-                .tipoId(Objects.nonNull(d.getTipo()) ?  d.getTipo().getId() : null)
-                .dsTipo(Objects.nonNull(d.getTipo()) ?  d.getTipo().getDescricao() : null)
-                .dtCriacao(d.getDtCriacao() != null ? d.getDtCriacao() : null)
-                .dtAtualizacao(d.getDtAtualizacao() != null ? d.getDtAtualizacao() : null)
-                .parcelas(d.getParcelas() != null ? d.getParcelas().stream().map(p ->
-                        ParcelamentoDTO.builder()
-                                .id(p.getId())
-                                .numeroParcela(p.getNumeroParcela())
-                                .valorTotal(p.getValorTotal())
-                                .dtVencimento(p.getDtVencimento() != null ? p.getDtVencimento() : null)
-                                .dtCriacao(p.getDtCriacao() != null ? p.getDtCriacao() : null)
-                                .dtAtualizacao(p.getDtAtualizacao() != null ? p.getDtAtualizacao() : null)
-                                .duplicataId(d.getId())
-                                .build()
-                ).collect(Collectors.toList()) : null)
-                .notasFiscais(d.getNotasFiscais() != null ? d.getNotasFiscais().stream().map(nf ->
-                        NotaFiscalResponseDTO.builder()
-                                .id(nf.getId())
-                                .chave(nf.getChave())
-                                .numero(nf.getNumero())
-                                .serie(nf.getSerie())
-                                .dtCompra(nf.getDtCompra())
-                                .fornecedorId(nf.getFornecedor().getId())
-                                .fornecedorNome(nf.getFornecedor().getNome())
-                                .filialId(nf.getFilial().getId())
-                                .tipoNotaId(nf.getTipo().getId())
-                                .valorTotal(nf.getValorTotal())
-                                .build()
-                ).collect(Collectors.toList()) : null)
-                .build());
+        Pageable pageable = PageRequest.of(pagina, tamanho);
+        Page<Duplicata> page = duplicataRepository.findByDescricaoContaining(numero, pageable);
+
+        return page.map(d -> {
+
+            var parcelas = parcelaRepository.findByDuplicataId(d.getId());
+            var notasFiscais = notaFiscalRepository.findByDuplicataId(d.getId());
+
+            return DuplicataResponseDTO.builder()
+                    .id(d.getId())
+                    .descricao(d.getDescricao())
+                    .valor(d.getValor())
+                    .desconto(d.getDesconto())
+                    .multa(d.getMulta())
+                    .juros(d.getJuros())
+                    .valorTotal(d.getValorTotal())
+                    .formaPagamentoId(d.getFormaPagamento() != null ? d.getFormaPagamento().getId() : null)
+                    .fornecedorId(d.getFornecedor() != null ? d.getFornecedor().getId() : null)
+                    .filialId(d.getFilial() != null ? d.getFilial().getId() : null)
+                    .dsFilial(d.getFilial() != null ? d.getFilial().getNome() : null)
+                    .dsFornecedor(d.getFornecedor() != null ? d.getFornecedor().getNome() : null)
+                    .tipoId(d.getTipo() != null ? d.getTipo().getId() : null)
+                    .dsTipo(d.getTipo() != null ? d.getTipo().getDescricao() : null)
+                    .dtCriacao(d.getDtCriacao())
+                    .dtAtualizacao(d.getDtAtualizacao())
+
+                    .parcelas(parcelas.stream().map(p ->
+                            ParcelamentoDTO.builder()
+                                    .id(p.getId())
+                                    .numeroParcela(p.getNumeroParcela())
+                                    .valorTotal(p.getValorTotal())
+                                    .dtVencimento(p.getDtVencimento())
+                                    .dtCriacao(p.getDtCriacao())
+                                    .dtAtualizacao(p.getDtAtualizacao())
+                                    .duplicataId(d.getId())
+                                    .build()
+                    ).toList())
+
+                    .notasFiscais(notasFiscais.stream().map(nf ->
+                            NotaFiscalResponseDTO.builder()
+                                    .id(nf.getId())
+                                    .chave(nf.getChave())
+                                    .numero(nf.getNumero())
+                                    .serie(nf.getSerie())
+                                    .dtCompra(nf.getDtCompra())
+                                    .fornecedorId(nf.getFornecedor().getId())
+                                    .fornecedorNome(nf.getFornecedor().getNome())
+                                    .filialId(nf.getFilial().getId())
+                                    .tipoNotaId(nf.getTipo().getId())
+                                    .valorTotal(nf.getValorTotal())
+                                    .build()
+                    ).toList())
+
+                    .build();
+        });
     }
 
     @Override
     public DuplicataResponseDTO buscarDuplicataPorId(Long id) {
+
         var duplicata = duplicataRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Duplicata não encontrada para id " + id));
 
-        List<ParcelamentoDTO> parcelasDTO = duplicata.getParcelas().stream().map(p ->
+        var parcelas = parcelaRepository.findByDuplicataId(id);
+        var notasFiscais = notaFiscalRepository.findByDuplicataId(id);
+
+        List<ParcelamentoDTO> parcelasDTO = parcelas.stream().map(p ->
                 ParcelamentoDTO.builder()
                         .id(p.getId())
                         .numeroParcela(p.getNumeroParcela())
                         .valorTotal(p.getValorTotal())
-                        .dtVencimento(p.getDtVencimento() != null ? p.getDtVencimento() : null)
-                        .dtCriacao(p.getDtCriacao() != null ? p.getDtCriacao() : null)
-                        .dtAtualizacao(p.getDtAtualizacao() != null ? p.getDtAtualizacao() : null)
+                        .dtVencimento(p.getDtVencimento())
+                        .dtCriacao(p.getDtCriacao())
+                        .dtAtualizacao(p.getDtAtualizacao())
                         .duplicataId(duplicata.getId())
                         .build()
-        ).collect(Collectors.toList());
-        
-        List<NotaFiscalResponseDTO> notaFiscalResponseDTO = duplicata.getNotasFiscais().stream().map(nf ->
-		        NotaFiscalResponseDTO.builder()
-		        .id(nf.getId())
-		        .chave(nf.getChave())
-		        .numero(nf.getNumero())
-		        .serie(nf.getSerie())
-		        .dtCompra(nf.getDtCompra())
-		        .fornecedorId(nf.getFornecedor().getId())
-		        .fornecedorNome(nf.getFornecedor().getNome())
-		        .filialId(nf.getFilial().getId())
-		        .tipoNotaId(nf.getTipo().getId())
-		        .valorTotal(nf.getValorTotal())
-		        .build()
-		).collect(Collectors.toList());
+        ).toList();
+
+        List<NotaFiscalResponseDTO> notasDTO = notasFiscais.stream().map(nf ->
+                NotaFiscalResponseDTO.builder()
+                        .id(nf.getId())
+                        .chave(nf.getChave())
+                        .numero(nf.getNumero())
+                        .serie(nf.getSerie())
+                        .dtCompra(nf.getDtCompra())
+                        .fornecedorId(nf.getFornecedor().getId())
+                        .fornecedorNome(nf.getFornecedor().getNome())
+                        .filialId(nf.getFilial().getId())
+                        .tipoNotaId(nf.getTipo().getId())
+                        .valorTotal(nf.getValorTotal())
+                        .build()
+        ).toList();
 
         return DuplicataResponseDTO.builder()
                 .id(duplicata.getId())
@@ -290,17 +324,17 @@ public class DuplicataServiceImpl implements DuplicataService {
                 .desconto(duplicata.getDesconto())
                 .multa(duplicata.getMulta())
                 .valorTotal(duplicata.getValorTotal())
-                .formaPagamentoId(duplicata.getFormaPagamento().getId())
-                .fornecedorId(duplicata.getFornecedor().getId())
-                .filialId(Objects.nonNull(duplicata.getFilial()) ? duplicata.getFilial().getId() : null)
-                .dsFilial(Objects.nonNull(duplicata.getFilial()) ? duplicata.getFilial().getNome() : null)
-                .tipoId(Objects.nonNull(duplicata.getTipo()) ?  duplicata.getTipo().getId() : null)
-                .dsTipo(Objects.nonNull(duplicata.getTipo()) ?  duplicata.getTipo().getDescricao() : null)
-                .dsFornecedor(duplicata.getFornecedor().getNome())
-                .dtCriacao(duplicata.getDtCriacao() != null ? duplicata.getDtCriacao() : null)
-                .dtAtualizacao(duplicata.getDtAtualizacao() != null ? duplicata.getDtAtualizacao() : null)
+                .formaPagamentoId(duplicata.getFormaPagamento() != null ? duplicata.getFormaPagamento().getId() : null)
+                .fornecedorId(duplicata.getFornecedor() != null ? duplicata.getFornecedor().getId() : null)
+                .filialId(duplicata.getFilial() != null ? duplicata.getFilial().getId() : null)
+                .dsFilial(duplicata.getFilial() != null ? duplicata.getFilial().getNome() : null)
+                .tipoId(duplicata.getTipo() != null ? duplicata.getTipo().getId() : null)
+                .dsTipo(duplicata.getTipo() != null ? duplicata.getTipo().getDescricao() : null)
+                .dsFornecedor(duplicata.getFornecedor() != null ? duplicata.getFornecedor().getNome() : null)
+                .dtCriacao(duplicata.getDtCriacao())
+                .dtAtualizacao(duplicata.getDtAtualizacao())
                 .parcelas(parcelasDTO)
-                .notasFiscais(notaFiscalResponseDTO)
+                .notasFiscais(notasDTO)
                 .build();
     }
 
@@ -464,10 +498,12 @@ public class DuplicataServiceImpl implements DuplicataService {
     @Override
     @Transactional
     public void excluirDuplicata(Long id) {
+
         var duplicata = duplicataRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Duplicata não encontrada para id " + id));
 
-        parcelaRepository.deleteAll(duplicata.getParcelas());
+        parcelaRepository.deleteByDuplicataId(id);
+
         duplicataRepository.delete(duplicata);
     }
     

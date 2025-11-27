@@ -5,6 +5,9 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.service.desk.entidade.Parcela;
@@ -20,5 +23,9 @@ public interface ParcelaRepository extends JpaRepository<Parcela, Long>, JpaSpec
     List<Parcela> findByNumeroParcelaContainingIgnoreCase(String numero);
     
     boolean existsByDuplicataIdAndStatusId(Long duplicataId, Long statusId);
+    
+    @Modifying
+    @Query("DELETE FROM Parcela p WHERE p.duplicata.id = :id")
+    void deleteByDuplicataId(@Param("id") Long id);
 
 }

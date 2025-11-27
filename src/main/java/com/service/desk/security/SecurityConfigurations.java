@@ -31,7 +31,10 @@ public class SecurityConfigurations {
                 .cors(cors -> cors.configurationSource(request -> {
                     var config = new CorsConfiguration();
                     config.setAllowCredentials(true);
-                    config.setAllowedOrigins(List.of("http://localhost:4200"));
+                    config.setAllowedOrigins(List.of(
+                    	    "http://localhost:4200",
+                    	    "https://base-front-1-0.onrender.com"
+                    	));
                     config.setAllowedHeaders(List.of("*"));
                     config.setAllowedMethods(List.of("*"));
                     return config;
@@ -39,7 +42,6 @@ public class SecurityConfigurations {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/tipo-nota").hasAuthority("ROLE_ADMIN")
                         .requestMatchers(
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",

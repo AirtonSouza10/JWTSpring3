@@ -22,8 +22,10 @@ import com.service.desk.entidade.Fornecedor;
 import com.service.desk.entidade.Telefone;
 import com.service.desk.enumerator.MensagemEnum;
 import com.service.desk.exceptions.NegocioException;
+import com.service.desk.repository.EnderecoRepository;
 import com.service.desk.repository.EnderecoTipoRepository;
 import com.service.desk.repository.FornecedorRepository;
+import com.service.desk.repository.TelefoneRepository;
 import com.service.desk.repository.TelefoneTipoRepository;
 import com.service.desk.service.service.FornecedorService;
 
@@ -41,20 +43,26 @@ public class FornecedorServiceImpl implements FornecedorService {
 
 	@Autowired
 	private EnderecoTipoRepository enderecoTipoRepository;
+	
+	@Autowired
+	private TelefoneRepository telefoneRepository;
+	
+	@Autowired
+	private EnderecoRepository enderecoRepository;
 	    
     @Override
     public List<FornecedorResponseDTO> listarFornecdores() {
     	var listaFornecedores = new ArrayList<FornecedorResponseDTO>();
     	var fornecedores = fornecedorRepository.findAllByOrderByNomeAsc();
     	fornecedores.forEach(f->{
-    		var telefonesList = f.getTelefones().stream().map(t-> TelefoneDTO.builder()
+    		var telefonesList = telefoneRepository.findByFornecedorId(f.getId()).stream().map(t-> TelefoneDTO.builder()
     				.id(t.getId())
     				.numero(t.getNumero())
     				.tpTelefone(TelefoneTipoDTO.builder().id(t.getTpTelefone().getId()).descricao(t.getTpTelefone().getDescricao()).build())
     				.build()
     			).toList();
-    		
-    		var enderecosList = f.getEnderecos().stream().map(e-> EnderecoDTO.builder()
+
+    		var enderecosList = enderecoRepository.findByFornecedorId(f.getId()).stream().map(e-> EnderecoDTO.builder()
     				.id(e.getId())
     				.logradouro(e.getLogradouro())
     				.complemento(e.getComplemento())
@@ -210,13 +218,13 @@ public class FornecedorServiceImpl implements FornecedorService {
     public FornecedorResponseDTO buscarPorId(Long id) {
         var fornecedor = fornecedorRepository.findById(id).orElseThrow();
 
-        var telefonesList = fornecedor.getTelefones().stream().map(t -> TelefoneDTO.builder()
+        var telefonesList = telefoneRepository.findByFornecedorId(fornecedor.getId()).stream().map(t -> TelefoneDTO.builder()
                 .id(t.getId())
                 .numero(t.getNumero())
                 .tpTelefone(TelefoneTipoDTO.builder().id(t.getTpTelefone().getId()).descricao(t.getTpTelefone().getDescricao()).build())
                 .build()).toList();
 
-        var enderecosList = fornecedor.getEnderecos().stream().map(e -> EnderecoDTO.builder()
+        var enderecosList = enderecoRepository.findByFornecedorId(fornecedor.getId()).stream().map(e -> EnderecoDTO.builder()
                 .id(e.getId())
                 .logradouro(e.getLogradouro())
                 .complemento(e.getComplemento())
@@ -256,7 +264,7 @@ public class FornecedorServiceImpl implements FornecedorService {
         Page<Fornecedor> fornecedoresPage = fornecedorRepository.findAll(pageable);
 
         return fornecedoresPage.map(f -> {
-            var telefonesList = f.getTelefones().stream().map(t -> TelefoneDTO.builder()
+            var telefonesList = telefoneRepository.findByFornecedorId(f.getId()).stream().map(t -> TelefoneDTO.builder()
                     .id(t.getId())
                     .numero(t.getNumero())
                     .tpTelefone(TelefoneTipoDTO.builder()
@@ -265,7 +273,7 @@ public class FornecedorServiceImpl implements FornecedorService {
                             .build())
                     .build()).toList();
 
-            var enderecosList = f.getEnderecos().stream().map(e -> EnderecoDTO.builder()
+            var enderecosList = enderecoRepository.findByFornecedorId(f.getId()).stream().map(e -> EnderecoDTO.builder()
                     .id(e.getId())
                     .logradouro(e.getLogradouro())
                     .complemento(e.getComplemento())

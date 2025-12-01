@@ -14,6 +14,7 @@ import com.service.desk.dto.DuplicataResponseDTO;
 import com.service.desk.dto.FiltroRelatorioCustomizadoDTO;
 import com.service.desk.dto.ParcelaBuscaGeralDTO;
 import com.service.desk.dto.ParcelaResponseDTO;
+import com.service.desk.dto.ParcelaUpdateRequestDTO;
 import com.service.desk.dto.RelatorioContasAbertasResponseDTO;
 import com.service.desk.dto.RelatorioCustomizadoResponseDTO;
 import com.service.desk.dto.RelatorioParcelasPagasPorTipoDTO;
@@ -58,5 +59,7 @@ public interface DuplicataService {
 	Page<ParcelaBuscaGeralDTO> buscarGeralParcela(String termo, int pagina, int tamanho);
 
 	Page<ParcelaBuscaGeralDTO> buscarGeralParcelaAtivas(String termo, int pagina, int tamanho);
+
+	void atualizarParcela(Long id, ParcelaUpdateRequestDTO dto);
 
 }

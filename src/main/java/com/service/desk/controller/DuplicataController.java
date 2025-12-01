@@ -31,6 +31,7 @@ import com.service.desk.dto.BaixaParcelaRequestDTO;
 import com.service.desk.dto.DuplicataRequestDTO;
 import com.service.desk.dto.DuplicataResponseDTO;
 import com.service.desk.dto.FiltroRelatorioCustomizadoDTO;
+import com.service.desk.dto.ParcelaUpdateRequestDTO;
 import com.service.desk.dto.RelatorioCustomizadoResponseDTO;
 import com.service.desk.dto.RelatorioParcelasPagasPorTipoDTO;
 import com.service.desk.enumerator.MensagemEnum;
@@ -363,6 +364,17 @@ public class DuplicataController extends ControllerServiceDesk{
 
         var page = duplicataService.buscarGeralParcelaAtivas(termo, pagina, tamanho);
         return new ResponseServiceDesk(page);
+    }
+    
+    @Operation(summary = "Atualizar dados da parcela")
+    @PutMapping("/parcela/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseServiceDesk atualizarParcela(
+            @PathVariable Long id,
+            @Valid @RequestBody ParcelaUpdateRequestDTO dto) {
+        
+    	duplicataService.atualizarParcela(id, dto);
+        return new ResponseServiceDesk("Parcela atualizada com sucesso!");
     }
 
 }

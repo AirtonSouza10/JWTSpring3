@@ -39,6 +39,7 @@ import com.service.desk.dto.NotaFiscalResumoDTO;
 import com.service.desk.dto.ParcelaBuscaGeralDTO;
 import com.service.desk.dto.ParcelaResponseDTO;
 import com.service.desk.dto.ParcelaResumoDTO;
+import com.service.desk.dto.ParcelaUpdateRequestDTO;
 import com.service.desk.dto.ParcelamentoDTO;
 import com.service.desk.dto.RelatorioContasAbertasResponseDTO;
 import com.service.desk.dto.RelatorioCustomizadoResponseDTO;
@@ -1163,5 +1164,29 @@ public class DuplicataServiceImpl implements DuplicataService {
         });
     }
 
+    @Override
+    @Transactional
+    public void atualizarParcela(Long id, ParcelaUpdateRequestDTO dto) {
+    	var parcela = parcelaRepository.findById(id).orElseThrow();
+    	if (dto.getStatusId() != null) {
+    	    var status = statusContaRepository.findById(dto.getStatusId())
+    	            .orElseThrow(() -> new EntityNotFoundException("Status inválido"));
+    	    parcela.setStatus(status);
+    	}
+
+    	if (dto.getTipoPagamentoId() != null) {
+    	    var tipoPagamento = tipoPagamentoRepository.findById(dto.getTipoPagamentoId())
+    	            .orElseThrow(() -> new EntityNotFoundException("Tipo de pagamento inválido"));
+    	    parcela.setTipoPagamento(tipoPagamento);
+    	}
+    	parcela.setDtPagamento(dto.getDtPagamento());
+    	parcela.setDtVencimento(dto.getDtVencimento());
+    	parcela.setNumeroParcela(dto.getNumeroParcela());
+    	parcela.setObservacao(dto.getObservacao());
+    	parcela.setValorTotal(dto.getValorTotal());
+    	parcela.setValorPago(dto.getValorPago());
+    	
+    	parcelaRepository.save(parcela);
+    }
     
 }

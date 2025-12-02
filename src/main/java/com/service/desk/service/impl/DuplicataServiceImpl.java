@@ -915,8 +915,9 @@ public class DuplicataServiceImpl implements DuplicataService {
 
     private RelatorioCustomizadoResponseDTO toDTO(Parcela p) {
         Duplicata d = p.getDuplicata();
+        var notasFiscaisDuplicata = notaFiscalRepository.findByDuplicataId(d.getId());
 
-        NotaFiscal nf = d.getNotasFiscais().isEmpty() ? null : d.getNotasFiscais().get(0);
+        NotaFiscal nf = notasFiscaisDuplicata.isEmpty() ? null : notasFiscaisDuplicata.get(0);
 
         Long prazo = null;
         if (nf != null && nf.getDtCompra() != null) {
@@ -992,7 +993,8 @@ public class DuplicataServiceImpl implements DuplicataService {
                         }
                     });
 
-            boolean matchNota = duplicata.getNotasFiscais().stream()
+            var notasFiscaisDuplicata = notaFiscalRepository.findByDuplicataId(duplicata.getId());
+            boolean matchNota = notasFiscaisDuplicata.stream()
                     .anyMatch(n -> n.getNumero() != null &&
                                    n.getNumero().contains(termo));
             if (matchNota) {
@@ -1011,7 +1013,7 @@ public class DuplicataServiceImpl implements DuplicataService {
                 });
             }
 
-            List<NotaFiscalResumoDTO> notasDTO = duplicata.getNotasFiscais()
+            List<NotaFiscalResumoDTO> notasDTO = notasFiscaisDuplicata
                     .stream()
                     .map(n -> NotaFiscalResumoDTO.builder()
                             .id(n.getId())

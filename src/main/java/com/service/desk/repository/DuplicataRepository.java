@@ -13,17 +13,22 @@ import com.service.desk.entidade.Duplicata;
 
 @Repository
 public interface DuplicataRepository extends JpaRepository<Duplicata, Long> {
+	@EntityGraph(attributePaths = {"parcelas","formaPagamento","fornecedor","filial","tipo"})
     Page<Duplicata> findAll(Pageable pageable);
 
+	@EntityGraph(attributePaths = {"parcelas","formaPagamento","fornecedor","filial","tipo"})
     Page<Duplicata> findByDescricaoContaining(String numero, Pageable pageable);
     
+	@EntityGraph(attributePaths = {"parcelas","formaPagamento","fornecedor","filial","tipo"})
     List<Duplicata> findByDescricaoContainingIgnoreCase(String descricao);
     
-	@EntityGraph(attributePaths = {"parcelas"})
+	@EntityGraph(attributePaths = {"parcelas","formaPagamento","fornecedor","filial","tipo"})
     List<Duplicata> findByFilialId(Long filialId);
     
+	@EntityGraph(attributePaths = {"parcelas","formaPagamento","fornecedor","filial","tipo"})
     Page<Duplicata> findByIdIn(Set<Long> ids, Pageable pageable);
     
+	@EntityGraph(attributePaths = {"parcelas","formaPagamento","fornecedor","filial","tipo"})
     List<Duplicata> findByIdIn(Set<Long> ids);
 
 }

@@ -667,10 +667,12 @@ public class DuplicataServiceImpl implements DuplicataService {
     }
     
     @Override
-    public RelatorioContasAbertasResponseDTO gerarRelatorioContasEmAbertoPorFilial(Long idFilial) {
+    public RelatorioContasAbertasResponseDTO gerarRelatorioContasEmAbertoPorFilial(Long idFilial, Long tipo) {
         var filial = filialRepository.findById(idFilial).orElseThrow();
 
-        var duplicatas = duplicataRepository.findByFilialId(idFilial);
+        var duplicatas = Objects.isNull(tipo)
+                ? duplicataRepository.findByFilialId(idFilial)
+                : duplicataRepository.findByFilialIdAndTipoId(idFilial, tipo);
 
         var parcelasEmAberto = duplicatas.stream()
             .flatMap(d -> d.getParcelas().stream()

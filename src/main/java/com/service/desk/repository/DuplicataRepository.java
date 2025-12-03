@@ -31,4 +31,6 @@ public interface DuplicataRepository extends JpaRepository<Duplicata, Long> {
 	@EntityGraph(attributePaths = {"parcelas","formaPagamento","fornecedor","filial","tipo"})
     List<Duplicata> findByIdIn(Set<Long> ids);
 
+	@EntityGraph(attributePaths = {"parcelas","formaPagamento","fornecedor","filial","tipo"})
+	List<Duplicata> findByFilialIdAndTipoId(Long filialId, Long tipoId);
 }

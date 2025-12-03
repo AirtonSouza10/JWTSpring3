@@ -24,10 +24,10 @@ public interface NotaFiscalRepository extends JpaRepository<NotaFiscal, Long> {
 	@EntityGraph(attributePaths = {"parcelasPrevistas","fornecedor","tipo","filial","formaPagamento","duplicata"})
 	List<NotaFiscal> findByNumeroAndFornecedorId(String numero, Long fornecedorId);
 	
-	@EntityGraph(attributePaths = {"parcelasPrevistas","fornecedor","tipo","filial","formaPagamento","duplicata"})
+	@EntityGraph(attributePaths = {"fornecedor","tipo","filial","formaPagamento","duplicata"})
     Page<NotaFiscal> findByNumeroContainingAndFornecedorId(String numero, Long fornecedorId, Pageable pageable);
 
-	@EntityGraph(attributePaths = {"parcelasPrevistas","fornecedor","tipo","filial","formaPagamento","duplicata"})
+	@EntityGraph(attributePaths = {"fornecedor","tipo","filial","formaPagamento","duplicata"})
     Page<NotaFiscal> findAll(Pageable pageable);
     
 	@EntityGraph(attributePaths = {"parcelasPrevistas","fornecedor","tipo","filial","formaPagamento","duplicata"})
@@ -44,10 +44,10 @@ public interface NotaFiscalRepository extends JpaRepository<NotaFiscal, Long> {
 	@EntityGraph(attributePaths = {"parcelasPrevistas","fornecedor","tipo","filial","formaPagamento","duplicata"})
     List<NotaFiscal> findByNumeroContainingIgnoreCase(String numero);
     
-	@EntityGraph(attributePaths = {"parcelasPrevistas","fornecedor","tipo","filial","formaPagamento","duplicata"})
+	@EntityGraph(attributePaths = {"fornecedor","tipo","filial","formaPagamento","duplicata"})
     Page<NotaFiscal> findByNumeroContainingIgnoreCase(String numero, Pageable pageable);
     
-	@EntityGraph(attributePaths = {"parcelasPrevistas","fornecedor","tipo","filial","formaPagamento","duplicata"})
+	@EntityGraph(attributePaths = {"fornecedor","tipo","filial","formaPagamento","duplicata"})
     Page<NotaFiscal> findByNumeroContainingIgnoreCaseOrFornecedorNomeContainingIgnoreCase(
             String numero, String fornecedorNome, Pageable pageable);
 	

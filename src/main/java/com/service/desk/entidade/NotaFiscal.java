@@ -40,7 +40,7 @@ public class NotaFiscal{
     @Column(nullable = false, length = 5)
     private String serie;
 
-    @Column(nullable = false, unique = true, length = 255)
+    @Column(nullable = true, length = 255)
     private String chave;
     
     @Column(length = 500)

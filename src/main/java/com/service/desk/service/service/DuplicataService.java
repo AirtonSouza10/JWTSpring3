@@ -43,7 +43,7 @@ public interface DuplicataService {
 
 	DuplicataDiaVencidoResponseDTO obterContasPagarDiaAndVencidas();
 
-	RelatorioContasAbertasResponseDTO gerarRelatorioContasEmAbertoPorFilial(Long idFilial);
+	RelatorioContasAbertasResponseDTO gerarRelatorioContasEmAbertoPorFilial(Long idFilial,Long tipo);
 
 	void baixarParcela(BaixaParcelaRequestDTO dto);
 

@@ -190,17 +190,18 @@ public class DuplicataController extends ControllerServiceDesk{
     @Operation(summary = "Relatório de contas a pagar em aberto por filial")
     @GetMapping("/relatorio-aberto-filial/{idFilial}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseServiceDesk relatorioContasEmAbertoPorFilial(@PathVariable Long idFilial) {
-        return new ResponseServiceDesk(duplicataService.gerarRelatorioContasEmAbertoPorFilial(idFilial));
+    public ResponseServiceDesk relatorioContasEmAbertoPorFilial(@PathVariable Long idFilial,@RequestParam(required = false) Long tipo) {
+        return new ResponseServiceDesk(duplicataService.gerarRelatorioContasEmAbertoPorFilial(idFilial,tipo));
     }
     
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Gera relatório de contas a pagar em aberto por filial em PDF")
     @GetMapping("/relatorio-contas-pagar-filial/{idFilial}")
-    public ResponseEntity<byte[]> gerarRelatorioContasEmAbertoPorFilialPDF(@PathVariable Long idFilial)
+    public ResponseEntity<byte[]> gerarRelatorioContasEmAbertoPorFilialPDF(@PathVariable Long idFilial,
+            @RequestParam(required = false) Long tipo)
             throws JRException, IOException {
 
-        var relatorio = duplicataService.gerarRelatorioContasEmAbertoPorFilial(idFilial);
+        var relatorio = duplicataService.gerarRelatorioContasEmAbertoPorFilial(idFilial,tipo);
 
         JRBeanCollectionDataSource dataSourceMeses = new JRBeanCollectionDataSource(relatorio.getMeses());
 

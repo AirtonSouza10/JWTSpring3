@@ -100,24 +100,31 @@ public class NotaFiscalServiceImpl implements NotaFiscalService {
     
     @Override
     public Page<NotaFiscalResponseDTO> listarNotasFiscaisByNumeroAndFornecedor(String numero, Long fornecedorId, Pageable pageable) {
+    	
+        Pageable pageableOrdenado = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                Sort.by(Sort.Direction.DESC, "dtCompra")
+        );
+        
         Page<NotaFiscal> page;
 
         if (numero != null && fornecedorId != null) {
-            page = notaFiscalRepository.findByNumeroContainingAndFornecedorId(numero, fornecedorId, pageable);
+            page = notaFiscalRepository.findByNumeroContainingAndFornecedorId(numero, fornecedorId, pageableOrdenado);
         } else {
-            page = notaFiscalRepository.findAll(pageable);
+            page = notaFiscalRepository.findAll(pageableOrdenado);
         }
-
+        
         return page.map(nota -> {
-            List<ParcelaPrevistaNotaResponseDTO> parcelasPrevistasDTO = nota.getParcelasPrevistas() != null
-                ? nota.getParcelasPrevistas().stream()
-                    .map(parcela -> ParcelaPrevistaNotaResponseDTO.builder()
-                        .id(parcela.getId())
-                        .dtVencimentoPrevisto(parcela.getDtVencimentoPrevisto())
-                        .valorPrevisto(parcela.getValorPrevisto())
-                        .build())
-                    .toList()
-                : List.of();
+            List<ParcelaPrevistaNotaResponseDTO> parcelasPrevistasDTO =
+                    parcelaPrevistaNotaRepository.findByNotaFiscalId(nota.getId())
+                        .stream()
+                        .map(parcela -> ParcelaPrevistaNotaResponseDTO.builder()
+                            .id(parcela.getId())
+                            .dtVencimentoPrevisto(parcela.getDtVencimentoPrevisto())
+                            .valorPrevisto(parcela.getValorPrevisto())
+                            .build())
+                        .toList();
 
             return NotaFiscalResponseDTO.builder()
                 .id(nota.getId())
@@ -146,18 +153,24 @@ public class NotaFiscalServiceImpl implements NotaFiscalService {
     
     @Override
     public Page<NotaFiscalResponseDTO> listarNotasFiscaisWithPaginacao(Pageable pageable) {
-        Page<NotaFiscal> page = notaFiscalRepository.findAll(pageable);
+        Pageable pageableOrdenado = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                Sort.by(Sort.Direction.DESC, "dtCompra")
+        );
+    	
+        Page<NotaFiscal> page = notaFiscalRepository.findAll(pageableOrdenado);
 
         return page.map(nota -> {
             List<ParcelaPrevistaNotaResponseDTO> parcelasPrevistasDTO = nota.getParcelasPrevistas() != null
-                ? nota.getParcelasPrevistas().stream()
-                    .map(parcela -> ParcelaPrevistaNotaResponseDTO.builder()
-                        .id(parcela.getId())
-                        .dtVencimentoPrevisto(parcela.getDtVencimentoPrevisto())
-                        .valorPrevisto(parcela.getValorPrevisto())
-                        .build())
-                    .toList()
-                : List.of();
+                    ? nota.getParcelasPrevistas().stream()
+                        .map(parcela -> ParcelaPrevistaNotaResponseDTO.builder()
+                            .id(parcela.getId())
+                            .dtVencimentoPrevisto(parcela.getDtVencimentoPrevisto())
+                            .valorPrevisto(parcela.getValorPrevisto())
+                            .build())
+                        .toList()
+                    : List.of();
 
             return NotaFiscalResponseDTO.builder()
                 .id(nota.getId())
@@ -525,15 +538,15 @@ public class NotaFiscalServiceImpl implements NotaFiscalService {
         Page<NotaFiscal> page = notaFiscalRepository.findByNumeroContainingIgnoreCaseOrFornecedorNomeContainingIgnoreCase(numero, numero, pageable);
 
         return page.map(nota ->         {
-	        List<ParcelaPrevistaNotaResponseDTO> parcelasDTO = nota.getParcelasPrevistas() != null
-	        ? nota.getParcelasPrevistas().stream()
-	            .map(p -> ParcelaPrevistaNotaResponseDTO.builder()
-	                .id(p.getId())
-	                .dtVencimentoPrevisto(p.getDtVencimentoPrevisto())
-	                .valorPrevisto(p.getValorPrevisto())
-	                .build())
-	            .toList()
-	        : Collections.emptyList();
+            List<ParcelaPrevistaNotaResponseDTO> parcelasDTO =
+                    parcelaPrevistaNotaRepository.findByNotaFiscalId(nota.getId())
+                        .stream()
+                        .map(parcela -> ParcelaPrevistaNotaResponseDTO.builder()
+                            .id(parcela.getId())
+                            .dtVencimentoPrevisto(parcela.getDtVencimentoPrevisto())
+                            .valorPrevisto(parcela.getValorPrevisto())
+                            .build())
+                        .toList();
 
             return NotaFiscalResponseDTO.builder()
                     .id(nota.getId())

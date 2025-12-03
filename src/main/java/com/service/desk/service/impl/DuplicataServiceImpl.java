@@ -548,6 +548,7 @@ public class DuplicataServiceImpl implements DuplicataService {
                 .situacao("Em Aberto")
                 .dtVencimento(p.getDtVencimentoPrevisto())
                 .dtVendimentoFormatada(FuxoCaixaUtils.formatarData(p.getDtVencimentoPrevisto()))
+                .valorFormatado(FuxoCaixaUtils.formatarValorBR(p.getValorPrevisto()))
                 .isPrevista(true)
                 .build())
             .toList();

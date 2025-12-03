@@ -52,7 +52,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="10" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[ $P{FILIAL} 
+				<textFieldExpression><![CDATA[$P{FILIAL} 
 + ($P{FILIAL_ID} != null && !$P{FILIAL_ID}.toString().isEmpty() 
        ? " (" + $P{FILIAL_ID}.toString() + ")" 
        : "")]]></textFieldExpression>
@@ -73,7 +73,7 @@
 					<subreportParameterExpression><![CDATA[$P{DATASET_NOTAS}]]></subreportParameterExpression>
 				</subreportParameter>
 				<dataSourceExpression><![CDATA[$P{DATASET_NOTAS}]]></dataSourceExpression>
-				<subreportExpression><![CDATA[$P{SUBREPORT_PATH} + "NotasProtocolo.jasper"]]></subreportExpression>
+				<subreportExpression><![CDATA["relatorios/subreport/NotasProtocolo.jasper"]]></subreportExpression>
 			</subreport>
 		</band>
 	</detail>

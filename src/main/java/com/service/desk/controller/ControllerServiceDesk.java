@@ -35,8 +35,8 @@ public class ControllerServiceDesk {
 	}
 	
 	protected void adicionarParametroBase(Map<String, Object> parameters, JRDataSource dataSource) throws IOException {
-	    String PATH_SUBREPORT = getClass().getResource("/relatorios/subreport/").getPath() + "/";
-		parameters.put("SUBREPORT_PATH", PATH_SUBREPORT);
+	    //String PATH_SUBREPORT = getClass().getResource("/relatorios/subreport/").getPath() + "/";
+		//parameters.put("SUBREPORT_PATH", PATH_SUBREPORT);
 		parameters.put("datasource", dataSource);
 	}
 }

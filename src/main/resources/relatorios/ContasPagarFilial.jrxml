@@ -58,7 +58,7 @@
 					<subreportParameterExpression><![CDATA[$P{DATASOURCE_MESES}]]></subreportParameterExpression>
 				</subreportParameter>
 				<dataSourceExpression><![CDATA[$P{DATASOURCE_MESES}]]></dataSourceExpression>
-				<subreportExpression><![CDATA[$P{SUBREPORT_PATH} + "ContasPagarMes.jasper"]]></subreportExpression>
+				<subreportExpression><![CDATA["relatorios/subreport/ContasPagarMes.jasper"]]></subreportExpression>
 			</subreport>
 		</band>
 		<band height="30" splitType="Stretch">

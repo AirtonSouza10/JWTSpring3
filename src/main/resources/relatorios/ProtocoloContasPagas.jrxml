@@ -70,7 +70,7 @@
 					<subreportParameterExpression><![CDATA[$P{DATASOURCE_TIPOS}]]></subreportParameterExpression>
 				</subreportParameter>
 				<dataSourceExpression><![CDATA[$P{DATASOURCE_TIPOS}]]></dataSourceExpression>
-				<subreportExpression><![CDATA[$P{SUBREPORT_PATH} + "ContasPagarProtocolo.jasper"]]></subreportExpression>
+				<subreportExpression><![CDATA["relatorios/subreport/ContasPagarProtocolo.jasper"]]></subreportExpression>
 			</subreport>
 		</band>
 	</detail>

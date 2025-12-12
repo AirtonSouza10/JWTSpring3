@@ -33,7 +33,7 @@ public class SecurityConfigurations {
                     config.setAllowCredentials(true);
                     config.setAllowedOrigins(List.of(
                     	    "http://localhost:4200",
-                    	    "https://base-front-1-0.onrender.com"
+                    	    "http://72.60.145.162"
                     	));
                     config.setAllowedHeaders(List.of("*"));
                     config.setAllowedMethods(List.of("*"));

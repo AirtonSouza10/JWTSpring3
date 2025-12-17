@@ -41,4 +41,10 @@ public interface NotaFiscalService {
 	List<ParcelaPrevistaNotaResponseDTO> listarParcelasPrevistasPorNota(Long notaId);
 
 	Page<ParcelaPrevistaResponseDTO> listarParcelasPrevistasPaginadas(Pageable pageable);
+
+	ParcelaPrevistaResponseDTO buscarParcelaPrevistaPorId(Long parcelaId);
+
+	void excluirParcelaPrevista(Long parcelaId);
+
+	Long converterParcelasPrevistasEmDuplicata(Long notaId);
 }

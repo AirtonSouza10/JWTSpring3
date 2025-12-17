@@ -221,4 +221,28 @@ public class NotaFiscalController extends ControllerServiceDesk{
         return new ResponseServiceDesk(parcelas);
     }
 
+    @Operation(summary = "Buscar parcela prevista por ID")
+    @GetMapping("/parcelas-previstas/{parcelaId}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseServiceDesk buscarParcelaPrevistaPorId(@PathVariable Long parcelaId) {
+        return new ResponseServiceDesk(
+                notaFiscalService.buscarParcelaPrevistaPorId(parcelaId)
+        );
+    }
+    
+    @Operation(summary = "Excluir parcela prevista por ID")
+    @DeleteMapping("/parcelas-previstas/{parcelaId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void excluirParcelaPrevista(@PathVariable Long parcelaId) {
+        notaFiscalService.excluirParcelaPrevista(parcelaId);
+    }
+    
+    @Operation(summary = "Converter parcelas previstas em duplicata")
+    @PostMapping("/{notaId}/converter-duplicata")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseServiceDesk converterParcelasEmDuplicata(@PathVariable Long notaId) {
+        return new ResponseServiceDesk(
+                notaFiscalService.converterParcelasPrevistasEmDuplicata(notaId)
+        );
+    }
 }

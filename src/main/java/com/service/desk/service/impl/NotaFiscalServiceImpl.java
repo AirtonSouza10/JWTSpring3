@@ -1,6 +1,8 @@
 package com.service.desk.service.impl;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -17,7 +19,9 @@ import com.service.desk.dto.NotaFiscalResponseDTO;
 import com.service.desk.dto.ParcelaPrevistaNotaResponseDTO;
 import com.service.desk.dto.ParcelaPrevistaResponseDTO;
 import com.service.desk.dto.ProtocoloContabilidadeResponseDTO;
+import com.service.desk.entidade.Duplicata;
 import com.service.desk.entidade.NotaFiscal;
+import com.service.desk.entidade.Parcela;
 import com.service.desk.entidade.ParcelaPrevistaNota;
 import com.service.desk.enumerator.MensagemEnum;
 import com.service.desk.exceptions.NegocioException;
@@ -29,6 +33,7 @@ import com.service.desk.repository.NotaFiscalRepository;
 import com.service.desk.repository.ParcelaPrevistaNotaRepository;
 import com.service.desk.repository.PessoaRepository;
 import com.service.desk.repository.TipoNotaRepository;
+import com.service.desk.repository.TipoRepository;
 import com.service.desk.service.service.NotaFiscalService;
 import com.service.desk.utils.FuxoCaixaUtils;
 import com.service.desk.utils.UsuarioLogadoUtil;
@@ -56,6 +61,8 @@ public class NotaFiscalServiceImpl implements NotaFiscalService {
 	private FormaPagamentoRepository formaPagamentoRepository;
 	@Autowired
 	private DuplicataRepository duplicataRepository;
+	@Autowired
+	private TipoRepository tipoRepository;
 
     @Override
     public List<NotaFiscalResponseDTO> listarNotasFiscais() {
@@ -596,5 +603,94 @@ public class NotaFiscalServiceImpl implements NotaFiscalService {
                 .dtVencimento(parcela.getDtVencimentoPrevisto())
                 .build());
     }
+    
+    @Override
+    public ParcelaPrevistaResponseDTO buscarParcelaPrevistaPorId(Long parcelaId) {
+
+        ParcelaPrevistaNota parcela = parcelaPrevistaNotaRepository.findById(parcelaId)
+                .orElseThrow(() -> new RuntimeException("Parcela prevista não encontrada"));
+
+        return ParcelaPrevistaResponseDTO.builder()
+                .id(parcela.getId())
+                .numeroParcela(parcela.getNumeroParcela())
+                .dtVencimento(parcela.getDtVencimentoPrevisto())
+                .valor(parcela.getValorPrevisto())
+                .notaFiscalId(parcela.getNotaFiscal().getId())
+                .numeroNota(parcela.getNotaFiscal().getNumero())
+                .build();
+    }
+    
+    @Override
+    @Transactional
+    public void excluirParcelaPrevista(Long parcelaId) {
+
+        ParcelaPrevistaNota parcela = parcelaPrevistaNotaRepository.findById(parcelaId)
+                .orElseThrow(() -> new NegocioException("Parcela prevista não encontrada"));
+
+        parcelaPrevistaNotaRepository.delete(parcela);
+    }
+    
+    @Override
+    @Transactional
+    public Long converterParcelasPrevistasEmDuplicata(Long notaId) {
+    	
+    	var parcelaPrevista = parcelaPrevistaNotaRepository.findById(notaId).orElseThrow();
+
+        NotaFiscal nota = notaFiscalRepository.findById(parcelaPrevista.getNotaFiscal().getId())
+                .orElseThrow(() -> new NegocioException(MensagemEnum.MSGE010.getKey()));
+
+        if (nota.getDuplicata() != null) {
+            throw new NegocioException("Nota já possui duplicata vinculada");
+        }
+
+        List<ParcelaPrevistaNota> parcelasPrevistas =
+                parcelaPrevistaNotaRepository.findByNotaFiscalId(nota.getId());
+
+        if (parcelasPrevistas.isEmpty()) {
+            throw new NegocioException("Nota não possui parcelas previstas");
+        }
+
+        var valorTotal = parcelasPrevistas.stream()
+                .map(ParcelaPrevistaNota::getValorPrevisto)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        
+        var tipo = tipoRepository.findById(1l).orElseThrow();
+
+        Duplicata duplicata = Duplicata.builder()
+                .descricao(nota.getNumero())
+                .valor(valorTotal)
+                .valorTotal(valorTotal)
+                .dtCriacao(LocalDate.now())
+                .fornecedor(nota.getFornecedor())
+                .filial(nota.getFilial())
+                .formaPagamento(nota.getFormaPagamento())
+                .tipo(tipo)
+                .parcelas(new ArrayList<>())
+                .notasFiscais(new ArrayList<>())
+                .build();
+
+        duplicataRepository.save(duplicata);
+
+        for (ParcelaPrevistaNota prevista : parcelasPrevistas) {
+
+            Parcela parcela = Parcela.builder()
+                    .numeroParcela(nota.getNumero() + " - " + prevista.getNumeroParcela())
+                    .valorTotal(prevista.getValorPrevisto())
+                    .dtVencimento(prevista.getDtVencimentoPrevisto())
+                    .dtCriacao(LocalDate.now())
+                    .duplicata(duplicata)
+                    .build();
+
+            duplicata.getParcelas().add(parcela);
+        }
+
+        nota.setDuplicata(duplicata);
+        duplicata.getNotasFiscais().add(nota);
+
+        parcelaPrevistaNotaRepository.deleteAll(parcelasPrevistas);
+
+        return duplicata.getId();
+    }
+
 
 }

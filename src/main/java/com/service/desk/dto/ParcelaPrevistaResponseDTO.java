@@ -11,7 +11,10 @@ import lombok.Data;
 @Builder
 @AllArgsConstructor
 public class ParcelaPrevistaResponseDTO {
+	private Long id;
     private String numeroNota;
+	private String numeroParcela;
     private BigDecimal valor;
     private LocalDate dtVencimento;
+    private Long notaFiscalId;
 }

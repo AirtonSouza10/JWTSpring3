@@ -117,7 +117,9 @@ public class NotaFiscalServiceImpl implements NotaFiscalService {
 
         if (numero != null && fornecedorId != null) {
             page = notaFiscalRepository.findByNumeroContainingAndFornecedorId(numero, fornecedorId, pageableOrdenado);
-        } else {
+        }else if(numero != null && Objects.isNull(fornecedorId)) {
+        	page = notaFiscalRepository.findByNumeroContainingIgnoreCase(numero, pageableOrdenado);
+        }else {
             page = notaFiscalRepository.findAll(pageableOrdenado);
         }
         

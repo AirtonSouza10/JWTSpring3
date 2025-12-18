@@ -23,6 +23,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -164,9 +165,13 @@ public class DuplicataServiceImpl implements DuplicataService {
     
     @Override   
     public Page<DuplicataResponseDTO> listarDuplicatasPaginadas(int pagina, int tamanho) {
-
-        Pageable pageable = PageRequest.of(pagina, tamanho);
-        Page<Duplicata> duplicatasPage = duplicataRepository.findAll(pageable);
+    	Pageable pageable = PageRequest.of(pagina, tamanho);
+        Pageable pageableOrdenado = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                Sort.by(Sort.Direction.DESC, "id")
+        );
+        Page<Duplicata> duplicatasPage = duplicataRepository.findAll(pageableOrdenado);
 
         return duplicatasPage.map(d -> {
 
@@ -366,6 +371,7 @@ public class DuplicataServiceImpl implements DuplicataService {
                     NotaFiscal nf = notaFiscalRepository.findById(nfDto.getId()).orElseThrow();
                     if (!CollectionUtils.isEmpty(nf.getParcelasPrevistas())) {
                     	parcelaPrevistaNotaRepository.deleteAll(nf.getParcelasPrevistas());
+                    	nf.getParcelasPrevistas().clear();
                     }
                     nf.setDuplicata(duplicata);
                     return nf;
